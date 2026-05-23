@@ -1,0 +1,116 @@
+// Faste markører: forskningsstation, gletsjere, AWS-vejrstationer, byer.
+// Genererer tre Leaflet layer-groups som UI-laget bruger.
+
+import { map } from './map.js';
+
+function makeIcon(cls, size = 18) {
+  return L.divIcon({
+    className: cls,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+  });
+}
+
+const stationLocations = {
+  sermilik: {
+    coords: [65.680864, -37.916071],
+    title: 'Sermilik Forskningsstation',
+    html: `<h3>Sermilik Forskningsstation</h3>
+      <p><b>65°40.85′N · 37°54.96′W</b> · KU/IGN-feltstation siden 1970</p>
+      <p>Hovedhus 60 m² (3 forskerværelser, opholdsrum), arbejdsbygning 50 m²,
+         annex på nunatak 515 m.o.h. nær Mittivakkats ligevægtslinje.
+         Plads til 6–10 forskere.</p>
+      <p><a href="https://ign.ku.dk/english/field-stations/sermilik-station/" target="_blank">Stationsside →</a></p>`,
+    icon: 'marker-station',
+    size: 22,
+  },
+  mittivakkat: {
+    coords: [65.69, -37.85],
+    title: 'Mittivakkat Gletsjer',
+    html: `<h3>Mittivakkat Gletsjer</h3>
+      <p>Lille lokal iskappe — ~15.8 km², elevation 160–880 m.o.h. Fokuspunkt for
+         forskning siden 1933 (Knud Rasmussens ekspedition). Massebalancemålinger
+         siden midten af 1980'erne — en af de længste serier i Arktis.</p>
+      <p>Markant tilbagetrækning siden Den Lille Istid. Ligevægtslinje ca. 515 m.o.h.</p>`,
+    icon: 'marker-glacier',
+    size: 16,
+  },
+  mit_b: {
+    coords: [65.674, -37.838],
+    title: 'PROMICE AWS — MIT_B',
+    html: `<h3>PROMICE AWS: MIT_B (Mittivakkat bedrock)</h3>
+      <p>Automatisk vejrstation på fjeld nær Mittivakkat-gletsjeren (GEUS/KU).
+         Måler temperatur, RH, vind, stråling og overfladeenergibalance.</p>
+      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws_l3_station_csv/level_3/MIT_B/MIT_B_hour.csv" target="_blank">Hent CSV (timedata) →</a></p>
+      <p><a href="https://promice.org/" target="_blank">Live-oversigt →</a></p>`,
+    icon: 'marker-aws',
+    size: 14,
+  },
+  ser_b: {
+    coords: [65.66, -38.155],
+    title: 'PROMICE AWS — SER_B',
+    html: `<h3>PROMICE AWS: SER_B (Sermilik bedrock)</h3>
+      <p>Vejrstation ved kysten nær feltstationen. Lavpunkt i højdegradienten
+         SER_B → MIT_B (515 m). Ideel reference for energibalance og temperaturinversioner.</p>
+      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws_l3_station_csv/level_3/SER_B/SER_B_hour.csv" target="_blank">Hent CSV (timedata) →</a></p>`,
+    icon: 'marker-aws',
+    size: 14,
+  },
+  mit: {
+    coords: [65.69, -37.83],
+    title: 'PROMICE AWS — MIT (på gletsjer)',
+    html: `<h3>PROMICE AWS: MIT (Mittivakkat ablationszone)</h3>
+      <p>Station <em>på</em> gletsjeren, etableret 3. maj 2009. ~440 m.o.h.
+         Måler ablation/akkumulation i ablationszonen.</p>
+      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws_l3_station_csv/level_3/MIT/MIT_hour.csv" target="_blank">Hent CSV (timedata) →</a></p>`,
+    icon: 'marker-aws',
+    size: 14,
+  },
+  tasiilaq: {
+    coords: [65.6145, -37.6368],
+    title: 'Tasiilaq',
+    html: `<h3>Tasiilaq (Ammassalik)</h3>
+      <p>Østgrønlands største by, ca. 1700 indbyggere. ~15 km sydøst for Sermilik feltstation.</p>
+      <p>Vandkraftværk (1,2 MW siden 2004), affaldshåndtering, museum, fiskefabrik.
+         Blomsterdalen — kort vandring fra byen.</p>`,
+    icon: 'marker-town',
+    size: 18,
+  },
+  kulusuk: {
+    coords: [65.5733, -37.1236],
+    title: 'Kulusuk Lufthavn',
+    html: `<h3>Kulusuk</h3>
+      <p>Ankomst- og afrejselufthavn fra Island. Lille bygd; oprindelig amerikansk DEW-line radarstation.</p>`,
+    icon: 'marker-town',
+    size: 16,
+  },
+  helheim: {
+    coords: [66.35, -38.20],
+    title: 'Helheim Gletsjer',
+    html: `<h3>Helheim Gletsjer</h3>
+      <p>Stor udløbsgletsjer fra Indlandsisen — leverer kalvende isbjerge til Sermilik Fjord.
+         Et af Grønlands mest aktive og velmonitorerede gletsjersystemer.</p>
+      <p>Synlig fra fjorden under sejlads.</p>`,
+    icon: 'marker-glacier',
+    size: 18,
+  },
+};
+
+export const stationsLayer = L.layerGroup();
+export const awsLayer = L.layerGroup();
+export const townsLayer = L.layerGroup();
+
+Object.entries(stationLocations).forEach(([key, s]) => {
+  const m = L.marker(s.coords, { icon: makeIcon(s.icon, s.size), title: s.title })
+    .bindPopup(s.html);
+  if (key === 'mit_b' || key === 'ser_b' || key === 'mit') awsLayer.addLayer(m);
+  else if (key === 'tasiilaq' || key === 'kulusuk') townsLayer.addLayer(m);
+  else stationsLayer.addLayer(m);
+});
+
+stationsLayer.addTo(map);
+awsLayer.addTo(map);
+townsLayer.addTo(map);
+
+// Brugt af tools.js til at lave divIcon for tegnede pins
+export { makeIcon };

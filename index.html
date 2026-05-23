@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sermilik feltstation — Validation-GIS</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<header>
+  <h1>Sermilik feltstation — Validation-GIS</h1>
+  <div class="meta">65°41′N · 37°55′W · Ammassalik Ø, Østgrønland</div>
+</header>
+
+<div id="app">
+  <button id="toggle-panel">☰ Kortlag</button>
+
+  <aside id="panel">
+    <p class="intro">
+      Tematisk kort til feltarbejde og on-ground-validation omkring Mittivakkat-gletsjeren
+      og Sermilik feltstation. Tænd og sluk lag efter undervisningstema. Klik på markører
+      for kontekst og direkte links til realtidsdata.
+    </p>
+
+    <h2>Baggrundskort</h2>
+    <div class="layer-group" id="basemaps"></div>
+
+    <h2>Lokaliteter</h2>
+    <div class="layer-group" id="poi-layers"></div>
+
+    <h2>Spektrale lag (Sentinel-2 bånd)</h2>
+
+    <div id="sh-config" class="connected">
+      <div class="sh-status-row">
+        <span class="status ok">✓ Sentinel Hub-instance forbundet</span>
+        <button type="button" id="sh-toggle-edit" class="link-btn">skift instance</button>
+      </div>
+      <div id="sh-instance-edit" style="display:none;">
+        <input type="text" id="sh-instance-input" placeholder="indsæt instance ID (UUID)">
+        <button id="sh-save-btn">Gem</button>
+      </div>
+    </div>
+
+    <div id="sh-dates">
+      <strong>📅 Vælg tidsperiode</strong>
+
+      <div class="mode-toggle">
+        <button type="button" data-mode="range" class="active">Periode (mosaik)</button>
+        <button type="button" data-mode="single">Specifik dato</button>
+      </div>
+
+      <div id="mode-range">
+        <div class="date-row">
+          <label for="sh-from">Fra</label>
+          <input type="date" id="sh-from">
+        </div>
+        <div class="date-row">
+          <label for="sh-to">Til</label>
+          <input type="date" id="sh-to">
+        </div>
+        <div class="presets">
+          <button data-preset="latest-summer">Sidste sommer</button>
+          <button data-preset="this-summer">I sommer</button>
+          <button data-preset="winter">Vinter '24</button>
+          <button data-preset="full-2024">Hele 2024</button>
+          <button data-preset="full-2020">Hele 2020</button>
+        </div>
+        <p class="hint">Mosaik af alle scener i perioden under skytærsklen. Bedst til års-sammenligning og oversigt.</p>
+      </div>
+
+      <div id="mode-single" style="display:none;">
+        <div class="date-row">
+          <label for="sh-target">Dato</label>
+          <input type="date" id="sh-target">
+        </div>
+        <div class="scrub-row">
+          <button type="button" data-scrub="-30" title="−1 måned">«</button>
+          <button type="button" data-scrub="-7" title="−1 uge">‹‹</button>
+          <button type="button" data-scrub="-1" title="−1 dag">‹</button>
+          <button type="button" data-scrub="1" title="+1 dag">›</button>
+          <button type="button" data-scrub="7" title="+1 uge">››</button>
+          <button type="button" data-scrub="30" title="+1 måned">»</button>
+        </div>
+        <div class="tolerance-row">
+          <label for="sh-tolerance">Tolerance ±</label>
+          <input type="range" id="sh-tolerance" min="0" max="14" value="3" step="1">
+          <span class="val" id="sh-tolerance-val">3 dage</span>
+        </div>
+        <p class="hint">Vælg én dato. WMS leverer den scene som er nærmest datoen og ligger inden for tolerance + skytærskel. Lavere tolerance = præcisere, højere = bedre chance for at finde en scene.</p>
+      </div>
+
+      <div class="maxcc-row">
+        <label for="sh-maxcc">Max sky %</label>
+        <input type="range" id="sh-maxcc" min="0" max="100" value="30" step="1">
+        <span class="val" id="sh-maxcc-val">30%</span>
+      </div>
+    </div>
+
+    <div class="layer-group" id="spectral-layers" style="margin-top: 0.7rem;"></div>
+
+    <h2>Glaciologiske indekser</h2>
+    <p style="font-size:0.78rem; color:#555; margin: 0 0 0.4rem;">
+      Beregnet on-the-fly af satellitens råbånd via custom evalscript.
+      Kræver Sentinel Hub-instance forbundet ovenfor. Bruger samme tidsperiode og skytærskel.
+    </p>
+    <div class="layer-group" id="glacial-layers"></div>
+
+    <h2>Termiske lag (Landsat 30 m)</h2>
+    <p style="font-size:0.78rem; color:#555; margin: 0 0 0.4rem;">
+      Brightness temperature fra Landsat 8/9 TIRS bånd 10 (~11 μm). Bemærk: revisit ~8 dage —
+      ved <em>Specifik dato</em>-mode bør tolerancen være mindst 8-10 dage for at finde en scene.
+    </p>
+    <div class="layer-group" id="thermal-layers"></div>
+
+    <h2>Geologi</h2>
+    <div class="layer-group" id="geology-layers"></div>
+
+    <h2>Terræn & relief</h2>
+    <div class="layer-group" id="terrain-layers"></div>
+
+    <div class="external-links">
+      <h2 style="margin-top:0;">Eksterne kilder</h2>
+      <a href="https://promice.org/" target="_blank">PROMICE realtidsdata fra AWS</a>
+      <a href="https://thredds.geus.dk/thredds/catalog/catalog.html" target="_blank">GEUS THREDDS datakatalog</a>
+      <a href="https://maps.greenmin.gl/geusmap/?mapname=greenland_portal&lang=en" target="_blank">Greenland Mineral Resources Portal</a>
+      <a href="https://ign.ku.dk/english/field-stations/sermilik-station/" target="_blank">Sermilik Station (KU)</a>
+      <a href="https://eu-interact.org/field-sites/sermilik-research-station/" target="_blank">INTERACT — Sermilik feltsite</a>
+      <a href="https://www.glims.org/maps/glims" target="_blank">GLIMS Glacier Database</a>
+      <a href="https://www.pgc.umn.edu/data/arcticdem/" target="_blank">ArcticDEM (PGC) — kildedata</a>
+      <a href="https://polarportal.dk/" target="_blank">Polar Portal (DMI) — masse-balance & havis</a>
+    </div>
+  </aside>
+
+  <div id="map"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>

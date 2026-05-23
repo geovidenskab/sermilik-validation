@@ -1,0 +1,16 @@
+.DS_Store
+node_modules/
+dist/
+.vscode/
+.idea/
+
+# Secrets — disse må ALDRIG committes
+*.env
+*.env.local
+credentials.json
+.credentials/
+*-credentials.json
+
+# Build artefakter
+*.log
+.cache/
