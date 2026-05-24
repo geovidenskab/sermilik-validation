@@ -141,17 +141,14 @@ const spectralLayerDefs = [
 const glacialLayerDefs = [
   { id: 'NDSI', name: 'NDSI — sne / firn / bar is',
     desc: 'Normalized Difference Snow Index, (B3−B11)/(B3+B11). Hvid = ren sne, lyseblå = firn, gul/orange = bar is, brun = jord/debris. Brug juli-september for tydeligst kontrast.',
-    teach: 'Det videnskabelige standardindeks til sne/is-adskillelse. Eleverne kan se ligevægtslinjen som en farvegrænse op ad gletsjeren — Mittivakkats ligger ca. 515 m.o.h.',
     evalscript: NDSI_EVALSCRIPT,
   },
   { id: 'ALBEDO', name: 'Albedo (broadband shortwave)',
     desc: 'Liang-formel fra B2, B4, B8, B11, B12. Mørk lilla = lav albedo (mørk is, smelt-intens), orange = bar is, gul = firn, hvid = frisk sne. Faldende albedo over sommeren = stigende smelte.',
-    teach: 'Kvantitativ smelte-intensitet. Sammenlign juli og september for samme år: albedoen falder når sneen smelter væk fra ablationszonen og blotter mørkere is. Kobl til energibalance fra MIT_B-stationen.',
     evalscript: ALBEDO_EVALSCRIPT,
   },
   { id: 'NDWI_LAKES', name: 'NDWI — smeltesøer',
     desc: 'McFeeters NDWI, (B3−B8)/(B3+B8). Mørkblå = dybt vand/sø, lyseblå = lavt eller fugtigt. Resten transparent — lægges som overlay på baggrundskort.',
-    teach: 'Lokalisér smeltesøer på gletsjeroverflade og i forland. Tæl, mål areal, sammenlign mellem år for at vise hydrologisk udvikling.',
     evalscript: NDWI_EVALSCRIPT,
   },
 ];
@@ -159,12 +156,10 @@ const glacialLayerDefs = [
 const thermalLayerDefs = [
   { id: 'LANDSAT_LST_FULL', name: 'Landsat overfladetemperatur (−30 → +20 °C)',
     desc: 'Brightness temperature fra TIRS bånd 10. Bred farveramme — virker hele året. Bemærk: ikke atmosfærisk korrigeret (L1) — kan afvige 2-5 °C fra ægte overfladetemperatur i fugtig luft.',
-    teach: 'Find opvarmede områder — bare fjeldsider, mørk is, smeltesøer. Sammenlign direkte med albedo-laget: lav albedo = høj overfladetemperatur i sollys (eleverne ser strålingsbalance i praksis).',
     evalscript: LANDSAT_LST_FULL_EVALSCRIPT,
   },
   { id: 'LANDSAT_LST_SUMMER', name: 'Landsat sommer-temperatur (−5 → +16 °C)',
     desc: 'Samme datakilde med smal farveramme tilpasset sommerforhold. Tydeligt skift fra lyseblå til gul ved 0 °C — frysepunktslinjen.',
-    teach: 'Brug i juli-august på Mittivakkat. Frysepunktslinjen viser hvor smelte aktivt sker. Sammenlign over en sæson: ligger 0 °C-grænsen højere op ad gletsjeren i august end i juni?',
     evalscript: LANDSAT_LST_SUMMER_EVALSCRIPT,
   },
 ];
@@ -259,7 +254,6 @@ function buildGlacialLayers() {
     label.innerHTML = `
       <div class="name">${def.name}</div>
       <div class="desc">${def.desc}</div>
-      ${def.teach ? `<div class="teach">${def.teach}</div>` : ''}
     `;
     wrap.appendChild(input);
     wrap.appendChild(label);
@@ -314,7 +308,6 @@ function buildThermalLayers() {
     label.innerHTML = `
       <div class="name">${def.name}</div>
       <div class="desc">${def.desc}</div>
-      ${def.teach ? `<div class="teach">${def.teach}</div>` : ''}
     `;
     wrap.appendChild(input);
     wrap.appendChild(label);
