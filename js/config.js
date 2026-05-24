@@ -123,4 +123,7 @@ function evaluatePixel(s){
   return[c[0],c[1],c[2],s.dataMask];
 }`;
 
-export const LANDSAT_TIRS_LAYER = 'TIRSL1';
+// VIGTIGT: Layer-navnet skal matche hvad Sentinel Hub-instance faktisk har konfigureret.
+// Tjek med: curl '<WMS_URL>?service=WMS&request=GetCapabilities&version=1.1.1' | grep '<Name>'
+// I instance b05a8d55... hedder Landsat-laget 'LANDSAT-TIRS' (ikke 'TIRSL1').
+export const LANDSAT_TIRS_LAYER = 'LANDSAT-TIRS';
