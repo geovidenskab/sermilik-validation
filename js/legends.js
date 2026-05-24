@@ -138,41 +138,6 @@ export const LEGENDS = {
     ],
   },
 
-  GEOLOGY: {
-    title: 'Geology composite',
-    type: 'rgb-bands',
-    bands: { red: 'B12 (SWIR-2, 2190 nm)', green: 'B11 (SWIR-1, 1610 nm)', blue: 'B2 (blå)' },
-    description: 'Fremhæver mineralforskelle. Jernoxider rødlige, lerlignelige toner i grøn/cyan.',
-  },
-
-  SWIR: {
-    title: 'SWIR composite',
-    type: 'rgb-bands',
-    bands: { red: 'B12 (SWIR-2)', green: 'B8A (NIR-narrow)', blue: 'B4 (rød)' },
-    description: 'Adskiller sne, is, vand og bare overflader. Sne = lyseblå, vand = sort, vegetation = grøn.',
-  },
-
-  ATMOSPHERIC_PENETRATION: {
-    title: 'Atmospheric Penetration',
-    type: 'rgb-bands',
-    bands: { red: 'B12 (SWIR-2)', green: 'B11 (SWIR-1)', blue: 'B8A (NIR-narrow)' },
-    description: 'Reducerer atmosfærisk slør. Godt ved svag dis.',
-  },
-
-  BATHYMETRIC: {
-    title: 'Bathymetric composite',
-    type: 'rgb-bands',
-    bands: { red: 'B4 (rød)', green: 'B3 (grøn)', blue: 'B1 (kystaerosol)' },
-    description: 'Forstærker undervands-relief i lavvandede områder.',
-  },
-
-  COLOR_INFRARED__URBAN_: {
-    title: 'False Color (urban)',
-    type: 'rgb-bands',
-    bands: { red: 'B12 (SWIR-2)', green: 'B11 (SWIR-1)', blue: 'B4 (rød)' },
-    description: 'Anden falsk-farve-variant. God til at adskille bart fjeld fra dækkede områder.',
-  },
-
   // ─── Terræn — ArcticDEM ──────────────────────────────────────────────────────
   arcticdem_tinted: {
     title: 'ArcticDEM tonet efter højde',

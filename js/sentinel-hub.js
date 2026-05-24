@@ -136,11 +136,6 @@ const spectralLayerDefs = [
   { id: 'COLOR_INFRARED', name: 'Color Infrared (B8-B4-B3)', desc: 'Vegetation lyser rødt. Pioneer-planter på morænerne fra Lille Istid bliver tydelige.' },
   { id: 'VEGETATION_INDEX', name: 'NDVI — vegetationsindeks', desc: 'Grønt = vegetation. Kvantificér prograderede områder siden Mittivakkats tilbagetrækning.' },
   { id: 'MOISTURE_INDEX', name: 'Moisture Index (B8A-B11)', desc: 'Fugtighed i terrænet — finder smelteområder og våde overflader.' },
-  { id: 'GEOLOGY', name: 'Geology composite (B12-B11-B2)', desc: 'Fremhæver mineralforskelle og bjergartstyper. Supplement til GEUS\' geologiske kort.' },
-  { id: 'SWIR', name: 'SWIR (B12-B8A-B4)', desc: 'Kortbølget infrarød — adskiller is, vand, sne og bare jordoverflader.' },
-  { id: 'ATMOSPHERIC_PENETRATION', name: 'Atmospheric Penetration (B12-B11-B8A)', desc: 'Reducerer atmosfærisk slør — godt til klar visning ved svag dis.' },
-  { id: 'BATHYMETRIC', name: 'Bathymetric', desc: 'Lavvandede områder i fjorden — undervands-relief tæt på kysten.' },
-  { id: 'COLOR_INFRARED__URBAN_', name: 'False Color (urban)', desc: 'Anden falsk-farve-variant. God til at adskille bart fjeld fra dækkede områder.' },
 ];
 
 const glacialLayerDefs = [
