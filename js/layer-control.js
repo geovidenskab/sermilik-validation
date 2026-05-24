@@ -2,7 +2,6 @@
 
 import { map, basemaps, setActiveBasemap } from './map.js';
 import { stationsLayer, awsLayer, townsLayer } from './markers.js';
-import { geusBedrock500k, geusLithologies, geusMinerals, geusOblique } from './geus.js';
 import { arcticDemHillshade, arcticDemTinted, arcticDemSlope, esriHillshade } from './arcticdem.js';
 
 const layerDefs = [
@@ -20,12 +19,6 @@ const layerDefs = [
   { group: 'poi-layers', id: 'stations', name: '🏠 Forskningsstation & gletsjere', desc: 'Sermilik feltstation, Mittivakkat- og Helheim-gletsjeren.', teach: 'Anker for hele turen — start her når du planlægger ruter eller forklarer geografien.', layer: stationsLayer, on: true },
   { group: 'poi-layers', id: 'aws', name: '📡 PROMICE vejrstationer', desc: 'AWS MIT_B (fjeld), MIT (på gletsjer), SER_B (kyst). Klik for direkte CSV-link til timedata fra GEUS THREDDS.', teach: 'Lad eleverne hente CSV og plotte temperatur eller stråling over en uge — ægte arktisk data.', layer: awsLayer, on: true },
   { group: 'poi-layers', id: 'towns', name: '🏘️ Tasiilaq & Kulusuk', desc: 'By og lufthavn. Logistik-noter i popups.', teach: 'Brug til samtaler om mennesker, klimaforandringer og samfund i Østgrønland.', layer: townsLayer, on: true },
-
-  // Geologi
-  { group: 'geology-layers', id: 'bedrock_500k', name: 'Bjerggrund 1:500.000 (M4EU/GEUS)', desc: 'Grundfjeldsgeologi som WMS — verificeret layer fra Greenmin Portal.', teach: 'Ammassalik er overvejende prækambrisk grundfjeld — brug laget til at vise sammenhæng mellem fjeldtyper og landskab.', layer: geusBedrock500k },
-  { group: 'geology-layers', id: 'lithologies', name: 'Litologier (Grønland)', desc: 'Stedlige bjerg- og aflejringstyper, vektor.', teach: 'Detaljer der bærer feltobservationer: hvad er stenen vi står på? Klik for at læse litologien direkte.', layer: geusLithologies },
-  { group: 'geology-layers', id: 'minerals', name: 'Mineralforekomster', desc: 'Kendte mineraliseringer i Østgrønland.', teach: 'Indgang til ressourcediskussion — Grønland som råstofland, etik og økonomi.', layer: geusMinerals },
-  { group: 'geology-layers', id: 'oblique', name: 'Skråfoto-dækning (GEUS)', desc: 'Hvor der findes detaljerede skråfotos i GEUS\' arkiv.', teach: 'Inspirerende billedmateriale før turen — find områder med dækning og hent foto fra GEUS-portalen.', layer: geusOblique },
 
   // Terræn & relief
   { group: 'terrain-layers', id: 'arcticdem_hs', name: '🏔️ ArcticDEM hillshade (2 m)', desc: 'Højeste-opløsnings relief over Grønland — Maxar stereopar via PGC.', teach: 'Læg ovenpå Esri Imagery for 1 m farve + 2 m relief. Få eleverne til at finde moræne-rygge og fjordvægge visuelt.', layer: arcticDemHillshade },

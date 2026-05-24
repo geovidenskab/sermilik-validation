@@ -24,9 +24,6 @@ export const SH_DEFAULT_DATES = {
   maxcc: 30,
 };
 
-// ─── GEUS Greenmin ─────────────────────────────────────────────────────────────
-export const GEUS_WMS = 'https://maps.greenmin.gl/geusmap/ows/3857.jsp';
-
 // ─── ArcticDEM ─────────────────────────────────────────────────────────────────
 export const ARCTICDEM_URL = 'https://elevation2.arcgis.com/arcgis/rest/services/Polar/ArcticDEM/ImageServer';
 export const ARCTICDEM_ATTRIB = 'ArcticDEM 2 m © PGC / Maxar (CC BY 4.0)';
