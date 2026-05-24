@@ -25,7 +25,13 @@ export const SH_DEFAULT_DATES = {
 };
 
 // ─── ArcticDEM ─────────────────────────────────────────────────────────────────
-export const ARCTICDEM_URL = 'https://elevation2.arcgis.com/arcgis/rest/services/Polar/ArcticDEM/ImageServer';
+// VIGTIGT (2026-05-24): Esri har nedlagt 'elevation2.arcgis.com'-subdomænet.
+// Det nuværende endpoint hostet via PGC's egen ArcGIS-instans hos AWS:
+//   https://di-pgc.img.arcgis.com/arcgis/rest/services/arcticdem_latest/ImageServer
+// Alternativ direkte fra PGC (lidt ældre):
+//   https://overlord.pgc.umn.edu/arcgis/rest/services/elevation/pgc_arcticdem_mosaics_latest/ImageServer
+// Tjek med: curl '<URL>/?f=json' | python3 -m json.tool
+export const ARCTICDEM_URL = 'https://di-pgc.img.arcgis.com/arcgis/rest/services/arcticdem_latest/ImageServer';
 export const ARCTICDEM_ATTRIB = 'ArcticDEM 2 m © PGC / Maxar (CC BY 4.0)';
 
 // ─── EOX Sentinel-2 cloudless ──────────────────────────────────────────────────
