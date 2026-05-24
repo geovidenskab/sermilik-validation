@@ -15,6 +15,7 @@ import { initSentinelHubUI, setOnLayersChanged } from './sentinel-hub.js';
 import { addToolBar, loadDrawings } from './tools.js';
 import {
   addBasemapBadge, updateBasemapBadge, addLegend, addScaleBar, addCoordReadout, addMobileToggle,
+  addSpectralLegendBox,
 } from './ui.js';
 import { initValidation } from './validation.js';
 
@@ -31,7 +32,8 @@ loadDrawings();
 
 // 4. Kort-overlays (badges, legend, koord-readout, mobile)
 addBasemapBadge();
-addLegend();
+addSpectralLegendBox();   // signaturforklaringer for satellit-lag (stacker når flere er aktive)
+addLegend();              // marker-typer
 addScaleBar();
 addCoordReadout();
 addMobileToggle();

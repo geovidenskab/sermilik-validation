@@ -121,6 +121,80 @@ header .meta { font-size: 0.8rem; opacity: 0.75; }
 .legend .item { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.15rem; }
 .legend .swatch { width: 14px; height: 14px; flex-shrink: 0; }
 
+/* Signaturforklaring-boks for spektrale lag */
+.legend-box {
+  background: rgba(255, 255, 255, 0.97);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  font-size: 0.76rem;
+  line-height: 1.4;
+  max-width: 280px;
+  max-height: 60vh;
+  overflow-y: auto;
+  margin-bottom: 8px;  /* spacing til marker-legend nedenunder */
+}
+.legend-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0A0F3C;
+  color: #fff;
+  padding: 0.35rem 0.6rem;
+  font-weight: 600;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 4px 4px 0 0;
+}
+.legend-box-collapse {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.2rem;
+}
+.legend-box-body { padding: 0.5rem 0.6rem; }
+.legend-item { margin-bottom: 0.8rem; }
+.legend-item:last-child { margin-bottom: 0; }
+.legend-item + .legend-item {
+  padding-top: 0.6rem;
+  border-top: 1px solid #e8eaef;
+}
+.leg-title { font-weight: 600; color: #0A0F3C; margin-bottom: 0.2rem; font-size: 0.78rem; }
+.leg-unit { color: #666; font-size: 0.7rem; font-style: italic; margin-bottom: 0.3rem; }
+.leg-desc { color: #555; font-size: 0.7rem; margin-top: 0.3rem; font-style: italic; line-height: 1.35; }
+.leg-stops { display: flex; flex-direction: column; gap: 1px; }
+.leg-tick { display: flex; align-items: center; gap: 0.35rem; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.72rem; }
+.leg-swatch { display: inline-block; width: 14px; height: 14px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.15); border-radius: 2px; }
+.leg-val { min-width: 36px; font-weight: 600; color: #1a1a1a; }
+.leg-lbl { color: #666; font-size: 0.7rem; }
+.legend-rgb .leg-bands { display: flex; flex-direction: column; gap: 0.15rem; }
+.leg-band { display: flex; align-items: center; gap: 0.3rem; font-size: 0.72rem; }
+.leg-band b { color: #0A0F3C; min-width: 14px; }
+
+/* Transparens-slider per lag */
+.layer-controls-row {
+  margin-top: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  color: #666;
+  padding-left: 0.5rem;
+}
+.layer-opacity-slider {
+  flex: 1;
+  height: 4px;
+  cursor: pointer;
+}
+.layer-opacity-val {
+  font-family: ui-monospace, Menlo, monospace;
+  min-width: 30px;
+  text-align: right;
+}
+
 .basemap-info {
   background: rgba(10, 15, 60, 0.92);
   color: #fff;

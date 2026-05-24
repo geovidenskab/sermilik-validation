@@ -1,8 +1,14 @@
 // UI-controls oven på kortet: basemap-badge, legend, scalebar, koordinat-readout,
-// mobile panel-toggle.
+// mobile panel-toggle, signaturforklaringer (legends).
 
 import { map, state as mapState } from './map.js';
 import { activeSpectralIds, activeGlacialIds, activeThermalIds, getShDates, getShTimeRange } from './sentinel-hub.js';
+import { renderLegend } from './legends.js';
+
+// Sæt af lag-ID'er der har en signaturforklaring vist på kortet. Eksporteres
+// så layer-control.js kan tilføje/fjerne ID'er når brugeren toggle'r lag.
+export const activeLegendLayers = new Set();
+let legendBoxEl = null;
 
 const basemapInfo = {
   esri: { label: 'Baggrund: Esri Imagery', value: 'Variable datoer', note: 'Mosaik fra forskellige år (Maxar). Brug Sentinel-2 hvis dato er kritisk.' },
@@ -70,6 +76,50 @@ export function addLegend() {
     return div;
   };
   legend.addTo(map);
+}
+
+// ─── Signaturforklaring (legends) — vises når satellit-lag er aktive ─────────
+export function addSpectralLegendBox() {
+  const ctrl = L.control({ position: 'bottomright' });
+  ctrl.onAdd = function () {
+    const div = L.DomUtil.create('div', 'legend-box');
+    div.id = 'legend-box';
+    L.DomEvent.disableClickPropagation(div);
+    L.DomEvent.disableScrollPropagation(div);
+    legendBoxEl = div;
+    return div;
+  };
+  ctrl.addTo(map);
+  updateLegendBox();
+}
+
+export function updateLegendBox() {
+  if (!legendBoxEl) return;
+  if (activeLegendLayers.size === 0) {
+    legendBoxEl.style.display = 'none';
+    return;
+  }
+  const items = Array.from(activeLegendLayers).map(id => renderLegend(id)).filter(Boolean);
+  if (items.length === 0) {
+    legendBoxEl.style.display = 'none';
+    return;
+  }
+  legendBoxEl.style.display = 'block';
+  legendBoxEl.innerHTML = `
+    <div class="legend-box-header">
+      <span>Signaturforklaring</span>
+      <button type="button" class="legend-box-collapse" title="Skjul/vis">−</button>
+    </div>
+    <div class="legend-box-body">${items.join('')}</div>
+  `;
+  // Bind collapse-toggle
+  const btn = legendBoxEl.querySelector('.legend-box-collapse');
+  const body = legendBoxEl.querySelector('.legend-box-body');
+  btn.addEventListener('click', () => {
+    const hidden = body.style.display === 'none';
+    body.style.display = hidden ? 'block' : 'none';
+    btn.textContent = hidden ? '−' : '+';
+  });
 }
 
 export function addScaleBar() {

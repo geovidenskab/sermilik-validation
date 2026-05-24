@@ -13,6 +13,57 @@ import {
   LANDSAT_LST_FULL_EVALSCRIPT, LANDSAT_LST_SUMMER_EVALSCRIPT,
   LANDSAT_TIRS_LAYER,
 } from './config.js';
+import { activeLegendLayers, updateLegendBox } from './ui.js';
+
+const OPACITY_LS_KEY = 'sermilik_layer_opacity';
+function loadOpacities() {
+  try { return JSON.parse(localStorage.getItem(OPACITY_LS_KEY) || '{}'); }
+  catch { return {}; }
+}
+function saveOpacities(o) {
+  try { localStorage.setItem(OPACITY_LS_KEY, JSON.stringify(o)); } catch {}
+}
+const opacities = loadOpacities();
+
+// Default opacities: spektrale 100%, glaciologiske 70% (de er overlays), thermal 70%
+const DEFAULT_OPACITY = {
+  spectral: 1.0,
+  glacial: 0.7,
+  thermal: 0.75,
+};
+
+function getOpacity(id, category) {
+  if (id in opacities) return opacities[id];
+  return DEFAULT_OPACITY[category] ?? 1.0;
+}
+
+function setOpacity(id, v, layer) {
+  opacities[id] = v;
+  saveOpacities(opacities);
+  if (layer && typeof layer.setOpacity === 'function') layer.setOpacity(v);
+}
+
+// Lille slider-row HTML der tilføjes per lag
+function makeOpacityRow(id, category, layer, hidden) {
+  const row = document.createElement('div');
+  row.className = 'layer-controls-row';
+  row.style.display = hidden ? 'none' : 'flex';
+  const pct = Math.round(getOpacity(id, category) * 100);
+  row.innerHTML = `
+    <span>Transparens</span>
+    <input type="range" class="layer-opacity-slider" min="0" max="100" value="${pct}" step="5">
+    <span class="layer-opacity-val">${pct}%</span>
+  `;
+  const slider = row.querySelector('input');
+  const valSpan = row.querySelector('.layer-opacity-val');
+  slider.addEventListener('input', e => {
+    const v = parseInt(e.target.value, 10);
+    valSpan.textContent = v + '%';
+    setOpacity(id, v / 100, layer);
+  });
+  L.DomEvent.disableClickPropagation(row);
+  return row;
+}
 
 let SH_INSTANCE_ID = localStorage.getItem(SH_LS_KEY) || SH_DEFAULT_INSTANCE_ID;
 let shDates = { ...SH_DEFAULT_DATES, ...(JSON.parse(localStorage.getItem(SH_DATE_LS_KEY) || '{}')) };
@@ -148,6 +199,7 @@ function buildSpectralLayers() {
   spectralLayerDefs.forEach(def => {
     const layer = shWMS(def.id);
     spectralLayers[def.id] = layer;
+    if (layer) layer.setOpacity(getOpacity(def.id, 'spectral'));
 
     const wrap = document.createElement('label');
     wrap.className = 'layer';
@@ -159,13 +211,25 @@ function buildSpectralLayers() {
     label.innerHTML = `<div class="name">${def.name}</div><div class="desc">${def.desc}</div>`;
     wrap.appendChild(input);
     wrap.appendChild(label);
+    const opacityRow = makeOpacityRow(def.id, 'spectral', layer, !input.checked);
+    wrap.appendChild(opacityRow);
     container.appendChild(wrap);
 
-    if (input.checked) { layer.addTo(map); activeSpectralIds.add(def.id); }
+    if (input.checked) {
+      layer.addTo(map);
+      activeSpectralIds.add(def.id);
+      activeLegendLayers.add(def.id);
+    }
 
     input.addEventListener('change', () => {
-      if (input.checked) { layer.addTo(map); activeSpectralIds.add(def.id); }
-      else { map.removeLayer(layer); activeSpectralIds.delete(def.id); }
+      if (input.checked) {
+        layer.addTo(map); activeSpectralIds.add(def.id); activeLegendLayers.add(def.id);
+        opacityRow.style.display = 'flex';
+      } else {
+        map.removeLayer(layer); activeSpectralIds.delete(def.id); activeLegendLayers.delete(def.id);
+        opacityRow.style.display = 'none';
+      }
+      updateLegendBox();
       onLayersChanged();
     });
   });
@@ -188,6 +252,7 @@ function buildGlacialLayers() {
   glacialLayerDefs.forEach(def => {
     const layer = glacialWMS(def.evalscript);
     glacialLayers[def.id] = layer;
+    if (layer) layer.setOpacity(getOpacity(def.id, 'glacial'));
 
     const wrap = document.createElement('label');
     wrap.className = 'layer';
@@ -203,13 +268,23 @@ function buildGlacialLayers() {
     `;
     wrap.appendChild(input);
     wrap.appendChild(label);
+    const opacityRow = makeOpacityRow(def.id, 'glacial', layer, !input.checked);
+    wrap.appendChild(opacityRow);
     container.appendChild(wrap);
 
-    if (input.checked) { layer.addTo(map); activeGlacialIds.add(def.id); }
+    if (input.checked) {
+      layer.addTo(map); activeGlacialIds.add(def.id); activeLegendLayers.add(def.id);
+    }
 
     input.addEventListener('change', () => {
-      if (input.checked) { layer.addTo(map); activeGlacialIds.add(def.id); }
-      else { map.removeLayer(layer); activeGlacialIds.delete(def.id); }
+      if (input.checked) {
+        layer.addTo(map); activeGlacialIds.add(def.id); activeLegendLayers.add(def.id);
+        opacityRow.style.display = 'flex';
+      } else {
+        map.removeLayer(layer); activeGlacialIds.delete(def.id); activeLegendLayers.delete(def.id);
+        opacityRow.style.display = 'none';
+      }
+      updateLegendBox();
       onLayersChanged();
     });
   });
@@ -232,6 +307,7 @@ function buildThermalLayers() {
   thermalLayerDefs.forEach(def => {
     const layer = thermalWMS(def.evalscript);
     thermalLayers[def.id] = layer;
+    if (layer) layer.setOpacity(getOpacity(def.id, 'thermal'));
 
     const wrap = document.createElement('label');
     wrap.className = 'layer';
@@ -247,13 +323,23 @@ function buildThermalLayers() {
     `;
     wrap.appendChild(input);
     wrap.appendChild(label);
+    const opacityRow = makeOpacityRow(def.id, 'thermal', layer, !input.checked);
+    wrap.appendChild(opacityRow);
     container.appendChild(wrap);
 
-    if (input.checked) { layer.addTo(map); activeThermalIds.add(def.id); }
+    if (input.checked) {
+      layer.addTo(map); activeThermalIds.add(def.id); activeLegendLayers.add(def.id);
+    }
 
     input.addEventListener('change', () => {
-      if (input.checked) { layer.addTo(map); activeThermalIds.add(def.id); }
-      else { map.removeLayer(layer); activeThermalIds.delete(def.id); }
+      if (input.checked) {
+        layer.addTo(map); activeThermalIds.add(def.id); activeLegendLayers.add(def.id);
+        opacityRow.style.display = 'flex';
+      } else {
+        map.removeLayer(layer); activeThermalIds.delete(def.id); activeLegendLayers.delete(def.id);
+        opacityRow.style.display = 'none';
+      }
+      updateLegendBox();
       onLayersChanged();
     });
   });
