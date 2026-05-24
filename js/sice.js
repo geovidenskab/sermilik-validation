@@ -4,6 +4,26 @@
 // URL-pattern:
 //   https://thredds.geus.dk/thredds/dodsC/SICE_500m/Greenland/SICEv3.0_Greenland_500m_YYYY-MM-DD.nc
 //
+// ⚠️ CORS-BEGRÆNSNING (verificeret 2026-05-24):
+// GEUS THREDDS sender IKKE 'Access-Control-Allow-Origin'-headers, så direkte
+// browser-fetch fra anden origin (incl. http://localhost:5173 og https://geo.sg.dk)
+// blokeres af browseren. Tre løsninger:
+//
+//   1) Apache reverse-proxy på geo.sg.dk:
+//        ProxyPass /thredds https://thredds.geus.dk/thredds
+//        ProxyPassReverse /thredds https://thredds.geus.dk/thredds
+//      Kald så `/thredds/dodsC/...` (relativ URL — ingen CORS).
+//
+//   2) Cloudflare Worker proxy (gratis, kræver konto).
+//
+//   3) Pre-downloaded data for kendte stationer:
+//      Brug scripts/fetch-sice-stations.py til at hente daglig albedo
+//      for alle AWS-stationer + Sermilik feltstation, gem som
+//      data/sice/{station}.json. INGEN runtime-afhængighed af GEUS.
+//
+// Vi har implementeret #3 som default (se loadSiceStationSeries) og
+// støtter #1 hvis SICE_PROXY_BASE er sat.
+//
 // Projektion: EPSG:3413 (NSIDC Sea Ice Polar Stereographic North).
 // Vi konverterer lat/lon → projicerede x,y, finder nærmeste pixel, og henter via OPeNDAP ascii-format.
 //
@@ -15,7 +35,31 @@
 // VIGTIGT: Filer eksisterer kun for dage hvor Sentinel-3 dækkede området under
 // gode forhold. Tjek HTTP-status og falder pænt tilbage hvis dagen mangler.
 
-const THREDDS_BASE = 'https://thredds.geus.dk/thredds/dodsC/SICE_500m/Greenland';
+// Hvis SICE_PROXY_BASE er sat (fx via Apache reverse-proxy), kalder vi den.
+// Ellers prøver vi direkte GEUS — som vil fejle med CORS i de fleste browsere.
+const SICE_PROXY_BASE = localStorage.getItem('sermilik_sice_proxy') || null;
+const THREDDS_BASE = SICE_PROXY_BASE
+  ? `${SICE_PROXY_BASE}/dodsC/SICE_500m/Greenland`
+  : 'https://thredds.geus.dk/thredds/dodsC/SICE_500m/Greenland';
+
+// Pre-downloaded data for kendte stationer (Sprint 3b: scripts/fetch-sice-stations.py)
+// Hvis vi har lokal data, foretrækker vi den.
+const STATION_SERIES_BASE = './data/sice/';
+
+/**
+ * Hent pre-downloaded SICE-tidsserie for en kendt station-key.
+ * @param {string} stationKey - fx 'tas_l', 'tas_u', 'tas_a', 'mit_b'
+ * @returns {Promise<Array<{date, albedo_bb}> | null>}
+ */
+export async function loadSiceStationSeries(stationKey) {
+  try {
+    const res = await fetch(`${STATION_SERIES_BASE}${stationKey}.json`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
 
 // EPSG:3413 grid-parametre fra SICE NetCDF (verificeres ved første load).
 // Disse er standard polar stereographic 70°N / -45°E.
