@@ -66,6 +66,48 @@ const stationLocations = {
     icon: 'marker-aws',
     size: 14,
   },
+  // ─── Tasiilaq-transekten (PANGAEA Van Tiggelen 2024, daglig SEB) ───────────
+  tas_l: {
+    coords: [65.6402, -38.8987],
+    title: 'AWS — TAS_L (Tasiilaq kyst, 250 m)',
+    html: `<h3>TAS_L — Tasiilaq Lower (250 m.o.h.)</h3>
+      <p><b>65.6402°N · 38.8987°W</b> · PROMICE-station siden 2007 (<b>17 års serie</b>)</p>
+      <p>Lavt-elevation reference på kysten — perfekt til at sætte rammerne for hvad
+         vinter og sommer ser ud som ved havniveau.</p>
+      <p><b>Daglig SEB-data</b> (Van Tiggelen et al. 2024): SWD/SWU → albedo,
+         LWU → overfladetemperatur, smelteenergi, luft-temp. 6.000 dage data.</p>
+      <p><a href="./data/pangaea/GRL_TAS_L_AWS.tab" target="_blank">Hent .tab (lokal)</a> ·
+         <a href="https://doi.org/10.1594/PANGAEA.970145" target="_blank">DOI</a></p>`,
+    icon: 'marker-aws',
+    size: 14,
+    pangaea: 'GRL_TAS_L_AWS.tab',
+  },
+  tas_u: {
+    coords: [65.6978, -38.8668],
+    title: 'AWS — TAS_U (Tasiilaq mellem, 570 m)',
+    html: `<h3>TAS_U — Tasiilaq Upper (570 m.o.h.)</h3>
+      <p><b>65.6978°N · 38.8668°W</b> · PROMICE-station 2008-2015</p>
+      <p>Mid-elevation på samme transekt som TAS_L og TAS_A — bruges til at se
+         hvordan albedo, overfladetemp og smelte ændrer sig op gennem ablationszonen.</p>
+      <p><a href="./data/pangaea/GRL_TAS_U_AWS.tab" target="_blank">Hent .tab (lokal)</a> ·
+         <a href="https://doi.org/10.1594/PANGAEA.970156" target="_blank">DOI</a></p>`,
+    icon: 'marker-aws',
+    size: 14,
+    pangaea: 'GRL_TAS_U_AWS.tab',
+  },
+  tas_a: {
+    coords: [65.7790, -38.8995],
+    title: 'AWS — TAS_A (Tasiilaq top, 890 m)',
+    html: `<h3>TAS_A — Tasiilaq Accumulation (890 m.o.h.)</h3>
+      <p><b>65.7790°N · 38.8995°W</b> · PROMICE-station 2013-2023</p>
+      <p>Højeste station på Tasiilaq-transekten — nær akkumulationszonen.
+         Vis hvor 0 °C-grænsen ligger om sommeren ved at sammenligne med TAS_L (250 m).</p>
+      <p><a href="./data/pangaea/GRL_TAS_A_AWS.tab" target="_blank">Hent .tab (lokal)</a> ·
+         <a href="https://doi.org/10.1594/PANGAEA.970152" target="_blank">DOI</a></p>`,
+    icon: 'marker-aws',
+    size: 14,
+    pangaea: 'GRL_TAS_A_AWS.tab',
+  },
   tasiilaq: {
     coords: [65.6145, -37.6368],
     title: 'Tasiilaq',
@@ -103,7 +145,7 @@ export const townsLayer = L.layerGroup();
 Object.entries(stationLocations).forEach(([key, s]) => {
   const m = L.marker(s.coords, { icon: makeIcon(s.icon, s.size), title: s.title })
     .bindPopup(s.html);
-  if (key === 'mit_b' || key === 'ser_b' || key === 'mit') awsLayer.addLayer(m);
+  if (key === 'mit_b' || key === 'ser_b' || key === 'mit' || key === 'tas_l' || key === 'tas_u' || key === 'tas_a') awsLayer.addLayer(m);
   else if (key === 'tasiilaq' || key === 'kulusuk') townsLayer.addLayer(m);
   else stationsLayer.addLayer(m);
 });
