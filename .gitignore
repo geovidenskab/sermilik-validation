@@ -14,3 +14,4 @@ credentials.json
 # Build artefakter
 *.log
 .cache/
+scripts/__pycache__/
