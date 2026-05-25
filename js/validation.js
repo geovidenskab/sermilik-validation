@@ -27,6 +27,7 @@
 import { map } from './map.js';
 import { VALIDATION_LS_KEY } from './config.js';
 import { openPhotoAlbedo } from './photo-albedo.js';
+import { fetchAllStatsForPoint, STATS_LAYER_INFO } from './sentinel-stats.js';
 
 const PHOTO_MAX_DIM = 1200;    // max bredde/højde for resized foto
 const PHOTO_JPEG_QUALITY = 0.78;
@@ -132,6 +133,12 @@ function renderPopup(p) {
     ? `<div class="vp-exif">Foto taget: ${new Date(exif.DateTimeOriginal).toLocaleString('da-DK')}${exif.Model ? ' · ' + exif.Model : ''}</div>`
     : '';
 
+  const sat = p.satellite || {};
+  const satRows = renderSatelliteRows(sat, ground);
+  const satFetched = sat._fetchedAt
+    ? `<div class="vp-sat-fetched">Hentet: ${new Date(sat._fetchedAt).toLocaleString('da-DK')}</div>`
+    : '';
+
   return `
     <div class="vp-popup">
       <h3>${p.name}</h3>
@@ -151,12 +158,51 @@ function renderPopup(p) {
         </table>
         ${ground.notes ? `<div class="vp-notes">${escapeHtml(ground.notes)}</div>` : ''}
       </div>
+      <div class="vp-sat">
+        <div class="vp-sat-header">
+          <strong>Satellit-måling</strong>
+          <button onclick="window.__vpFetchSat('${p.id}')" class="vp-sat-fetch-btn">${sat._fetchedAt ? 'Genhent' : 'Hent satellit-data'}</button>
+        </div>
+        ${satRows}
+        ${satFetched}
+      </div>
       <div class="vp-actions">
         <button onclick="window.__vpEdit('${p.id}')">Redigér</button>
         <button onclick="window.__vpDelete('${p.id}')">Slet</button>
       </div>
     </div>
   `;
+}
+
+function renderSatelliteRows(sat, ground) {
+  const rows = [];
+  const pairs = [
+    { key: 'S2_ALBEDO',    label: 'Sentinel-2 albedo',     unit: '',     decimals: 3, groundKey: 'albedo_measured' },
+    { key: 'S2_NDVI',      label: 'Sentinel-2 NDVI',       unit: '',     decimals: 3, groundKey: null },
+    { key: 'S2_NDSI',      label: 'Sentinel-2 NDSI',       unit: '',     decimals: 3, groundKey: null },
+    { key: 'LANDSAT_LST',  label: 'Landsat overflade-temp', unit: ' °C', decimals: 1, groundKey: 'temp_surface_C' },
+  ];
+  for (const p of pairs) {
+    const s = sat[p.key];
+    if (!s) {
+      rows.push(`<tr><th>${p.label}</th><td class="vp-sat-empty">—</td></tr>`);
+      continue;
+    }
+    if (s.error || s.value == null) {
+      rows.push(`<tr><th>${p.label}</th><td class="vp-sat-err" title="${escapeHtml(s.error || '')}">ingen data</td></tr>`);
+      continue;
+    }
+    const val = s.value.toFixed(p.decimals);
+    let diff = '';
+    if (p.groundKey && ground?.[p.groundKey] != null) {
+      const d = s.value - ground[p.groundKey];
+      const sign = d >= 0 ? '+' : '';
+      const cls = Math.abs(d) > 0.1 ? 'vp-diff-large' : 'vp-diff-small';
+      diff = ` <span class="vp-diff ${cls}">(${sign}${d.toFixed(p.decimals)} vs. ground)</span>`;
+    }
+    rows.push(`<tr><th>${p.label}</th><td><b>${val}${p.unit}</b>${diff}</td></tr>`);
+  }
+  return `<table>${rows.join('')}</table>`;
 }
 
 function escapeHtml(s) {
@@ -398,6 +444,28 @@ window.__vpDelete = function (id) {
   removeMarker(id);
   save();
   map.closePopup();
+};
+
+window.__vpFetchSat = async function (pointId) {
+  const p = findPoint(pointId);
+  if (!p) return;
+  const dateIso = (p.timestamp_ground || nowIso()).slice(0, 10);
+
+  // Vis loader
+  const btn = document.querySelector(`button[onclick*="__vpFetchSat('${pointId}')"]`);
+  if (btn) { btn.disabled = true; btn.textContent = 'Henter…'; }
+
+  try {
+    const stats = await fetchAllStatsForPoint(p.lat, p.lng, dateIso, { toleranceDays: 7 });
+    p.satellite = { ...stats, _fetchedAt: nowIso(), _dateUsed: dateIso };
+    p.modified = nowIso();
+    save();
+    const m = markerById.get(pointId);
+    if (m) m.openPopup();
+  } catch (e) {
+    alert('Kunne ikke hente satellit-data: ' + e.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'Hent satellit-data'; }
+  }
 };
 
 window.__vpPhotoAlbedo = function (pointId, photoIdx) {

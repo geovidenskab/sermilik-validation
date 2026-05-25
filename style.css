@@ -538,6 +538,69 @@ header .meta { font-size: 0.8rem; opacity: 0.75; }
   margin: 0.4rem 0;
   white-space: pre-wrap;
 }
+/* Satellit-sektion i validation-popup */
+.vp-popup .vp-sat {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e8eaef;
+}
+.vp-popup .vp-sat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.3rem;
+}
+.vp-popup .vp-sat-header strong {
+  color: #0A0F3C;
+  font-size: 0.82rem;
+}
+.vp-popup .vp-sat-fetch-btn {
+  background: #0A0F3C;
+  color: #fff;
+  border: 1px solid #0A0F3C;
+  border-radius: 3px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+.vp-popup .vp-sat-fetch-btn:hover { background: #2a2f6c; }
+.vp-popup .vp-sat-fetch-btn:disabled {
+  background: #888; border-color: #888; cursor: not-allowed;
+}
+.vp-popup .vp-sat table {
+  width: 100%;
+  font-size: 0.76rem;
+  border-collapse: collapse;
+}
+.vp-popup .vp-sat th {
+  text-align: left;
+  font-weight: 500;
+  color: #555;
+  padding: 0.15rem 0.4rem 0.15rem 0;
+  width: 45%;
+}
+.vp-popup .vp-sat td {
+  padding: 0.15rem 0;
+  font-family: ui-monospace, Menlo, monospace;
+  font-weight: 600;
+}
+.vp-popup .vp-sat-empty { color: #aaa; font-style: italic; font-weight: normal; }
+.vp-popup .vp-sat-err { color: #c44; font-style: italic; font-weight: normal; font-size: 0.7rem; }
+.vp-popup .vp-sat-fetched {
+  font-size: 0.68rem;
+  color: #888;
+  font-style: italic;
+  margin-top: 0.25rem;
+  text-align: right;
+}
+.vp-popup .vp-diff {
+  font-size: 0.7rem;
+  font-weight: normal;
+  margin-left: 0.3rem;
+}
+.vp-popup .vp-diff-small { color: #2a7a2a; }
+.vp-popup .vp-diff-large { color: #c44; }
+
 .vp-popup .vp-actions {
   display: flex;
   gap: 0.4rem;
