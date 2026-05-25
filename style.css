@@ -1072,6 +1072,77 @@ header .meta { font-size: 0.8rem; opacity: 0.75; }
   border-top: 1px solid #e8eaef;
   padding-top: 0.5rem;
 }
+
+/* Integral-kort (tilført energi i synlig periode) */
+.pv-integral { /* container */ }
+.pv-int-card {
+  background: linear-gradient(135deg, #fff8dc 0%, #fde9b3 100%);
+  border: 1px solid #f0c020;
+  border-radius: 5px;
+  padding: 0.6rem 0.8rem;
+  margin-top: 0.2rem;
+}
+.pv-int-card.pv-int-neg {
+  background: linear-gradient(135deg, #dceaf8 0%, #b8d0e8 100%);
+  border-color: #5680c0;
+}
+.pv-int-card.pv-int-pos {
+  background: linear-gradient(135deg, #fff3d8 0%, #f5d488 100%);
+  border-color: #d49830;
+}
+.pv-int-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5a4a1a;
+  font-weight: 600;
+}
+.pv-int-card.pv-int-neg .pv-int-label { color: #1a3a6a; }
+.pv-int-value {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0A0F3C;
+  margin: 0.15rem 0 0.3rem;
+}
+.pv-int-unit { font-size: 0.85rem; color: #666; font-weight: 500; }
+.pv-int-detail {
+  font-size: 0.72rem;
+  color: #555;
+  line-height: 1.4;
+}
+
+/* Download-knapper */
+.pv-download {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  padding: 0.5rem 0.6rem;
+  background: #f5f7fa;
+  border-radius: 3px;
+  flex-wrap: wrap;
+}
+.pv-download strong { color: #0A0F3C; }
+.pv-download-hint { color: #888; font-size: 0.72rem; font-style: italic; }
+.pv-download button {
+  padding: 0.3rem 0.7rem;
+  background: #0A0F3C;
+  color: #fff;
+  border: 1px solid #0A0F3C;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+}
+.pv-download button:hover { background: #2a2f6c; }
+.pv-dl-allvars {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.76rem;
+  color: #555;
+  margin-left: auto;
+}
 .pv-meta a { color: #0A0F3C; }
 .pv-empty { color: #aaa; font-style: italic; }
 
