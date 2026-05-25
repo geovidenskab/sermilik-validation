@@ -954,6 +954,87 @@ header .meta { font-size: 0.8rem; opacity: 0.75; }
 }
 #pa-save:not(:disabled):hover { background: #2a2f6c; }
 
+/* PROMICE viewer modal */
+#pv-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 6000;
+  align-items: center;
+  justify-content: center;
+}
+#pv-modal.open { display: flex; }
+.pv-modal-backdrop { position: absolute; inset: 0; background: rgba(10,15,60,0.6); }
+.pv-modal-card {
+  position: relative;
+  background: #fff;
+  border-radius: 6px;
+  width: min(900px, 95vw);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+.pv-modal-header {
+  background: #0A0F3C;
+  color: #fff;
+  padding: 0.7rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pv-modal-header h2 { margin: 0; font-size: 1rem; font-weight: 600; }
+#pv-close { background: none; border: none; color: #fff; font-size: 1.4rem; cursor: pointer; padding: 0 0.3rem; }
+.pv-modal-body { padding: 0.8rem 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.6rem; }
+.pv-toolbar {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+}
+.pv-toolbar label { margin-right: 0.3rem; color: #555; font-size: 0.78rem; }
+.pv-toolbar select {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #c8d0d8;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  background: #fff;
+}
+.pv-info {
+  font-size: 0.78rem;
+  color: #666;
+  font-style: italic;
+  margin-left: auto;
+}
+.pv-chart-wrap {
+  position: relative;
+  height: 380px;
+  background: #fafbfc;
+  border: 1px solid #e8eaef;
+  border-radius: 3px;
+  padding: 0.5rem;
+}
+.pv-stats {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+  padding: 0.4rem 0.6rem;
+  background: #f5f7fa;
+  border-radius: 3px;
+}
+.pv-stats b { color: #0A0F3C; font-family: ui-monospace, Menlo, monospace; }
+.pv-meta {
+  font-size: 0.74rem;
+  color: #888;
+  border-top: 1px solid #e8eaef;
+  padding-top: 0.5rem;
+}
+.pv-meta a { color: #0A0F3C; }
+.pv-empty { color: #aaa; font-style: italic; }
+
 /* Mobile: stack results under canvas */
 @media (max-width: 720px) {
   .pa-modal-body {

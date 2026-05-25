@@ -18,6 +18,7 @@ import {
   addSpectralLegendBox,
 } from './ui.js';
 import { initValidation } from './validation.js';
+import './promice-viewer.js';  // side-effekt: registrerer window.__openPromiceViewer
 
 // 1. Lag-panelet — basemap-radioer, POI-overlays, geologi, terræn
 buildAllLayerControls(updateBasemapBadge);

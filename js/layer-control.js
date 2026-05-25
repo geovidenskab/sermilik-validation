@@ -66,8 +66,8 @@ const layerDefs = [
     desc: 'Havdybde + topografi under indlandsisen (IceBridge BedMachine). 15 arc-sek opløsning, GEBCO 2024.',
     layer: basemaps.gebco },
   { group: 'basemaps-bathy', type: 'radio', radioGroup: 'basemap', id: 'modis_truecolor',
-    name: 'MODIS Terra True Color (daglig, ~250 m)',
-    desc: 'Daglig satellit-mosaik fra NASA GIBS. God til havis-koncentration og storm-fronter — men kun zoom 5-9.',
+    name: 'VIIRS daglig True Color (~375 m)',
+    desc: 'Daglig VIIRS-mosaik fra NASA GIBS. Bredere swath end MODIS — typisk ingen sorte huller over Arktis. Brug zoom 5-9 til regional oversigt.',
     layer: basemaps.modis_truecolor },
 
   // ─── TERRÆN & RELIEF ────────────────────────────────────────────────────────

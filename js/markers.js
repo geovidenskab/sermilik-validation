@@ -41,8 +41,8 @@ const stationLocations = {
     html: `<h3>PROMICE AWS: SER_B (Sermilik bedrock)</h3>
       <p>Vejrstation ved kysten nær feltstationen. Ideel reference for energibalance
          og temperaturinversioner mellem kyst og højere stationer.</p>
-      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/hour/SER_B_hour.csv" target="_blank">Hent CSV (timedata) →</a></p>
-      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/day/SER_B_day.csv" target="_blank">Hent CSV (dagligt) →</a></p>`,
+      <p><button onclick="window.__openPromiceViewer('SER_B','SER_B Sermilik bedrock')" class="vp-photo-btn">Vis og plot data →</button></p>
+      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/hour/SER_B_hour.csv" target="_blank">Hent original timedata CSV →</a></p>`,
     icon: 'marker-aws',
     size: 14,
   },
@@ -52,8 +52,8 @@ const stationLocations = {
     html: `<h3>PROMICE AWS: MIT (Mittivakkat ablationszone)</h3>
       <p>Station <em>på</em> gletsjeren, etableret 3. maj 2009. ~440 m.o.h.
          Måler ablation/akkumulation i ablationszonen.</p>
-      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/hour/MIT_hour.csv" target="_blank">Hent CSV (timedata) →</a></p>
-      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/day/MIT_day.csv" target="_blank">Hent CSV (dagligt) →</a></p>`,
+      <p><button onclick="window.__openPromiceViewer('MIT','MIT Mittivakkat ablationszone')" class="vp-photo-btn">Vis og plot data →</button></p>
+      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/hour/MIT_hour.csv" target="_blank">Hent original timedata CSV →</a></p>`,
     icon: 'marker-aws',
     size: 14,
   },
@@ -67,7 +67,7 @@ const stationLocations = {
          vinter og sommer ser ud som ved havniveau.</p>
       <p><b>Daglig SEB-data</b> (Van Tiggelen et al. 2024): SWD/SWU → albedo,
          LWU → overfladetemperatur, smelteenergi, luft-temp. 6.000 dage data.</p>
-      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/hour/TAS_L_hour.csv" target="_blank">CSV (timedata, PROMICE) →</a></p>
+      <p><button onclick="window.__openPromiceViewer('TAS_L','TAS_L Tasiilaq Lower (250 m)')" class="vp-photo-btn">Vis og plot PROMICE data →</button></p>
       <p><a href="./data/pangaea/GRL_TAS_L_AWS.tab" target="_blank">Daglig SEB (.tab, lokal)</a> ·
          <a href="https://doi.org/10.1594/PANGAEA.970145" target="_blank">DOI</a></p>`,
     icon: 'marker-aws',
@@ -81,7 +81,7 @@ const stationLocations = {
       <p><b>65.6978°N · 38.8668°W</b> · PROMICE-station 2008-2015</p>
       <p>Mid-elevation på samme transekt som TAS_L og TAS_A — bruges til at se
          hvordan albedo, overfladetemp og smelte ændrer sig op gennem ablationszonen.</p>
-      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/hour/TAS_U_hour.csv" target="_blank">CSV (timedata, PROMICE) →</a></p>
+      <p><button onclick="window.__openPromiceViewer('TAS_U','TAS_U Tasiilaq Upper (570 m)')" class="vp-photo-btn">Vis og plot PROMICE data →</button></p>
       <p><a href="./data/pangaea/GRL_TAS_U_AWS.tab" target="_blank">Daglig SEB (.tab, lokal)</a> ·
          <a href="https://doi.org/10.1594/PANGAEA.970156" target="_blank">DOI</a></p>`,
     icon: 'marker-aws',
@@ -95,7 +95,7 @@ const stationLocations = {
       <p><b>65.7790°N · 38.8995°W</b> · PROMICE-station 2013-2023</p>
       <p>Højeste station på Tasiilaq-transekten — nær akkumulationszonen.
          Vis hvor 0 °C-grænsen ligger om sommeren ved at sammenligne med TAS_L (250 m).</p>
-      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/hour/TAS_A_hour.csv" target="_blank">CSV (timedata, PROMICE) →</a></p>
+      <p><button onclick="window.__openPromiceViewer('TAS_A','TAS_A Tasiilaq Accumulation (890 m)')" class="vp-photo-btn">Vis og plot PROMICE data →</button></p>
       <p><a href="./data/pangaea/GRL_TAS_A_AWS.tab" target="_blank">Daglig SEB (.tab, lokal)</a> ·
          <a href="https://doi.org/10.1594/PANGAEA.970152" target="_blank">DOI</a></p>`,
     icon: 'marker-aws',

@@ -19,19 +19,24 @@ const sentinelLayer = (year) => L.tileLayer(
   }
 );
 
-// Esri har Maxar 1m kun op til zoom ~17-18 over Grønland.
-// Sætter maxNativeZoom så Leaflet upscaler eksisterende tiles i stedet for at
-// hente en degraderet "World Imagery 2017"-mosaik fra højere zoom-levels.
+// Esri har MEGET VARIERENDE coverage over Grønland:
+//   - Tasiilaq/Kulusuk: Maxar 1m op til z~16
+//   - Sermilik feltstation (Mittivakkat): KUN low-res placeholder z>11
+//   - Nuuk: ingen high-res
+// Hvis vi tillader zoom forbi z14 vil Esri vise en lavopløsnings-placeholder.
+// Vi sætter derfor maxNativeZoom: 14 så Leaflet upscaler eksisterende z14-tiles
+// for konsistent visning (slørede men ikke skiftende). Den der vil have
+// høj-opløsning over fjeldet skal bruge ArcticDEM tinted eller Sentinel-2.
 const esriImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-  attribution: 'Tiles © Esri — Maxar/Earthstar — ~1 m opløsning over Grønland',
-  maxNativeZoom: 18,
-  maxZoom: 19,
+  attribution: 'Tiles © Esri — Maxar/Earthstar — varieret opløsning over Grønland',
+  maxNativeZoom: 14,
+  maxZoom: 18,
 });
 
 const esriLabels = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
   attribution: 'Labels © Esri',
-  maxNativeZoom: 18,
-  maxZoom: 19,
+  maxNativeZoom: 16,
+  maxZoom: 18,
 });
 
 // GEBCO bathymetri-baggrund — viser havdybde med bedrock topo under Grønland
@@ -55,7 +60,9 @@ function gibsLayer(layerId, tileMatrixSet, ext, attribution, date = 'default') {
     }
   );
 }
-export const gibsMODISTrueColor = gibsLayer('MODIS_Terra_CorrectedReflectance_TrueColor', 'GoogleMapsCompatible_Level9', 'jpg', 'MODIS Terra Corrected Reflectance — daglig');
+// VIIRS_SNPP har bredere swath (3000 km vs MODIS 2300 km) — typisk ingen sorte
+// huller mellem orbital tracks ved polerne. Daglig, ~375 m i band I.
+export const gibsMODISTrueColor = gibsLayer('VIIRS_SNPP_CorrectedReflectance_TrueColor', 'GoogleMapsCompatible_Level9', 'jpg', 'VIIRS SNPP daglig — bred swath uden polare huller');
 export const gibsMODISIceTemp = gibsLayer('MODIS_Terra_Ice_Surface_Temp_Day', 'GoogleMapsCompatible_Level7', 'png', 'MODIS Terra Ice Surface Temperature Day');
 export const gibsMODISAlbedo = gibsLayer('MODIS_Combined_L3_Black_Sky_Albedo_Daily', 'GoogleMapsCompatible_Level7', 'png', 'MODIS Combined L3 Black-Sky Albedo Daily');
 export const gibsSeaIceConc = gibsLayer('AMSRU2_Sea_Ice_Concentration_12km', 'GoogleMapsCompatible_Level6', 'png', 'AMSR2 Sea Ice Concentration 12 km');
