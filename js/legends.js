@@ -157,6 +157,52 @@ export const LEGENDS = {
     ],
   },
 
+  gibs_albedo: {
+    title: 'MODIS daglig albedo (Black-Sky)',
+    type: 'gradient',
+    unit: '0-1 (skaleret ×0.001 i raw data)',
+    description: 'MODIS_Combined_L3_Black_Sky_Albedo_Daily. Hvid = høj albedo (sne/is), brun = lav (vand/mørk overflade).',
+    stops: [
+      { value: '0.9', label: 'frisk sne', color: '#ffffff' },
+      { value: '0.7', label: 'firn', color: '#e0e8f0' },
+      { value: '0.5', label: 'gammel sne', color: '#a8c8e0' },
+      { value: '0.3', label: 'bar is', color: '#80a0c0' },
+      { value: '0.1', label: 'mørk / vand', color: '#4a6080' },
+      { value: '0', label: 'sort', color: '#1a2030' },
+    ],
+  },
+
+  gibs_ice_temp: {
+    title: 'MODIS overfladetemperatur (dag)',
+    type: 'gradient',
+    unit: '°C — MODIS Terra Ice Surface Temperature',
+    description: 'NASA GIBS standard colormap. Værdier mellem −60 og +5 °C. Bemærk: 1 km opløsning — for grov til lokal Mittivakkat-analyse, men god til regional.',
+    stops: [
+      { value: '+5', label: 'smelte', color: '#cc0000' },
+      { value: '0', label: 'frysepunkt', color: '#ff8800' },
+      { value: '−10', label: '', color: '#ffcc00' },
+      { value: '−20', label: '', color: '#99cc00' },
+      { value: '−30', label: '', color: '#00aaaa' },
+      { value: '−45', label: '', color: '#0066cc' },
+      { value: '−60', label: 'koldest', color: '#440099' },
+    ],
+  },
+
+  gibs_sea_ice: {
+    title: 'AMSR2 havis-koncentration',
+    type: 'gradient',
+    unit: '% dækning (12 km opløsning)',
+    description: 'AMSR2 sea ice concentration. 0% = åbent vand, 100% = helt isdækket. Brug til at se sæsonvariation i Sermilik Fjord.',
+    stops: [
+      { value: '100', label: 'fast is', color: '#ffffff' },
+      { value: '80', label: '', color: '#e8e8ff' },
+      { value: '60', label: 'kompakt drivis', color: '#a8a8ff' },
+      { value: '40', label: '', color: '#6868d0' },
+      { value: '20', label: 'spredt is', color: '#3030a0' },
+      { value: '0', label: 'åbent vand', color: 'transparent' },
+    ],
+  },
+
   arcticdem_slope: {
     title: 'ArcticDEM hældningskort',
     type: 'gradient',

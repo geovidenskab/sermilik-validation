@@ -35,24 +35,14 @@ const stationLocations = {
     icon: 'marker-glacier',
     size: 16,
   },
-  mit_b: {
-    coords: [65.674, -37.838],
-    title: 'PROMICE AWS — MIT_B',
-    html: `<h3>PROMICE AWS: MIT_B (Mittivakkat bedrock)</h3>
-      <p>Automatisk vejrstation på fjeld nær Mittivakkat-gletsjeren (GEUS/KU).
-         Måler temperatur, RH, vind, stråling og overfladeenergibalance.</p>
-      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws_l3_station_csv/level_3/MIT_B/MIT_B_hour.csv" target="_blank">Hent CSV (timedata) →</a></p>
-      <p><a href="https://promice.org/" target="_blank">Live-oversigt →</a></p>`,
-    icon: 'marker-aws',
-    size: 14,
-  },
   ser_b: {
     coords: [65.66, -38.155],
     title: 'PROMICE AWS — SER_B',
     html: `<h3>PROMICE AWS: SER_B (Sermilik bedrock)</h3>
-      <p>Vejrstation ved kysten nær feltstationen. Lavpunkt i højdegradienten
-         SER_B → MIT_B (515 m). Ideel reference for energibalance og temperaturinversioner.</p>
-      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws_l3_station_csv/level_3/SER_B/SER_B_hour.csv" target="_blank">Hent CSV (timedata) →</a></p>`,
+      <p>Vejrstation ved kysten nær feltstationen. Ideel reference for energibalance
+         og temperaturinversioner mellem kyst og højere stationer.</p>
+      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/hour/SER_B_hour.csv" target="_blank">Hent CSV (timedata) →</a></p>
+      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/day/SER_B_day.csv" target="_blank">Hent CSV (dagligt) →</a></p>`,
     icon: 'marker-aws',
     size: 14,
   },
@@ -62,7 +52,8 @@ const stationLocations = {
     html: `<h3>PROMICE AWS: MIT (Mittivakkat ablationszone)</h3>
       <p>Station <em>på</em> gletsjeren, etableret 3. maj 2009. ~440 m.o.h.
          Måler ablation/akkumulation i ablationszonen.</p>
-      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws_l3_station_csv/level_3/MIT/MIT_hour.csv" target="_blank">Hent CSV (timedata) →</a></p>`,
+      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/hour/MIT_hour.csv" target="_blank">Hent CSV (timedata) →</a></p>
+      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/day/MIT_day.csv" target="_blank">Hent CSV (dagligt) →</a></p>`,
     icon: 'marker-aws',
     size: 14,
   },
@@ -76,7 +67,8 @@ const stationLocations = {
          vinter og sommer ser ud som ved havniveau.</p>
       <p><b>Daglig SEB-data</b> (Van Tiggelen et al. 2024): SWD/SWU → albedo,
          LWU → overfladetemperatur, smelteenergi, luft-temp. 6.000 dage data.</p>
-      <p><a href="./data/pangaea/GRL_TAS_L_AWS.tab" target="_blank">Hent .tab (lokal)</a> ·
+      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/hour/TAS_L_hour.csv" target="_blank">CSV (timedata, PROMICE) →</a></p>
+      <p><a href="./data/pangaea/GRL_TAS_L_AWS.tab" target="_blank">Daglig SEB (.tab, lokal)</a> ·
          <a href="https://doi.org/10.1594/PANGAEA.970145" target="_blank">DOI</a></p>`,
     icon: 'marker-aws',
     size: 14,
@@ -89,7 +81,8 @@ const stationLocations = {
       <p><b>65.6978°N · 38.8668°W</b> · PROMICE-station 2008-2015</p>
       <p>Mid-elevation på samme transekt som TAS_L og TAS_A — bruges til at se
          hvordan albedo, overfladetemp og smelte ændrer sig op gennem ablationszonen.</p>
-      <p><a href="./data/pangaea/GRL_TAS_U_AWS.tab" target="_blank">Hent .tab (lokal)</a> ·
+      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/hour/TAS_U_hour.csv" target="_blank">CSV (timedata, PROMICE) →</a></p>
+      <p><a href="./data/pangaea/GRL_TAS_U_AWS.tab" target="_blank">Daglig SEB (.tab, lokal)</a> ·
          <a href="https://doi.org/10.1594/PANGAEA.970156" target="_blank">DOI</a></p>`,
     icon: 'marker-aws',
     size: 14,
@@ -102,7 +95,8 @@ const stationLocations = {
       <p><b>65.7790°N · 38.8995°W</b> · PROMICE-station 2013-2023</p>
       <p>Højeste station på Tasiilaq-transekten — nær akkumulationszonen.
          Vis hvor 0 °C-grænsen ligger om sommeren ved at sammenligne med TAS_L (250 m).</p>
-      <p><a href="./data/pangaea/GRL_TAS_A_AWS.tab" target="_blank">Hent .tab (lokal)</a> ·
+      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/hour/TAS_A_hour.csv" target="_blank">CSV (timedata, PROMICE) →</a></p>
+      <p><a href="./data/pangaea/GRL_TAS_A_AWS.tab" target="_blank">Daglig SEB (.tab, lokal)</a> ·
          <a href="https://doi.org/10.1594/PANGAEA.970152" target="_blank">DOI</a></p>`,
     icon: 'marker-aws',
     size: 14,
@@ -145,7 +139,7 @@ export const townsLayer = L.layerGroup();
 Object.entries(stationLocations).forEach(([key, s]) => {
   const m = L.marker(s.coords, { icon: makeIcon(s.icon, s.size), title: s.title })
     .bindPopup(s.html);
-  if (key === 'mit_b' || key === 'ser_b' || key === 'mit' || key === 'tas_l' || key === 'tas_u' || key === 'tas_a') awsLayer.addLayer(m);
+  if (key === 'ser_b' || key === 'mit' || key === 'tas_l' || key === 'tas_u' || key === 'tas_a') awsLayer.addLayer(m);
   else if (key === 'tasiilaq' || key === 'kulusuk') townsLayer.addLayer(m);
   else stationsLayer.addLayer(m);
 });

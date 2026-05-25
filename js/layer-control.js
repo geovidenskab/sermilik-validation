@@ -1,7 +1,7 @@
 // Bygger lag-panelet ud fra layerDefs. Håndterer radio (baggrund) og checkbox (overlays).
 // Tilføjer transparens-slider per overlay-lag og registrerer legends når lag aktiveres.
 
-import { map, basemaps, setActiveBasemap } from './map.js';
+import { map, basemaps, setActiveBasemap, gibsMODISIceTemp, gibsMODISAlbedo, gibsSeaIceConc } from './map.js';
 import { stationsLayer, awsLayer, townsLayer } from './markers.js';
 import { arcticDemHillshade, arcticDemTinted, arcticDemSlope, esriHillshade } from './arcticdem.js';
 import { activeLegendLayers, updateLegendBox } from './ui.js';
@@ -61,6 +61,15 @@ const layerDefs = [
     desc: 'Standardkort med byer, veje og navne.',
     layer: basemaps.osm },
 
+  { group: 'basemaps-bathy', type: 'radio', radioGroup: 'basemap', id: 'gebco',
+    name: 'GEBCO bathymetri (sub-ice topo)',
+    desc: 'Havdybde + topografi under indlandsisen (IceBridge BedMachine). 15 arc-sek opløsning, GEBCO 2024.',
+    layer: basemaps.gebco },
+  { group: 'basemaps-bathy', type: 'radio', radioGroup: 'basemap', id: 'modis_truecolor',
+    name: 'MODIS Terra True Color (daglig, ~250 m)',
+    desc: 'Daglig satellit-mosaik fra NASA GIBS. God til havis-koncentration og storm-fronter — men kun zoom 5-9.',
+    layer: basemaps.modis_truecolor },
+
   // ─── TERRÆN & RELIEF ────────────────────────────────────────────────────────
   { group: 'terrain-layers', id: 'arcticdem_hs',
     name: 'ArcticDEM hillshade (2 m)',
@@ -79,6 +88,20 @@ const layerDefs = [
     desc: 'Fallback når ArcticDEM ikke svarer. Lavere opløsning, men virker overalt.',
     layer: esriHillshade, defaultOpacity: 0.5 },
 
+  // ─── NASA GIBS OVERLAYS (daglig) ────────────────────────────────────────────
+  { group: 'gibs-layers', id: 'gibs_albedo',
+    name: 'MODIS daglig albedo (Black-Sky)',
+    desc: 'Daglig kombineret MODIS-albedo, 500 m. Værdier 0-1 (×0.001). Sammenlign med Sentinel-2 Liang og ground-måling.',
+    layer: gibsMODISAlbedo, defaultOpacity: 0.7, legendId: 'gibs_albedo' },
+  { group: 'gibs-layers', id: 'gibs_ice_temp',
+    name: 'MODIS overfladetemperatur (dag)',
+    desc: 'Daglig MODIS Terra Ice Surface Temperature, 1 km. Mere global dækning end Landsat (daglig vs. 8-dages revisit).',
+    layer: gibsMODISIceTemp, defaultOpacity: 0.7, legendId: 'gibs_ice_temp' },
+  { group: 'gibs-layers', id: 'gibs_sea_ice',
+    name: 'AMSR2 havis-koncentration (12 km)',
+    desc: 'Daglig havis-dækning fra AMSR2-radiometer. Vis hvornår Sermilik Fjord fryser/optøer.',
+    layer: gibsSeaIceConc, defaultOpacity: 0.6, legendId: 'gibs_sea_ice' },
+
   // ─── LOKALITETER ────────────────────────────────────────────────────────────
   { group: 'poi-layers', id: 'stations',
     name: 'Forskningsstation & gletsjere',
@@ -86,7 +109,7 @@ const layerDefs = [
     layer: stationsLayer, on: true, noOpacity: true },
   { group: 'poi-layers', id: 'aws',
     name: 'PROMICE vejrstationer',
-    desc: 'AWS MIT_B (fjeld), MIT (på gletsjer), SER_B (kyst), TAS_L/U/A (Tasiilaq-transekt). Klik for direkte CSV-link til timedata fra GEUS THREDDS.',
+    desc: 'MIT (på gletsjer), SER_B (kyst), TAS_L/U/A (Tasiilaq-transekt). Klik for direkte CSV-link til timedata fra GEUS THREDDS.',
     layer: awsLayer, on: true, noOpacity: true },
   { group: 'poi-layers', id: 'towns',
     name: 'Tasiilaq & Kulusuk',

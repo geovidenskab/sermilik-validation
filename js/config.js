@@ -24,6 +24,20 @@ export const SH_DEFAULT_DATES = {
   maxcc: 30,
 };
 
+// ─── GEBCO bathymetri ──────────────────────────────────────────────────────────
+// Generic Bathymetric Chart of the Oceans — global havdybde-kort.
+// WMS: https://wms.gebco.net/mapserv?
+// Layers:
+//   GEBCO_LATEST                 — havis-baseret + havdybde
+//   GEBCO_LATEST_SUB_ICE_TOPO    — viser bathymetri UNDER Grønlands indlandsis (IceBridge BedMachine)
+export const GEBCO_WMS = 'https://wms.gebco.net/mapserv?';
+
+// ─── NASA GIBS — Global Imagery Browse Services ────────────────────────────────
+// WMTS-baseret med daglig dækning af MODIS/VIIRS/AMSR-produkter.
+// Pattern: {base}/{LAYER}/default/{TIME}/{TileMatrixSet}/{z}/{y}/{x}.{ext}
+// TIME = 'default' (seneste) eller 'YYYY-MM-DD'
+export const GIBS_WMTS_BASE = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best';
+
 // ─── ArcticDEM ─────────────────────────────────────────────────────────────────
 // VIGTIGT (2026-05-24): Esri har nedlagt 'elevation2.arcgis.com'-subdomænet.
 // Det nuværende endpoint hostet via PGC's egen ArcGIS-instans hos AWS:
