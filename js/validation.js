@@ -26,6 +26,7 @@
 
 import { map } from './map.js';
 import { VALIDATION_LS_KEY } from './config.js';
+import { openPhotoAlbedo } from './photo-albedo.js';
 
 const PHOTO_MAX_DIM = 1200;    // max bredde/højde for resized foto
 const PHOTO_JPEG_QUALITY = 0.78;
@@ -136,7 +137,10 @@ function renderPopup(p) {
       <h3>${p.name}</h3>
       <div class="vp-coord">${p.lat.toFixed(5)}°N · ${Math.abs(p.lng).toFixed(5)}°W${p.elevation_m != null ? ' · ' + p.elevation_m + ' m.o.h.' : ''}</div>
       <div class="vp-time">Måling: ${p.timestamp_ground ? new Date(p.timestamp_ground).toLocaleString('da-DK') : '—'}</div>
-      ${photoCount > 0 ? `<div class="vp-photos">${photoThumbs}</div>${exifLine}` : '<div class="vp-empty">Ingen foto</div>'}
+      ${photoCount > 0 ? `<div class="vp-photos">${photoThumbs}</div>${exifLine}
+        <div class="vp-photo-actions">
+          ${(p.photos || []).map((_, i) => `<button onclick="window.__vpPhotoAlbedo('${p.id}', ${i})" class="vp-photo-btn">Beregn albedo fra foto ${i + 1}</button>`).join('')}
+        </div>` : '<div class="vp-empty">Ingen foto</div>'}
       <div class="vp-ground">
         <table>
           <tr><th>Albedo (målt)</th><td>${fmt(ground.albedo_measured)}</td></tr>
@@ -394,6 +398,25 @@ window.__vpDelete = function (id) {
   removeMarker(id);
   save();
   map.closePopup();
+};
+
+window.__vpPhotoAlbedo = function (pointId, photoIdx) {
+  const p = findPoint(pointId);
+  if (!p || !p.photos?.[photoIdx]) return;
+  const photo = p.photos[photoIdx];
+  map.closePopup();
+  openPhotoAlbedo(photo, (albedoValue) => {
+    if (albedoValue == null) return;
+    // Gem albedo både på fotoet og på punktets ground-måling
+    p.photos[photoIdx].albedo_measured = albedoValue;
+    p.ground = p.ground || {};
+    p.ground.albedo_measured = albedoValue;
+    p.modified = nowIso();
+    save();
+    // Genåben popup med opdaterede tal
+    const m = markerById.get(pointId);
+    if (m) m.openPopup();
+  });
 };
 
 // ─── Toolbar-integration ──────────────────────────────────────────────────────
