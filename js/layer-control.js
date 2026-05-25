@@ -139,6 +139,8 @@ function getAllBasemapDefs() {
 function buildLayerControl(def, onBasemapChange) {
   const wrap = document.createElement('label');
   wrap.className = 'layer';
+  // Hele beskrivelsen som title-attribut → vises som tooltip på hover
+  wrap.title = def.desc || '';
 
   const input = document.createElement('input');
   input.type = def.type === 'radio' ? 'radio' : 'checkbox';
@@ -147,10 +149,8 @@ function buildLayerControl(def, onBasemapChange) {
 
   const label = document.createElement('div');
   label.className = 'label';
-  label.innerHTML = `
-    <div class="name">${def.name}</div>
-    <div class="desc">${def.desc}</div>
-  `;
+  // Kun navn (komprimeret) — beskrivelse er på title-attributten ovenfor
+  label.innerHTML = `<div class="name">${def.name}</div>`;
 
   // Opacity-slider — kun for overlay-lag (ikke radio, ikke POI), kun synlig når aktivt
   let opacityRow = null;

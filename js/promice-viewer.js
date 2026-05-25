@@ -16,18 +16,45 @@
 const PROMICE_BASE = './data/promice/';
 const cache = new Map();
 
+// Variabler kan være "rene" (direkte i data) eller "afledte" (compute-funktion).
+// Afledte beregner per-dag fra de rå variabler — bruges til strålingsbalance.
 const VARIABLES = {
-  albedo_calc: { label: 'Albedo (beregnet usr/dsr)', unit: '', color: '#f0c020', yMin: 0, yMax: 1 },
-  albedo:      { label: 'Albedo (instrument)',        unit: '', color: '#b88800', yMin: 0, yMax: 1 },
-  t_u:         { label: 'Luft-temperatur',            unit: '°C', color: '#cc3a3a' },
-  t_surf:      { label: 'Overflade-temperatur',       unit: '°C', color: '#7a2a2a' },
-  dsr:         { label: 'Indgående kort-bølge',       unit: 'W/m²', color: '#e69646' },
-  usr:         { label: 'Udgående kort-bølge',        unit: 'W/m²', color: '#a05050' },
-  dlr:         { label: 'Indgående lang-bølge',       unit: 'W/m²', color: '#8c4a8c' },
-  ulr:         { label: 'Udgående lang-bølge',        unit: 'W/m²', color: '#3a3a8c' },
-  wspd_u:      { label: 'Vindhastighed',              unit: 'm/s', color: '#5a9a9a' },
-  z_stake:     { label: 'Sne/is-stake-højde',         unit: 'm', color: '#8a5a3a' },
+  // ─── STRÅLINGSBALANCE — afledte ──────────────────────────────────────────
+  sw_net:      { label: 'Netto kort-bølge (SW↓ − SW↑)',       unit: 'W/m²', color: '#e69646', group: 'Strålingsbalance',
+                 compute: d => (d.dsr != null && d.usr != null) ? d.dsr - d.usr : null },
+  lw_net:      { label: 'Netto lang-bølge (LW↓ − LW↑)',       unit: 'W/m²', color: '#8c4a8c', group: 'Strålingsbalance',
+                 compute: d => (d.dlr != null && d.ulr != null) ? d.dlr - d.ulr : null },
+  rad_net:     { label: 'Netto al-bølge stråling',            unit: 'W/m²', color: '#0A0F3C', group: 'Strålingsbalance',
+                 compute: d => {
+                   const sw = (d.dsr != null && d.usr != null) ? d.dsr - d.usr : null;
+                   const lw = (d.dlr != null && d.ulr != null) ? d.dlr - d.ulr : null;
+                   return (sw != null && lw != null) ? sw + lw : null;
+                 } },
+
+  // ─── RÅ STRÅLINGSKOMPONENTER ────────────────────────────────────────────
+  dsr:         { label: 'Indgående kort-bølge (SW↓)',         unit: 'W/m²', color: '#f0a838', group: 'Stråling rå' },
+  usr:         { label: 'Udgående kort-bølge (SW↑)',          unit: 'W/m²', color: '#a05050', group: 'Stråling rå' },
+  dlr:         { label: 'Indgående lang-bølge (LW↓)',         unit: 'W/m²', color: '#7c3a8c', group: 'Stråling rå' },
+  ulr:         { label: 'Udgående lang-bølge (LW↑)',          unit: 'W/m²', color: '#3a3a8c', group: 'Stråling rå' },
+
+  // ─── ALBEDO ─────────────────────────────────────────────────────────────
+  albedo_calc: { label: 'Albedo (beregnet usr/dsr)',          unit: '',     color: '#f0c020', yMin: 0, yMax: 1, group: 'Albedo' },
+  albedo:      { label: 'Albedo (instrument)',                unit: '',     color: '#b88800', yMin: 0, yMax: 1, group: 'Albedo' },
+
+  // ─── TEMPERATURER & METEOROLOGI ──────────────────────────────────────────
+  t_u:         { label: 'Luft-temperatur (2 m)',              unit: '°C',   color: '#cc3a3a', group: 'Meteorologi' },
+  t_surf:      { label: 'Overflade-temperatur (fra LWU)',     unit: '°C',   color: '#7a2a2a', group: 'Meteorologi' },
+  wspd_u:      { label: 'Vindhastighed',                      unit: 'm/s',  color: '#5a9a9a', group: 'Meteorologi' },
+  z_stake:     { label: 'Sne/is-stake-højde',                 unit: 'm',    color: '#8a5a3a', group: 'Meteorologi' },
 };
+
+// Hjælper: udtræk værdi for variabel — rå eller beregnet
+function valueFor(record, varKey) {
+  const info = VARIABLES[varKey];
+  if (!info) return null;
+  if (info.compute) return info.compute(record);
+  return record[varKey] ?? null;
+}
 
 // ─── Public: load station data (cached) ───────────────────────────────────────
 export async function loadStation(stationKey) {
@@ -72,6 +99,7 @@ function buildModal() {
               <option value="summer">Kun sommer (jun-sep)</option>
             </select>
           </div>
+          <button type="button" id="pv-reset-zoom" title="Nulstil zoom (Ctrl+scroll for zoom · træk for at zoom på interval · Shift+drag for at panne)">Reset zoom</button>
           <div class="pv-info" id="pv-info"></div>
         </div>
         <div class="pv-chart-wrap">
@@ -88,14 +116,28 @@ function buildModal() {
   modalEl.querySelector('.pv-modal-backdrop').addEventListener('click', close);
   modalEl.querySelector('#pv-variable').addEventListener('change', refresh);
   modalEl.querySelector('#pv-period').addEventListener('change', refresh);
+  modalEl.querySelector('#pv-reset-zoom').addEventListener('click', () => {
+    if (chartInstance) chartInstance.resetZoom();
+  });
 
-  // Populér variabel-vælger
+  // Populér variabel-vælger med optgroups
   const sel = modalEl.querySelector('#pv-variable');
+  const groups = {};
   Object.entries(VARIABLES).forEach(([key, info]) => {
-    const opt = document.createElement('option');
-    opt.value = key;
-    opt.textContent = `${info.label}${info.unit ? ' (' + info.unit + ')' : ''}`;
-    sel.appendChild(opt);
+    const g = info.group || 'Andet';
+    if (!groups[g]) groups[g] = [];
+    groups[g].push([key, info]);
+  });
+  Object.entries(groups).forEach(([groupName, entries]) => {
+    const og = document.createElement('optgroup');
+    og.label = groupName;
+    entries.forEach(([key, info]) => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = info.label;
+      og.appendChild(opt);
+    });
+    sel.appendChild(og);
   });
 }
 
@@ -121,10 +163,13 @@ function refresh() {
   const varKey = modalEl.querySelector('#pv-variable').value;
   const period = modalEl.querySelector('#pv-period').value;
   const info = VARIABLES[varKey];
-  const filtered = filterPeriod(currentStation.data, period).filter(d => d[varKey] != null);
+  // Brug valueFor() så afledte variabler (sw_net, lw_net, rad_net) virker
+  const filtered = filterPeriod(currentStation.data, period)
+    .map(d => ({ ...d, _v: valueFor(d, varKey) }))
+    .filter(d => d._v != null);
 
   // Stats
-  const values = filtered.map(d => d[varKey]);
+  const values = filtered.map(d => d._v);
   const statsEl = modalEl.querySelector('#pv-stats');
   if (values.length === 0) {
     statsEl.innerHTML = '<p class="pv-empty">Ingen data for valgt periode + variabel.</p>';
@@ -149,7 +194,7 @@ function refresh() {
     data: {
       datasets: [{
         label: `${info.label} ${info.unit ? '(' + info.unit + ')' : ''}`,
-        data: filtered.map(d => ({ x: d.date, y: d[varKey] })),
+        data: filtered.map(d => ({ x: d.date, y: d._v })),
         borderColor: info.color,
         backgroundColor: info.color + '20',
         pointRadius: 0,
@@ -177,6 +222,19 @@ function refresh() {
       plugins: {
         legend: { display: true, position: 'top' },
         tooltip: { callbacks: { label: c => `${info.label}: ${c.parsed.y.toFixed(3)} ${info.unit}` } },
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: 'x',
+            modifierKey: 'shift',  // shift+drag for at panne
+          },
+          zoom: {
+            wheel: { enabled: true, modifierKey: 'ctrl' },  // ctrl + scroll for zoom
+            pinch: { enabled: true },
+            drag: { enabled: true, backgroundColor: 'rgba(10, 15, 60, 0.1)' },  // drag-rektangel for at zoome
+            mode: 'x',
+          },
+        },
       },
     },
   });

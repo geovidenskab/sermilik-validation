@@ -153,3 +153,58 @@ export function addMobileToggle() {
     document.getElementById('panel').classList.toggle('open');
   });
 }
+
+// ─── Foldelig panel-sektioner ─────────────────────────────────────────────────
+// Hver <h2> bliver klikbar — toggle CSS-klasse "collapsed" på h2 og næste sektion-content
+// indtil næste h2. State persisteres i localStorage.
+const COLLAPSE_LS_KEY = 'sermilik_panel_collapsed';
+
+function loadCollapsedState() {
+  try { return new Set(JSON.parse(localStorage.getItem(COLLAPSE_LS_KEY) || '[]')); }
+  catch { return new Set(); }
+}
+
+function saveCollapsedState(set) {
+  try { localStorage.setItem(COLLAPSE_LS_KEY, JSON.stringify([...set])); } catch {}
+}
+
+export function addPanelCollapseToggles() {
+  const collapsed = loadCollapsedState();
+  const panel = document.getElementById('panel');
+  if (!panel) return;
+  const sections = panel.querySelectorAll('h2');
+  sections.forEach(h2 => {
+    const text = h2.textContent.trim();
+    h2.classList.add('collapsible');
+    h2.setAttribute('role', 'button');
+    h2.setAttribute('tabindex', '0');
+
+    // Pak alt mellem denne h2 og næste h2 i en <div class="collapse-content">
+    const wrapper = document.createElement('div');
+    wrapper.className = 'collapse-content';
+    let next = h2.nextElementSibling;
+    while (next && next.tagName !== 'H2') {
+      const cur = next;
+      next = next.nextElementSibling;
+      wrapper.appendChild(cur);
+    }
+    h2.after(wrapper);
+
+    // Initial state
+    if (collapsed.has(text)) {
+      h2.classList.add('collapsed');
+      wrapper.style.display = 'none';
+    }
+
+    const toggle = () => {
+      const isCollapsed = h2.classList.toggle('collapsed');
+      wrapper.style.display = isCollapsed ? 'none' : '';
+      if (isCollapsed) collapsed.add(text); else collapsed.delete(text);
+      saveCollapsedState(collapsed);
+    };
+    h2.addEventListener('click', toggle);
+    h2.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  });
+}

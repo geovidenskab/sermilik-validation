@@ -48,12 +48,20 @@ export const gebcoBathymetry = L.tileLayer.wms(GEBCO_WMS, {
 });
 
 // NASA GIBS overlay-lag (WMTS, daglig dækning)
-// Default-tid 'default' = seneste tilgængelige scene
-function gibsLayer(layerId, tileMatrixSet, ext, attribution, date = 'default') {
+// VIGTIGT: GIBS True Color produkter understøtter IKKE 'default' som time
+// (returnerer 404). Vi skal angive en specifik dato. I dag er ofte ikke
+// processed endnu kl. 12 UTC, så vi bruger "yesterday" som sikker default.
+function gibsYesterday() {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().slice(0, 10);
+}
+
+function gibsLayer(layerId, tileMatrixSet, ext, attribution, date = gibsYesterday()) {
   return L.tileLayer(
     `${GIBS_WMTS_BASE}/${layerId}/default/${date}/${tileMatrixSet}/{z}/{y}/{x}.${ext}`,
     {
-      attribution: 'NASA EOSDIS GIBS — ' + attribution,
+      attribution: `NASA EOSDIS GIBS — ${attribution} (${date})`,
       tileSize: 256,
       maxNativeZoom: parseInt(tileMatrixSet.match(/Level(\d+)/)?.[1] || '6', 10),
       maxZoom: 12,

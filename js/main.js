@@ -15,7 +15,7 @@ import { initSentinelHubUI, setOnLayersChanged } from './sentinel-hub.js';
 import { addToolBar, loadDrawings } from './tools.js';
 import {
   addBasemapBadge, updateBasemapBadge, addLegend, addScaleBar, addCoordReadout, addMobileToggle,
-  addSpectralLegendBox,
+  addSpectralLegendBox, addPanelCollapseToggles,
 } from './ui.js';
 import { initValidation } from './validation.js';
 import './promice-viewer.js';  // side-effekt: registrerer window.__openPromiceViewer
@@ -39,5 +39,8 @@ addScaleBar();
 addCoordReadout();
 addMobileToggle();
 
-// 5. Validation (Sprint 2 — tom for nu)
+// 5. Validation
 initValidation();
+
+// 6. Foldelige panel-sektioner (kører efter alt UI er bygget)
+addPanelCollapseToggles();

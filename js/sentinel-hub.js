@@ -198,7 +198,8 @@ function buildSpectralLayers() {
     input.checked = previouslyActive.has(def.id);
     const label = document.createElement('div');
     label.className = 'label';
-    label.innerHTML = `<div class="name">${def.name}</div><div class="desc">${def.desc}</div>`;
+    label.innerHTML = `<div class="name">${def.name}</div>`;
+    wrap.title = def.desc || '';
     wrap.appendChild(input);
     wrap.appendChild(label);
     const opacityRow = makeOpacityRow(def.id, 'spectral', layer, !input.checked);
@@ -251,10 +252,8 @@ function buildGlacialLayers() {
     input.checked = previouslyActive.has(def.id);
     const label = document.createElement('div');
     label.className = 'label';
-    label.innerHTML = `
-      <div class="name">${def.name}</div>
-      <div class="desc">${def.desc}</div>
-    `;
+    label.innerHTML = `<div class="name">${def.name}</div>`;
+    wrap.title = def.desc || '';
     wrap.appendChild(input);
     wrap.appendChild(label);
     const opacityRow = makeOpacityRow(def.id, 'glacial', layer, !input.checked);
@@ -305,10 +304,8 @@ function buildThermalLayers() {
     input.checked = previouslyActive.has(def.id);
     const label = document.createElement('div');
     label.className = 'label';
-    label.innerHTML = `
-      <div class="name">${def.name}</div>
-      <div class="desc">${def.desc}</div>
-    `;
+    label.innerHTML = `<div class="name">${def.name}</div>`;
+    wrap.title = def.desc || '';
     wrap.appendChild(input);
     wrap.appendChild(label);
     const opacityRow = makeOpacityRow(def.id, 'thermal', layer, !input.checked);

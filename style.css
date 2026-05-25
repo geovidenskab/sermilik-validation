@@ -37,11 +37,33 @@ header .meta { font-size: 0.8rem; opacity: 0.75; }
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #0A0F3C;
-  margin: 1.3rem 0 0.5rem;
-  padding-bottom: 0.25rem;
+  margin: 1rem 0 0.4rem;
+  padding: 0.2rem 0;
   border-bottom: 1px solid #eaecef;
 }
 #panel h2:first-of-type { margin-top: 0.4rem; }
+#panel h2.collapsible {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  outline: none;
+  transition: background 0.12s;
+}
+#panel h2.collapsible:hover { background: #f0f4f8; }
+#panel h2.collapsible:focus-visible { outline: 2px solid #0A0F3C; outline-offset: 1px; }
+#panel h2.collapsible::before {
+  content: '▾';
+  font-size: 0.65rem;
+  transition: transform 0.15s;
+  color: #5a6378;
+  flex-shrink: 0;
+  display: inline-block;
+  width: 0.8rem;
+}
+#panel h2.collapsible.collapsed::before { transform: rotate(-90deg); }
+#panel .collapse-content { transition: opacity 0.15s; }
 
 #panel h3.layer-subhead {
   font-size: 0.7rem;
@@ -52,21 +74,28 @@ header .meta { font-size: 0.8rem; opacity: 0.75; }
   font-weight: 600;
 }
 
-.layer-group { margin-bottom: 0.3rem; }
+.layer-group { margin-bottom: 0.15rem; }
 .layer {
   display: flex;
-  align-items: flex-start;
-  gap: 0.55rem;
-  padding: 0.4rem 0.35rem;
-  border-radius: 4px;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.35rem;
+  border-radius: 3px;
   cursor: pointer;
   transition: background 0.12s;
+  font-size: 0.85rem;
 }
-.layer:hover { background: #f5f7fa; }
-.layer input { margin-top: 0.2rem; flex-shrink: 0; cursor: pointer; }
-.layer .label { flex: 1; }
-.layer .name { font-weight: 500; color: #1a1a1a; }
-.layer .desc { font-size: 0.78rem; color: #666; margin-top: 0.15rem; }
+.layer:hover { background: #f0f4f8; }
+.layer input { flex-shrink: 0; cursor: pointer; }
+.layer .label { flex: 1; min-width: 0; }
+.layer .name {
+  font-weight: 500;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.layer .desc { display: none; }  /* Skjult — vises som tooltip via title-attribut */
 .layer .teach {
   font-size: 0.76rem;
   color: #0A0F3C;
@@ -1002,6 +1031,17 @@ header .meta { font-size: 0.8rem; opacity: 0.75; }
   font-size: 0.85rem;
   background: #fff;
 }
+#pv-reset-zoom {
+  padding: 0.3rem 0.7rem;
+  border: 1px solid #c8d0d8;
+  background: #f8f9fb;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: #0A0F3C;
+}
+#pv-reset-zoom:hover { background: #e8eef5; }
+
 .pv-info {
   font-size: 0.78rem;
   color: #666;
