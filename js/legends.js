@@ -202,24 +202,6 @@ export const LEGENDS = {
     ],
   },
 
-  // ─── AMSR2 havis-koncentration (deprecated) ──────────────────────────────
-  // NASA's faktiske colormap (verificeret mod AMSR_Sea_Ice_Concentration.xml):
-  // sort/mørk-lilla ved lav koncentration, magenta-pink ved høj.
-  gibs_sea_ice: {
-    title: 'AMSR2 havis-koncentration (deprecated)',
-    type: 'gradient',
-    unit: '% dækning — NASA GIBS purple-pink colormap',
-    description: '⚠ AMSR2/GCOM-W1 satellitten stoppede transmissioner 2025-09-01. Lag viser sidste tilgængelige snapshot.',
-    stops: [
-      { value: '100', label: 'fast is', color: '#ff80ff' },
-      { value: '75',  label: 'kompakt drivis', color: '#cc40cc' },
-      { value: '50',  label: '', color: '#800080' },
-      { value: '25',  label: 'spredt', color: '#400040' },
-      { value: '1',   label: '', color: '#0e000e' },
-      { value: '0',   label: 'åbent vand', color: 'transparent' },
-    ],
-  },
-
   arcticdem_slope: {
     title: 'ArcticDEM hældningskort',
     type: 'gradient',

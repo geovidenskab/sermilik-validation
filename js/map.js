@@ -52,7 +52,6 @@ export const gebcoBathymetry = L.tileLayer.wms(GEBCO_WMS, {
 // eksplicit en dato. Forsinkelse afhænger af produkt-type:
 //   - VIIRS/MODIS True Color: typisk 1 dag (yesterday)
 //   - MODIS L3 Black-Sky Albedo: 2-3 dages forsinkelse
-//   - AMSR2 Sea Ice: deprecated, sidste data 2025-09-01 (hardcoded)
 function gibsDaysAgo(n) {
   const d = new Date();
   d.setUTCDate(d.getUTCDate() - n);
@@ -79,9 +78,6 @@ export const gibsMODISIceTemp = gibsLayer('MODIS_Terra_Ice_Surface_Temp_Day', 'G
 // MODIS Black-Sky Albedo: KRÆVER Level8 (ikke 7) — verificeret mod WMTSCapabilities.
 // L3-produkt med 2-3 dages forsinkelse — bruger 3 dage tilbage.
 export const gibsMODISAlbedo = gibsLayer('MODIS_Combined_L3_Black_Sky_Albedo_Daily', 'GoogleMapsCompatible_Level8', 'png', 'MODIS Combined L3 Black-Sky Albedo Daily', gibsDaysAgo(3));
-// AMSR2 Sea Ice: GCOM-W1 satellitten stoppede transmissioner 2025-09-01.
-// Vi viser sidste tilgængelige snapshot.
-export const gibsSeaIceConc = gibsLayer('AMSRU2_Sea_Ice_Concentration_12km', 'GoogleMapsCompatible_Level6', 'png', 'AMSR2 Sea Ice Concentration 12 km (data stoppet 2025-09-01)', '2025-09-01');
 
 export const basemaps = {
   esri: esriImagery,

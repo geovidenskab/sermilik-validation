@@ -1,7 +1,7 @@
 // Bygger lag-panelet ud fra layerDefs. Håndterer radio (baggrund) og checkbox (overlays).
 // Tilføjer transparens-slider per overlay-lag og registrerer legends når lag aktiveres.
 
-import { map, basemaps, setActiveBasemap, gibsMODISIceTemp, gibsMODISAlbedo, gibsSeaIceConc } from './map.js';
+import { map, basemaps, setActiveBasemap, gibsMODISIceTemp, gibsMODISAlbedo } from './map.js';
 import { stationsLayer, awsLayer, townsLayer } from './markers.js';
 import { arcticDemHillshade, arcticDemTinted, arcticDemSlope, esriHillshade } from './arcticdem.js';
 import { activeLegendLayers, updateLegendBox } from './ui.js';
@@ -93,10 +93,6 @@ const layerDefs = [
     name: 'MODIS overfladetemperatur (dag)',
     desc: 'Daglig MODIS Terra Ice Surface Temperature, 1 km. Mere global dækning end Landsat (daglig vs. 8-dages revisit).',
     layer: gibsMODISIceTemp, defaultOpacity: 0.7, legendId: 'gibs_ice_temp' },
-  { group: 'gibs-layers', id: 'gibs_sea_ice',
-    name: 'AMSR2 havis-koncentration (12 km)',
-    desc: 'Daglig havis-dækning fra AMSR2-radiometer. Vis hvornår Sermilik Fjord fryser/optøer.',
-    layer: gibsSeaIceConc, defaultOpacity: 0.6, legendId: 'gibs_sea_ice' },
 
   // ─── LOKALITETER ────────────────────────────────────────────────────────────
   { group: 'poi-layers', id: 'stations',
