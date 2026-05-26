@@ -157,41 +157,59 @@ export const LEGENDS = {
     ],
   },
 
+  // ─── MODIS Combined Albedo Daily ─────────────────────────────────────────
+  // NASA's faktiske colormap (verificeret mod gibs.earthdata.nasa.gov/colormaps/
+  // v1.3/MODIS_Combined_Albedo_Daily.xml): JET-spektrum 0-750, hvor sourceValue/750
+  // er reel albedo. Mørkeblå = lav, rød = høj.
   gibs_albedo: {
     title: 'MODIS daglig albedo (Black-Sky)',
     type: 'gradient',
     unit: '0-1 — broadband shortwave',
-    description: 'NASA GIBS MODIS Combined Aqua+Terra. Sort = lav, hvid = høj. Officiel SVG-legend: gibs.earthdata.nasa.gov/legends/MODIS_Combined_Albedo_Daily_V.svg',
+    description: 'NASA GIBS MODIS Combined Aqua+Terra. JET-spektrum: mørkeblå=lav, rød=høj. Bemærk over 0.75 er grupperet (sjælden i naturen). Vand/sky/no-data = transparent.',
     stops: [
-      { value: '1.0', label: 'frisk sne', color: '#ffffff' },
-      { value: '0.8', label: '', color: '#cccccc' },
-      { value: '0.6', label: 'firn', color: '#999999' },
-      { value: '0.4', label: 'is/jord', color: '#666666' },
-      { value: '0.2', label: 'mørk overflade', color: '#333333' },
-      { value: '0.0', label: 'vand/sort', color: '#000000' },
+      { value: '0.75', label: 'frisk sne', color: '#ff1100' },
+      { value: '0.65', label: 'firn / våd sne', color: '#ff5900' },
+      { value: '0.55', label: '', color: '#ffa125' },
+      { value: '0.45', label: 'lyse områder', color: '#ffe92e' },
+      { value: '0.35', label: 'tundra / græsland', color: '#d2ff12' },
+      { value: '0.25', label: '', color: '#4dff34' },
+      { value: '0.15', label: 'mørk overflade', color: '#00ffb3' },
+      { value: '0.10', label: 'vegetation', color: '#005ed1' },
+      { value: '0.05', label: '', color: '#000080' },
+      { value: '0.00', label: 'vand / no-data', color: '#000005' },
     ],
   },
 
+  // ─── MODIS Ice Surface Temperature ───────────────────────────────────────
+  // Verificeret mod NASA colormap: hue går fra magenta (-50°C) gennem blå/cyan/grøn
+  // (-30 til 0°C) til gul/orange/rød (+10 til +30°C). Middelhavet (~290 K = +15°C)
+  // viser orange-gul i screenshot — bekræftet matchende.
   gibs_ice_temp: {
     title: 'MODIS overfladetemperatur (dag)',
     type: 'gradient',
-    unit: 'K — MODIS Terra Ice Surface Temperature (1 km)',
-    description: 'NASA GIBS standard colormap (rainbow). Værdier i Kelvin: ~233 K (−40 °C) til ~273 K (0 °C). Klik på legend-link nedenfor for præcis NASA colormap. Bemærk: 1 km opløsning — for grov til Mittivakkat-detalje, men god til regional sammenligning.',
+    unit: 'K (°C i parentes) — MODIS Terra Ice Surface Temperature (1 km)',
+    description: 'NASA GIBS JET colormap. Renderer ALLE pixels — også hav/land hvor "ice surface" ikke er meningsfuldt (læs som "overflade-temp"). Bemærk: 1 km opløsning — bedst til regional sammenligning, for grov til Mittivakkat-detalje.',
     stops: [
-      { value: '273 K  (0 °C)', label: 'smelte', color: '#cc0000' },
-      { value: '263 K  (−10)', label: '', color: '#ff8800' },
-      { value: '253 K  (−20)', label: '', color: '#ffcc00' },
-      { value: '243 K  (−30)', label: '', color: '#99cc66' },
-      { value: '233 K  (−40)', label: '', color: '#3399cc' },
-      { value: '223 K  (−50)', label: 'koldest', color: '#3333aa' },
+      { value: '303 K  (+30°C)', label: 'meget varm (ørken)', color: '#ff5b00' },
+      { value: '293 K  (+20°C)', label: 'tempereret hav', color: '#ffaf00' },
+      { value: '283 K  (+10°C)', label: '', color: '#ffff00' },
+      { value: '273 K   (0°C)', label: 'frysepunkt', color: '#99ff00' },
+      { value: '263 K  (−10°C)', label: '', color: '#37ff80' },
+      { value: '253 K  (−20°C)', label: '', color: '#00bdff' },
+      { value: '243 K  (−30°C)', label: '', color: '#0033ff' },
+      { value: '233 K  (−40°C)', label: '', color: '#4d00ff' },
+      { value: '223 K  (−50°C)', label: 'koldest', color: '#c500ff' },
     ],
   },
 
+  // ─── AMSR2 havis-koncentration (deprecated) ──────────────────────────────
+  // NASA's faktiske colormap (verificeret mod AMSR_Sea_Ice_Concentration.xml):
+  // sort/mørk-lilla ved lav koncentration, magenta-pink ved høj.
   gibs_sea_ice: {
     title: 'AMSR2 havis-koncentration (deprecated)',
     type: 'gradient',
-    unit: '% dækning — NASA GIBS purple-colormap',
-    description: '⚠ AMSR2/GCOM-W1 satellitten stoppede transmissioner 2025-09-01. Lag viser sidste tilgængelige snapshot. NASA standard colormap: lilla-pink (mørk = lav, lys magenta = høj).',
+    unit: '% dækning — NASA GIBS purple-pink colormap',
+    description: '⚠ AMSR2/GCOM-W1 satellitten stoppede transmissioner 2025-09-01. Lag viser sidste tilgængelige snapshot.',
     stops: [
       { value: '100', label: 'fast is', color: '#ff80ff' },
       { value: '75',  label: 'kompakt drivis', color: '#cc40cc' },
