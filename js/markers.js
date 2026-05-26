@@ -107,8 +107,7 @@ const stationLocations = {
     title: 'Tasiilaq',
     html: `<h3>Tasiilaq (Ammassalik)</h3>
       <p>Østgrønlands største by, ca. 1700 indbyggere. ~15 km sydøst for Sermilik feltstation.</p>
-      <p>Vandkraftværk (1,2 MW siden 2004), affaldshåndtering, museum, fiskefabrik.
-         Blomsterdalen — kort vandring fra byen.</p>`,
+      <p>Vandkraftværk (1,2 MW siden 2004).</p>`,
     icon: 'marker-town',
     size: 18,
   },

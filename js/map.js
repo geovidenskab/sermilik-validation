@@ -48,16 +48,18 @@ export const gebcoBathymetry = L.tileLayer.wms(GEBCO_WMS, {
 });
 
 // NASA GIBS overlay-lag (WMTS, daglig dækning)
-// VIGTIGT: GIBS True Color produkter understøtter IKKE 'default' som time
-// (returnerer 404). Vi skal angive en specifik dato. I dag er ofte ikke
-// processed endnu kl. 12 UTC, så vi bruger "yesterday" som sikker default.
-function gibsYesterday() {
+// VIGTIGT: GIBS produkter understøtter IKKE 'default' som time. Vi angiver
+// eksplicit en dato. Forsinkelse afhænger af produkt-type:
+//   - VIIRS/MODIS True Color: typisk 1 dag (yesterday)
+//   - MODIS L3 Black-Sky Albedo: 2-3 dages forsinkelse
+//   - AMSR2 Sea Ice: deprecated, sidste data 2025-09-01 (hardcoded)
+function gibsDaysAgo(n) {
   const d = new Date();
-  d.setUTCDate(d.getUTCDate() - 1);
+  d.setUTCDate(d.getUTCDate() - n);
   return d.toISOString().slice(0, 10);
 }
 
-function gibsLayer(layerId, tileMatrixSet, ext, attribution, date = gibsYesterday()) {
+function gibsLayer(layerId, tileMatrixSet, ext, attribution, date = gibsDaysAgo(1)) {
   return L.tileLayer(
     `${GIBS_WMTS_BASE}/${layerId}/default/${date}/${tileMatrixSet}/{z}/{y}/{x}.${ext}`,
     {
@@ -70,10 +72,16 @@ function gibsLayer(layerId, tileMatrixSet, ext, attribution, date = gibsYesterda
 }
 // VIIRS_SNPP har bredere swath (3000 km vs MODIS 2300 km) — typisk ingen sorte
 // huller mellem orbital tracks ved polerne. Daglig, ~375 m i band I.
-export const gibsMODISTrueColor = gibsLayer('VIIRS_SNPP_CorrectedReflectance_TrueColor', 'GoogleMapsCompatible_Level9', 'jpg', 'VIIRS SNPP daglig — bred swath uden polare huller');
-export const gibsMODISIceTemp = gibsLayer('MODIS_Terra_Ice_Surface_Temp_Day', 'GoogleMapsCompatible_Level7', 'png', 'MODIS Terra Ice Surface Temperature Day');
-export const gibsMODISAlbedo = gibsLayer('MODIS_Combined_L3_Black_Sky_Albedo_Daily', 'GoogleMapsCompatible_Level7', 'png', 'MODIS Combined L3 Black-Sky Albedo Daily');
-export const gibsSeaIceConc = gibsLayer('AMSRU2_Sea_Ice_Concentration_12km', 'GoogleMapsCompatible_Level6', 'png', 'AMSR2 Sea Ice Concentration 12 km');
+// True Color: 1 dags forsinkelse — VIIRS-tiles for "i går" er klar
+export const gibsMODISTrueColor = gibsLayer('VIIRS_SNPP_CorrectedReflectance_TrueColor', 'GoogleMapsCompatible_Level9', 'jpg', 'VIIRS SNPP daglig — bred swath uden polare huller', gibsDaysAgo(1));
+// MODIS Ice Temp: 1-2 dages forsinkelse — bruger 2 dage tilbage for sikkerhed
+export const gibsMODISIceTemp = gibsLayer('MODIS_Terra_Ice_Surface_Temp_Day', 'GoogleMapsCompatible_Level7', 'png', 'MODIS Terra Ice Surface Temperature Day', gibsDaysAgo(2));
+// MODIS Black-Sky Albedo: KRÆVER Level8 (ikke 7) — verificeret mod WMTSCapabilities.
+// L3-produkt med 2-3 dages forsinkelse — bruger 3 dage tilbage.
+export const gibsMODISAlbedo = gibsLayer('MODIS_Combined_L3_Black_Sky_Albedo_Daily', 'GoogleMapsCompatible_Level8', 'png', 'MODIS Combined L3 Black-Sky Albedo Daily', gibsDaysAgo(3));
+// AMSR2 Sea Ice: GCOM-W1 satellitten stoppede transmissioner 2025-09-01.
+// Vi viser sidste tilgængelige snapshot.
+export const gibsSeaIceConc = gibsLayer('AMSRU2_Sea_Ice_Concentration_12km', 'GoogleMapsCompatible_Level6', 'png', 'AMSR2 Sea Ice Concentration 12 km (data stoppet 2025-09-01)', '2025-09-01');
 
 export const basemaps = {
   esri: esriImagery,
