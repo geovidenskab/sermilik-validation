@@ -108,14 +108,23 @@ function buildModal() {
         <div class="pv-stats" id="pv-stats"></div>
         <div class="pv-integral" id="pv-integral"></div>
         <div class="pv-download">
-          <strong>Download udvalgte data:</strong>
-          <span class="pv-download-hint">(zoom på grafen for at vælge periode først)</span>
-          <button type="button" id="pv-dl-csv">CSV</button>
-          <button type="button" id="pv-dl-xlsx">Excel</button>
-          <label class="pv-dl-allvars">
-            <input type="checkbox" id="pv-dl-allvars-cb">
-            Inkludér alle variabler
-          </label>
+          <div class="pv-download-header">
+            <strong>Download udvalgte data:</strong>
+            <span class="pv-download-hint">zoom på grafen for at vælge periode først</span>
+            <div class="pv-dl-buttons">
+              <button type="button" id="pv-dl-csv">Download CSV</button>
+              <button type="button" id="pv-dl-xlsx">Download Excel</button>
+            </div>
+          </div>
+          <div class="pv-dl-vars-wrap">
+            <div class="pv-dl-vars-header">
+              <span>Variabler at inkludere:</span>
+              <button type="button" id="pv-dl-vars-all" class="pv-dl-mini">vælg alle</button>
+              <button type="button" id="pv-dl-vars-none" class="pv-dl-mini">ryd</button>
+              <button type="button" id="pv-dl-vars-current" class="pv-dl-mini">kun nuværende</button>
+            </div>
+            <div id="pv-dl-vars" class="pv-dl-vars"></div>
+          </div>
         </div>
         <div class="pv-meta" id="pv-meta"></div>
       </div>
@@ -154,6 +163,37 @@ function buildModal() {
       og.appendChild(opt);
     });
     sel.appendChild(og);
+  });
+
+  // Populér download-variabel-checkboxes (grupperet, samme rækkefølge)
+  const dlVars = modalEl.querySelector('#pv-dl-vars');
+  Object.entries(groups).forEach(([groupName, entries]) => {
+    const groupHeader = document.createElement('div');
+    groupHeader.className = 'pv-dl-vars-group-label';
+    groupHeader.textContent = groupName;
+    dlVars.appendChild(groupHeader);
+    const groupRow = document.createElement('div');
+    groupRow.className = 'pv-dl-vars-group';
+    entries.forEach(([key, info]) => {
+      const label = document.createElement('label');
+      label.className = 'pv-dl-var-chk';
+      label.title = info.label;
+      label.innerHTML = `<input type="checkbox" value="${key}"><span>${info.label.split('(')[0].trim()}</span>`;
+      groupRow.appendChild(label);
+    });
+    dlVars.appendChild(groupRow);
+  });
+
+  // "Vælg alle"-handlers
+  modalEl.querySelector('#pv-dl-vars-all').addEventListener('click', () => {
+    modalEl.querySelectorAll('#pv-dl-vars input[type="checkbox"]').forEach(cb => cb.checked = true);
+  });
+  modalEl.querySelector('#pv-dl-vars-none').addEventListener('click', () => {
+    modalEl.querySelectorAll('#pv-dl-vars input[type="checkbox"]').forEach(cb => cb.checked = false);
+  });
+  modalEl.querySelector('#pv-dl-vars-current').addEventListener('click', () => {
+    const current = modalEl.querySelector('#pv-variable').value;
+    modalEl.querySelectorAll('#pv-dl-vars input[type="checkbox"]').forEach(cb => cb.checked = (cb.value === current));
   });
 }
 
@@ -205,6 +245,8 @@ function refresh() {
   // Chart
   if (chartInstance) chartInstance.destroy();
   const ctx = modalEl.querySelector('#pv-chart').getContext('2d');
+  // For W/m²-variabler: fyld areal under kurven (visualiserer integralet)
+  const isPower = info.unit === 'W/m²';
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
@@ -212,9 +254,10 @@ function refresh() {
         label: `${info.label} ${info.unit ? '(' + info.unit + ')' : ''}`,
         data: filtered.map(d => ({ x: d.date, y: d._v })),
         borderColor: info.color,
-        backgroundColor: info.color + '20',
+        backgroundColor: isPower ? info.color + '40' : info.color + '20',
+        fill: isPower ? { target: 'origin', above: info.color + '40', below: '#5680c060' } : false,
         pointRadius: 0,
-        borderWidth: 1,
+        borderWidth: 1.2,
         tension: 0,
       }],
     },
@@ -265,6 +308,9 @@ export function openPromiceViewer(stationKey, stationName) {
   modalEl.querySelector('#pv-title').textContent = `${stationName} — PROMICE data`;
   modalEl.querySelector('#pv-info').textContent = 'Henter…';
   modalEl.classList.add('open');
+  // Pre-select den valgte variabel som default download-checkbox
+  const current = modalEl.querySelector('#pv-variable').value;
+  modalEl.querySelectorAll('#pv-dl-vars input[type="checkbox"]').forEach(cb => cb.checked = (cb.value === current));
   loadStation(stationKey).then(meta => {
     currentStation = meta;
     modalEl.querySelector('#pv-info').textContent =
@@ -340,20 +386,33 @@ function updateIntegralAndStats() {
   // Integral kun for W/m²-variabler
   const integralEl = modalEl.querySelector('#pv-integral');
   if (info.unit === 'W/m²') {
-    // Sum × 86400 s/dag → J/m². Konvertér til MJ/m².
-    const totalJoules = values.reduce((a, b) => a + b, 0) * 86400;
+    // Ægte trapez-integral: ∫ P dt ≈ Σ ((y_i + y_{i+1}) / 2) × Δt_i
+    // hvor Δt_i er FAKTISK sekunder mellem datapoint i og i+1.
+    // Det her respekterer dato-huller (manglende dage) korrekt.
+    let totalJoules = 0;
+    let gapDays = 0;
+    for (let i = 1; i < visible.length; i++) {
+      const dtSec = (new Date(visible[i].date) - new Date(visible[i - 1].date)) / 1000;
+      if (dtSec > 86400 * 2) gapDays += Math.round(dtSec / 86400) - 1;  // tæl hul over 1 dag
+      const yAvg = (visible[i]._v + visible[i - 1]._v) / 2;
+      totalJoules += yAvg * dtSec;
+    }
     const totalMJ = totalJoules / 1e6;
     const sign = totalMJ >= 0 ? '' : '';
     const colorClass = totalMJ >= 0 ? 'pv-int-pos' : 'pv-int-neg';
+    const spanDays = Math.round((new Date(visible[visible.length - 1].date) - new Date(visible[0].date)) / 86400000);
+    const gapNote = gapDays > 0 ? ` (${gapDays} dage med data-huller — trapez-interpolation brugt)` : '';
+
     integralEl.innerHTML = `
       <div class="pv-int-card ${colorClass}">
         <div class="pv-int-label">Tilført energi i perioden (∫ ${info.label.split('(')[0].trim()} · dt)</div>
         <div class="pv-int-value">${sign}${totalMJ.toFixed(1)} <span class="pv-int-unit">MJ/m²</span></div>
         <div class="pv-int-detail">
-          ${visible.length} dage × 86400 s × middel ${mean.toFixed(2)} W/m² = ${totalMJ.toFixed(1)} MJ/m²<br>
+          Trapez-integral over ${visible.length} datapunkter (${spanDays} dages spændvidde${gapNote}).<br>
+          Areal under kurven er markeret i grafen — ${totalMJ >= 0 ? 'orange = energi-overskud' : 'blå = energi-tab'}.<br>
           ${totalMJ >= 0
             ? `Positiv → overfladen MODTAGER netto-energi (smelt-/opvarmnings-potentiale: ${(totalMJ * 1e6 / 334000).toFixed(0)} kg/m² sne-smelte v. 0°C)`
-            : 'Negativ → overfladen MISTER netto-energi (afkøling)'}
+            : `Negativ → overfladen MISTER netto-energi (afkøling, ${Math.abs(totalMJ).toFixed(0)} MJ/m² netto-tab)`}
         </div>
       </div>
     `;
@@ -374,22 +433,19 @@ function updateIntegralAndStats() {
 
 function downloadData(format) {
   if (!currentStation) return;
-  const includeAll = modalEl.querySelector('#pv-dl-allvars-cb').checked;
-  const varKey = modalEl.querySelector('#pv-variable').value;
   const visible = getVisibleData();
-  const range = getVisibleRange();
   if (visible.length === 0) {
     alert('Ingen data i synligt interval — zoom ud eller vælg en anden periode.');
     return;
   }
 
-  // Vælg kolonner: enten kun den aktuelle variabel, eller alle rå + afledte
-  let cols;
-  if (includeAll) {
-    cols = ['date', 't_u', 't_surf', 'dsr', 'usr', 'dlr', 'ulr', 'sw_net', 'lw_net', 'rad_net', 'albedo', 'albedo_calc', 'wspd_u', 'z_stake'];
-  } else {
-    cols = ['date', varKey];
+  // Læs valgte variabler fra checkbox-grid. Default: kun aktuel variabel hvis intet er valgt.
+  const selectedVars = Array.from(modalEl.querySelectorAll('#pv-dl-vars input:checked')).map(cb => cb.value);
+  if (selectedVars.length === 0) {
+    alert('Vælg mindst én variabel at downloade.\nTip: klik "kun nuværende" eller markér flere checkboxes.');
+    return;
   }
+  const cols = ['date', ...selectedVars];
 
   // Byg rækker
   const rows = visible.map(d => {
@@ -403,7 +459,10 @@ function downloadData(format) {
 
   const minDate = visible[0].date;
   const maxDate = visible[visible.length - 1].date;
-  const filename = `${currentStation._station}_${minDate}_${maxDate}${includeAll ? '_all' : '_' + varKey}`;
+  const varSuffix = selectedVars.length === 1 ? '_' + selectedVars[0]
+                  : selectedVars.length <= 3 ? '_' + selectedVars.join('-')
+                  : '_' + selectedVars.length + 'vars';
+  const filename = `${currentStation._station}_${minDate}_${maxDate}${varSuffix}`;
 
   if (format === 'csv') {
     const header = cols.join(',');

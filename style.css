@@ -1112,36 +1112,94 @@ header .meta { font-size: 0.8rem; opacity: 0.75; }
   line-height: 1.4;
 }
 
-/* Download-knapper */
+/* Download-sektion */
 .pv-download {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
   font-size: 0.82rem;
   padding: 0.5rem 0.6rem;
   background: #f5f7fa;
   border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.pv-download-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
-.pv-download strong { color: #0A0F3C; }
-.pv-download-hint { color: #888; font-size: 0.72rem; font-style: italic; }
-.pv-download button {
-  padding: 0.3rem 0.7rem;
+.pv-download-header strong { color: #0A0F3C; }
+.pv-download-hint { color: #888; font-size: 0.72rem; font-style: italic; flex: 1; }
+.pv-dl-buttons { display: flex; gap: 0.4rem; }
+.pv-dl-buttons button {
+  padding: 0.35rem 0.8rem;
   background: #0A0F3C;
   color: #fff;
   border: 1px solid #0A0F3C;
   border-radius: 3px;
   cursor: pointer;
   font-size: 0.78rem;
+  font-weight: 500;
 }
-.pv-download button:hover { background: #2a2f6c; }
-.pv-dl-allvars {
+.pv-dl-buttons button:hover { background: #2a2f6c; }
+
+.pv-dl-vars-wrap {
+  background: #fff;
+  border: 1px solid #e0e4ea;
+  border-radius: 3px;
+  padding: 0.4rem 0.55rem;
+}
+.pv-dl-vars-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.76rem;
+  color: #555;
+  flex-wrap: wrap;
+}
+.pv-dl-mini {
+  padding: 0.1rem 0.5rem;
+  background: #fff;
+  border: 1px solid #c8d0d8;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 0.7rem;
+  color: #0A0F3C;
+}
+.pv-dl-mini:hover { background: #e8eef5; }
+
+.pv-dl-vars { display: flex; flex-direction: column; gap: 0.35rem; }
+.pv-dl-vars-group-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #888;
+  font-weight: 600;
+  margin-top: 0.1rem;
+}
+.pv-dl-vars-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 0.15rem 0.6rem;
+  padding-left: 0.3rem;
+}
+.pv-dl-var-chk {
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  font-size: 0.76rem;
-  color: #555;
-  margin-left: auto;
+  font-size: 0.74rem;
+  color: #1a1a1a;
+  cursor: pointer;
+  padding: 0.1rem 0.2rem;
+  border-radius: 2px;
+}
+.pv-dl-var-chk:hover { background: #f0f4f8; }
+.pv-dl-var-chk input { margin: 0; cursor: pointer; flex-shrink: 0; }
+.pv-dl-var-chk span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .pv-meta a { color: #0A0F3C; }
 .pv-empty { color: #aaa; font-style: italic; }
