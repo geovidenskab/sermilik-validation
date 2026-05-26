@@ -437,13 +437,17 @@ header .meta { font-size: 0.8rem; opacity: 0.75; }
   border: none;
   width: 36px;
   height: 36px;
-  font-size: 1.05rem;
+  font-size: 1.35rem;
+  line-height: 1;
+  color: #0A0F3C;
   cursor: pointer;
   border-bottom: 1px solid #eee;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.12s;
+  transition: background 0.12s, color 0.12s;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Symbol", "Helvetica Neue", sans-serif;
+  font-weight: 500;
 }
 .tool-btn:last-child { border-bottom: none; }
 .tool-btn:hover { background: #f0f5fa; }

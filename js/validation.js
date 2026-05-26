@@ -553,7 +553,7 @@ export function initValidation() {
     btn.className = 'tool-btn';
     btn.dataset.tool = 'validation';
     btn.title = 'Afsæt validation-punkt — klik på kortet for at tilføje foto + ground-måling';
-    btn.textContent = '🎯';
+    btn.textContent = '◎';
     // Indsæt før eksport-knappen (data-tool="export")
     const exportBtn = toolBar.querySelector('[data-tool="export"]');
     if (exportBtn) toolBar.insertBefore(btn, exportBtn);

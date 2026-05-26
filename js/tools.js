@@ -32,12 +32,12 @@ export function addToolBar() {
   toolBar.onAdd = function () {
     const div = L.DomUtil.create('div', 'tool-bar leaflet-bar');
     div.innerHTML = `
-      <button class="tool-btn" data-tool="measure" title="Mål afstand (klik waypoints, dobbeltklik afslutter, Esc annullerer)">📏</button>
-      <button class="tool-btn" data-tool="pin" title="Afsæt punkt — klik på kortet for at lægge en markør med koordinat">📍</button>
-      <button class="tool-btn" data-tool="polygon" title="Tegn areal — klik vertices, dobbeltklik afslutter. Bruges fx til ablationsområde.">📐</button>
-      <button class="tool-btn" data-tool="polyline" title="Tegn linje — klik vertices, dobbeltklik afslutter. Bruges fx til gletsjerfront.">〰️</button>
-      <button class="tool-btn" data-tool="export" title="Eksportér alle tegninger som GeoJSON (åbnes direkte i QGIS)">💾</button>
-      <button class="tool-btn danger" data-tool="clear" title="Ryd målinger og pins (tegninger bevares — slet enkelt-tegninger via popup)">🗑️</button>
+      <button class="tool-btn" data-tool="measure" title="Mål afstand (klik waypoints, dobbeltklik afslutter, Esc annullerer)">⟷</button>
+      <button class="tool-btn" data-tool="pin" title="Afsæt punkt — klik på kortet for at lægge en markør med koordinat">◉</button>
+      <button class="tool-btn" data-tool="polygon" title="Tegn areal — klik vertices, dobbeltklik afslutter. Bruges fx til ablationsområde.">⬡</button>
+      <button class="tool-btn" data-tool="polyline" title="Tegn linje — klik vertices, dobbeltklik afslutter. Bruges fx til gletsjerfront.">∿</button>
+      <button class="tool-btn" data-tool="export" title="Eksportér alle tegninger som GeoJSON (åbnes direkte i QGIS)">⇩</button>
+      <button class="tool-btn danger" data-tool="clear" title="Ryd målinger og pins (tegninger bevares — slet enkelt-tegninger via popup)">✕</button>
     `;
     L.DomEvent.disableClickPropagation(div);
     L.DomEvent.disableScrollPropagation(div);

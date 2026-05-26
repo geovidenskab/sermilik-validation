@@ -40,7 +40,7 @@ export function initPixelInfo() {
   btn.className = 'tool-btn';
   btn.dataset.tool = 'pixel-info';
   btn.title = 'Pixel-info — klik på kortet for at hente satellit-værdier (albedo, NDVI, temp, elevation). Træk-rektangel for større område.';
-  btn.textContent = '🔍';
+  btn.textContent = 'ⓘ';
   const exportBtn = toolBar.querySelector('[data-tool="export"]');
   if (exportBtn) toolBar.insertBefore(btn, exportBtn);
   else toolBar.appendChild(btn);
