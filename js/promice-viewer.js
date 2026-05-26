@@ -1,30 +1,70 @@
 // PROMICE viewer — vis og plot daglige værdier fra PROMICE-stationer i browser.
 //
-// Data hostes lokalt som JSON i data/promice/{STATION}_daily.json (4 MB total).
-// Genereret offline med scripts/promice-to-daily-json.py fra hourly CSV.
+// Data hostes lokalt som JSON i data/promice/{STATION}_daily.json (PROMICE rå)
+// og data/promice/{STATION}_vt2024.json (Van Tiggelen et al. 2024 SEB-data,
+// hvor tilgængeligt — i.e. TAS_L/U/A). Genereret offline med:
+//   scripts/promice-to-daily-json.py
+//   scripts/vantiggelen-to-daily-json.py
 //
-// Variabler tilgængelige per station og dag (daglig middel):
-//   t_u          — luft-temperatur (°C)
-//   t_surf       — overflade-temperatur (°C, fra LWU)
-//   dsr / usr    — kort-bølge ind / ud (W/m²)
-//   dlr / ulr    — lang-bølge ind / ud (W/m²)
-//   albedo       — broadband albedo fra instrument
-//   albedo_calc  — usr/dsr (kun når dsr > 50 W/m²)
-//   wspd_u       — vindhastighed (m/s)
-//   z_stake      — sne/is-stake højde (m)
+// VIGTIGT om datakilder:
+//   - PROMICE rå (dsr/usr/dlr/ulr): pyranometeret tilter med boom-røret,
+//     hvilket giver en systematisk SW-bias på op til ~25 W/m² for tilted
+//     stationer. Egnet til "instant" øjebliksvurdering, IKKE til energibudget.
+//   - Van Tiggelen 2024 (vt_*): tilt-korrigeret stråling på flad overflade
+//     + modellerede turbulente flukse (Qh, Qe) + subsurface flux (G) +
+//     residual smelteenergi (melt_E). Anbefalet til SEB-analyse.
+//
+// Variabler i merged record:
+//   PROMICE rå:    t_u, t_surf, dsr/usr/dlr/ulr, wspd_u, z_stake, albedo_calc
+//   Van Tiggelen:  vt_t_air, vt_SWD/SWU/LWD/LWU, vt_Qh, vt_Qe, vt_G,
+//                  vt_melt_E, vt_dz_boom/dz_stakes, vt_subl_day, vt_t_surf_max
 
 const PROMICE_BASE = './data/promice/';
 const cache = new Map();
 
+// Hvilke stationer har Van Tiggelen-data? Liste matchet i scripts/vantiggelen-to-daily-json.py
+const VT_STATIONS = new Set(['TAS_L', 'TAS_U', 'TAS_A']);
+
 // Variabler kan være "rene" (direkte i data) eller "afledte" (compute-funktion).
 // Afledte beregner per-dag fra de rå variabler — bruges til strålingsbalance.
+//
+// Grupperingsstrategi: Van Tiggelen-variabler vises ØVERST (anbefalet kilde),
+// dernæst PROMICE rå-data (med tilt-bias-advarsel i label).
 const VARIABLES = {
-  // ─── STRÅLINGSBALANCE — afledte ──────────────────────────────────────────
-  sw_net:      { label: 'Netto kort-bølge (SW↓ − SW↑)',       unit: 'W/m²', color: '#e69646', group: 'Strålingsbalance',
+  // ─── FULD SEB (Van Tiggelen 2024 — anbefalet) ────────────────────────────
+  vt_rad_net:  { label: 'Netto al-bølge stråling Rn',           unit: 'W/m²', color: '#0A0F3C', group: 'SEB (Van Tiggelen)',
+                 compute: d => (d.vt_SWD != null && d.vt_SWU != null && d.vt_LWD != null && d.vt_LWU != null)
+                   ? (d.vt_SWD - d.vt_SWU) + (d.vt_LWD - d.vt_LWU) : null,
+                 desc: 'Tilt-korrigeret SW + LW, flad overflade' },
+  vt_Qh:       { label: 'Qh — sensibel varmeflux',             unit: 'W/m²', color: '#cc6633', group: 'SEB (Van Tiggelen)',
+                 vtKey: 'Qh', desc: 'Positiv = varm luft varmer overfladen (vigtig over Tasiilaq pga. føhn)' },
+  vt_Qe:       { label: 'Qe — latent varmeflux',               unit: 'W/m²', color: '#33aaaa', group: 'SEB (Van Tiggelen)',
+                 vtKey: 'Qe', desc: 'Negativ = sublimation/fordampning tager energi væk' },
+  vt_G:        { label: 'G — subsurface flux (positiv op)',    unit: 'W/m²', color: '#8a5a3a', group: 'SEB (Van Tiggelen)',
+                 vtKey: 'G',  desc: 'Positiv op = sneens "kold-content" optager energi' },
+  seb_total:   { label: 'SEB total = Rn + Qh + Qe − G',        unit: 'W/m²', color: '#a02060', group: 'SEB (Van Tiggelen)',
+                 compute: d => {
+                   if (d.vt_SWD == null || d.vt_SWU == null || d.vt_LWD == null || d.vt_LWU == null) return null;
+                   if (d.vt_Qh == null || d.vt_Qe == null || d.vt_G == null) return null;
+                   return (d.vt_SWD - d.vt_SWU) + (d.vt_LWD - d.vt_LWU) + d.vt_Qh + d.vt_Qe - d.vt_G;
+                 },
+                 desc: 'Hele overflade-energi-budgettet. Residualen ER smelte-energi (når T_surf=0°C)' },
+  vt_melt_E:   { label: 'Smelte-energi (SEB-model)',           unit: 'W/m²', color: '#d44400', group: 'SEB (Van Tiggelen)',
+                 vtKey: 'melt_E', desc: 'Modelleret smelteenergi via fuld SEB. ∫dt giver kg vand smeltet.' },
+  vt_sw_net:   { label: 'SW_net tilt-korrigeret',              unit: 'W/m²', color: '#e69646', group: 'SEB (Van Tiggelen)',
+                 compute: d => (d.vt_SWD != null && d.vt_SWU != null) ? d.vt_SWD - d.vt_SWU : null },
+  vt_lw_net:   { label: 'LW_net tilt-korrigeret',              unit: 'W/m²', color: '#8c4a8c', group: 'SEB (Van Tiggelen)',
+                 compute: d => (d.vt_LWD != null && d.vt_LWU != null) ? d.vt_LWD - d.vt_LWU : null },
+
+  // ─── PROMICE RÅ STRÅLINGSBALANCE — TILT-BIAS-ADVARSEL ────────────────────
+  // Disse værdier kommer direkte fra pyranometer-bommen og er IKKE tilt-korrigerede.
+  // Bommen tipper sig over tid → systematisk overestimering af SW på 10-30 W/m².
+  // Egnet til hurtig "hvad ser instrumentet" — men IKKE til energibudget!
+  sw_net:      { label: 'SW_net rå (⚠ tilt-bias)',             unit: 'W/m²', color: '#e69646', group: 'PROMICE rå (tilt-uncorr)',
                  compute: d => (d.dsr != null && d.usr != null) ? d.dsr - d.usr : null },
-  lw_net:      { label: 'Netto lang-bølge (LW↓ − LW↑)',       unit: 'W/m²', color: '#8c4a8c', group: 'Strålingsbalance',
+  lw_net:      { label: 'LW_net rå',                           unit: 'W/m²', color: '#8c4a8c', group: 'PROMICE rå (tilt-uncorr)',
                  compute: d => (d.dlr != null && d.ulr != null) ? d.dlr - d.ulr : null },
-  rad_net:     { label: 'Netto al-bølge stråling',            unit: 'W/m²', color: '#0A0F3C', group: 'Strålingsbalance',
+  rad_net:     { label: 'Rn rå (⚠ tilt-bias — IKKE smelte-proxy)', unit: 'W/m²', color: '#5a6a8a', group: 'PROMICE rå (tilt-uncorr)',
                  compute: d => {
                    const sw = (d.dsr != null && d.usr != null) ? d.dsr - d.usr : null;
                    const lw = (d.dlr != null && d.ulr != null) ? d.dlr - d.ulr : null;
@@ -32,37 +72,111 @@ const VARIABLES = {
                  } },
 
   // ─── RÅ STRÅLINGSKOMPONENTER ────────────────────────────────────────────
-  dsr:         { label: 'Indgående kort-bølge (SW↓)',         unit: 'W/m²', color: '#f0a838', group: 'Stråling rå' },
-  usr:         { label: 'Udgående kort-bølge (SW↑)',          unit: 'W/m²', color: '#a05050', group: 'Stråling rå' },
-  dlr:         { label: 'Indgående lang-bølge (LW↓)',         unit: 'W/m²', color: '#7c3a8c', group: 'Stråling rå' },
-  ulr:         { label: 'Udgående lang-bølge (LW↑)',          unit: 'W/m²', color: '#3a3a8c', group: 'Stråling rå' },
+  dsr:         { label: 'Indgående kort-bølge SW↓ (rå)',      unit: 'W/m²', color: '#f0a838', group: 'PROMICE rå (tilt-uncorr)' },
+  usr:         { label: 'Udgående kort-bølge SW↑ (rå)',       unit: 'W/m²', color: '#a05050', group: 'PROMICE rå (tilt-uncorr)' },
+  dlr:         { label: 'Indgående lang-bølge LW↓',           unit: 'W/m²', color: '#7c3a8c', group: 'PROMICE rå (tilt-uncorr)' },
+  ulr:         { label: 'Udgående lang-bølge LW↑',            unit: 'W/m²', color: '#3a3a8c', group: 'PROMICE rå (tilt-uncorr)' },
 
   // ─── ALBEDO ─────────────────────────────────────────────────────────────
   albedo_calc: { label: 'Albedo (beregnet usr/dsr)',          unit: '',     color: '#f0c020', yMin: 0, yMax: 1, group: 'Albedo' },
-  albedo:      { label: 'Albedo (instrument)',                unit: '',     color: '#b88800', yMin: 0, yMax: 1, group: 'Albedo' },
 
   // ─── TEMPERATURER & METEOROLOGI ──────────────────────────────────────────
   t_u:         { label: 'Luft-temperatur (2 m)',              unit: '°C',   color: '#cc3a3a', group: 'Meteorologi' },
   t_surf:      { label: 'Overflade-temperatur (fra LWU)',     unit: '°C',   color: '#7a2a2a', group: 'Meteorologi' },
+  vt_t_surf_max: { label: 'Max daglig overflade-temp (Van T.)', unit: '°C', color: '#aa3030', group: 'Meteorologi',
+                 vtKey: 't_surf_max', desc: 'Vigtigt for at vide om smeltning OVERHOVEDET er mulig den dag (skal ≥ 0°C)' },
   wspd_u:      { label: 'Vindhastighed',                      unit: 'm/s',  color: '#5a9a9a', group: 'Meteorologi' },
-  z_stake:     { label: 'Sne/is-stake-højde',                 unit: 'm',    color: '#8a5a3a', group: 'Meteorologi' },
+  z_stake:     { label: 'Sne/is-stake-højde (PROMICE)',       unit: 'm',    color: '#8a5a3a', group: 'Meteorologi' },
+  vt_dz_boom:  { label: 'Daglig højdeændring (sonic boom)',   unit: 'm',    color: '#6a4a2a', group: 'Meteorologi',
+                 vtKey: 'dz_boom', desc: 'Daglig dz fra ultrasonic ranger. Negativ = afsmeltning + kompaktion + sublimation' },
+  vt_subl_day: { label: 'Daglig sublimation',                 unit: 'm',    color: '#3a8aaa', group: 'Meteorologi',
+                 vtKey: 'subl_day', desc: 'Højdeækvivalent — tab fra overflade som vanddamp (ikke flydende)' },
 };
 
-// Hjælper: udtræk værdi for variabel — rå eller beregnet
+// Hjælper: hent værdi fra record for variabel med vtKey-mapping
+function readVtField(record, vtKey) {
+  return record['vt_' + vtKey] ?? null;
+}
+
+// Hjælper: udtræk værdi for variabel — rå, beregnet eller Van Tiggelen-felt
 function valueFor(record, varKey) {
   const info = VARIABLES[varKey];
   if (!info) return null;
   if (info.compute) return info.compute(record);
+  if (info.vtKey) return readVtField(record, info.vtKey);
   return record[varKey] ?? null;
 }
 
 // ─── Public: load station data (cached) ───────────────────────────────────────
+//
+// Merger PROMICE rå-data med Van Tiggelen 2024 SEB-data på dato. VT-felter får
+// præfix 'vt_' så de ikke kolliderer med PROMICE-felter. Hvis VT-data ikke
+// findes for stationen, returneres bare PROMICE-data alene.
 export async function loadStation(stationKey) {
   if (cache.has(stationKey)) return cache.get(stationKey);
   const p = (async () => {
-    const res = await fetch(PROMICE_BASE + stationKey + '_daily.json');
-    if (!res.ok) throw new Error(`HTTP ${res.status} for ${stationKey}`);
-    return await res.json();
+    // Hent PROMICE rå-data (obligatorisk)
+    const promiseRes = await fetch(PROMICE_BASE + stationKey + '_daily.json');
+    if (!promiseRes.ok) throw new Error(`HTTP ${promiseRes.status} for ${stationKey}`);
+    const promice = await promiseRes.json();
+
+    // Hent Van Tiggelen-data hvis tilgængeligt
+    let vt = null;
+    if (VT_STATIONS.has(stationKey)) {
+      try {
+        const r = await fetch(PROMICE_BASE + stationKey + '_vt2024.json');
+        if (r.ok) vt = await r.json();
+      } catch (e) { console.warn('VT-data fetch failed:', e); }
+    }
+
+    if (!vt) {
+      // Marker tydeligt at vi KUN har PROMICE rå (tilt-bias)
+      promice._has_vt = false;
+      promice._n_days = promice.data.length;
+      return promice;
+    }
+
+    // Byg date → vt-record map
+    const vtMap = new Map(vt.data.map(r => [r.date, r]));
+
+    // Merge: for hvert PROMICE-record, indsæt vt_-præfix-felter
+    const mergedRows = [];
+    const promiseDates = new Set();
+    for (const p of promice.data) {
+      promiseDates.add(p.date);
+      const vRec = vtMap.get(p.date);
+      const merged = { ...p };
+      if (vRec) {
+        for (const [k, v] of Object.entries(vRec)) {
+          if (k !== 'date') merged['vt_' + k] = v;
+        }
+      }
+      mergedRows.push(merged);
+    }
+    // Tilføj VT-records som er ÆLDRE end PROMICE-serien (TAS_L går tilbage til 2007)
+    for (const v of vt.data) {
+      if (!promiseDates.has(v.date)) {
+        const merged = { date: v.date };
+        for (const [k, value] of Object.entries(v)) {
+          if (k !== 'date') merged['vt_' + k] = value;
+        }
+        mergedRows.push(merged);
+      }
+    }
+    mergedRows.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+
+    return {
+      ...promice,
+      data: mergedRows,
+      _has_vt: true,
+      _vt_source: vt._source,
+      _vt_doi: vt._doi,
+      _vt_first_date: vt._first_date,
+      _vt_last_date: vt._last_date,
+      _first_date: mergedRows[0].date,
+      _last_date: mergedRows[mergedRows.length - 1].date,
+      _n_days: mergedRows.length,
+    };
   })();
   cache.set(stationKey, p);
   return p;
@@ -305,20 +419,34 @@ function refresh() {
 
 export function openPromiceViewer(stationKey, stationName) {
   if (!modalEl) buildModal();
-  modalEl.querySelector('#pv-title').textContent = `${stationName} — PROMICE data`;
+  modalEl.querySelector('#pv-title').textContent = `${stationName} — PROMICE / Van Tiggelen data`;
   modalEl.querySelector('#pv-info').textContent = 'Henter…';
   modalEl.classList.add('open');
-  // Pre-select den valgte variabel som default download-checkbox
-  const current = modalEl.querySelector('#pv-variable').value;
-  modalEl.querySelectorAll('#pv-dl-vars input[type="checkbox"]').forEach(cb => cb.checked = (cb.value === current));
+  // Default-variabel afhænger af om stationen har Van Tiggelen-data
+  const defaultVar = VT_STATIONS.has(stationKey) ? 'vt_rad_net' : 'rad_net';
+  modalEl.querySelector('#pv-variable').value = defaultVar;
+  // Sync download-checkboxes til den valgte variabel
+  modalEl.querySelectorAll('#pv-dl-vars input[type="checkbox"]').forEach(cb => cb.checked = (cb.value === defaultVar));
   loadStation(stationKey).then(meta => {
     currentStation = meta;
     modalEl.querySelector('#pv-info').textContent =
       `${meta._n_days.toLocaleString('da-DK')} dage (${meta._first_date} → ${meta._last_date})`;
-    modalEl.querySelector('#pv-meta').innerHTML = `
-      <p>Kilde: ${escapeHtml(meta._source || '')}<br>
-      ${meta._url ? `<a href="${meta._url}" target="_blank">Original CSV (PROMICE THREDDS) →</a>` : ''}</p>
-    `;
+
+    // Vis kilde-info — to forskellige paths afhængigt af om VT-data findes
+    let metaHtml = `<p><b>PROMICE rå:</b> ${escapeHtml(meta._source || '')}`;
+    if (meta._url) metaHtml += ` <a href="${meta._url}" target="_blank">[THREDDS CSV →]</a>`;
+    metaHtml += `</p>`;
+    if (meta._has_vt) {
+      metaHtml += `<p><b>Van Tiggelen 2024 (anbefalet til SEB):</b> ${escapeHtml(meta._vt_source || '')}
+        <a href="${meta._vt_doi}" target="_blank">[PANGAEA DOI →]</a><br>
+        <span style="color:#5a4a1a;">⚠ <b>Vigtigt:</b> PROMICE rå-stråling har tilt-bias på op til ~25 W/m² fordi pyranometeret hælder med boom-røret.
+        Brug variabler i gruppen "<b>SEB (Van Tiggelen)</b>" til energibudget — de er tilt-korrigerede og indeholder også turbulente flukse (Qh, Qe).</span></p>`;
+    } else {
+      metaHtml += `<p style="color:#aa4400;">⚠ Ingen Van Tiggelen SEB-data tilgængelig for denne station.
+        PROMICE rå-stråling har tilt-bias og kan IKKE bruges direkte som smelte-energi-proxy.</p>`;
+    }
+    modalEl.querySelector('#pv-meta').innerHTML = metaHtml;
+
     refresh();
   }).catch(e => {
     modalEl.querySelector('#pv-info').textContent = 'Fejl: ' + e.message;
@@ -403,16 +531,41 @@ function updateIntegralAndStats() {
     const spanDays = Math.round((new Date(visible[visible.length - 1].date) - new Date(visible[0].date)) / 86400000);
     const gapNote = gapDays > 0 ? ` (${gapDays} dage med data-huller — trapez-interpolation brugt)` : '';
 
+    // Variabel-specifik fortolkning af integralet
+    const meltKg = (totalMJ * 1e6 / 334000);  // sne-smelte ved 334 kJ/kg latent varme
+    let interpretation;
+    if (varKey === 'vt_melt_E') {
+      // melt_E ER allerede smelte-energi fra fuld SEB-model (kun positiv når T_surf ≥ 0°C)
+      interpretation = `<b>Faktisk smelte-energi</b> fra Van Tiggelens SEB-model (kun positiv når overflade nåede 0°C).<br>
+        Svarer til <b>${meltKg.toFixed(0)} kg/m² vandækvivalent</b> = ${(meltKg/1000).toFixed(2)} m v.eq. = ${(meltKg/400).toFixed(2)} m firn ved firn-densitet 0.4.`;
+    } else if (varKey === 'seb_total') {
+      interpretation = `<b>Netto SEB-overskud</b> (Rn + Qh + Qe − G). Den del der overstiger T_surf=0°C-tærsklen går til smelte.<br>
+        Hvis hele integralet gik til smelte: <b>${meltKg.toFixed(0)} kg/m² v.eq.</b> (overvurdering — noget bruges til opvarmning af sneen om foråret).`;
+    } else if (varKey === 'vt_rad_net') {
+      interpretation = `<b>Al-bølge stråling (tilt-korrigeret)</b>. Dette er IKKE smelte-energi — Qh, Qe og G bidrager også.<br>
+        Smelte-øvre-grænse hvis alt gik til smelte: ${meltKg.toFixed(0)} kg/m² v.eq. (overvurdering).<br>
+        For Sermilik-området leverer Qh (sensibel varme fra føhn) ofte mere energi end Rn — tjek seb_total eller vt_melt_E.`;
+    } else if (varKey === 'rad_net' || varKey === 'sw_net') {
+      interpretation = `<b>⚠ PROMICE rå-data — tilt-bias kan overestimere med 10–30 W/m²</b>.<br>
+        Brug <b>vt_rad_net</b> eller <b>vt_melt_E</b> i SEB-gruppen for fysisk korrekt værdi.<br>
+        Naivt smelte-estimat: ${meltKg.toFixed(0)} kg/m² v.eq. (sandsynligt overvurderet).`;
+    } else if (varKey === 'vt_Qh' || varKey === 'vt_Qe' || varKey === 'vt_G' || varKey === 'lw_net' || varKey === 'vt_lw_net' || varKey === 'vt_sw_net') {
+      const compName = info.label.split('—')[0].trim();
+      interpretation = `<b>${compName}-bidrag</b> til SEB. Tæller med i seb_total.<br>
+        ${totalMJ >= 0 ? 'Positiv = energi ind i overfladen.' : 'Negativ = energi ud af overfladen.'}`;
+    } else {
+      interpretation = totalMJ >= 0
+        ? `Positiv → overfladen MODTAGER netto-energi.`
+        : `Negativ → overfladen MISTER netto-energi.`;
+    }
+
     integralEl.innerHTML = `
       <div class="pv-int-card ${colorClass}">
-        <div class="pv-int-label">Tilført energi i perioden (∫ ${info.label.split('(')[0].trim()} · dt)</div>
+        <div class="pv-int-label">∫ ${info.label.split('(')[0].trim()} · dt</div>
         <div class="pv-int-value">${sign}${totalMJ.toFixed(1)} <span class="pv-int-unit">MJ/m²</span></div>
         <div class="pv-int-detail">
           Trapez-integral over ${visible.length} datapunkter (${spanDays} dages spændvidde${gapNote}).<br>
-          Areal under kurven er markeret i grafen — ${totalMJ >= 0 ? 'orange = energi-overskud' : 'blå = energi-tab'}.<br>
-          ${totalMJ >= 0
-            ? `Positiv → overfladen MODTAGER netto-energi (smelt-/opvarmnings-potentiale: ${(totalMJ * 1e6 / 334000).toFixed(0)} kg/m² sne-smelte v. 0°C)`
-            : `Negativ → overfladen MISTER netto-energi (afkøling, ${Math.abs(totalMJ).toFixed(0)} MJ/m² netto-tab)`}
+          ${interpretation}
         </div>
       </div>
     `;
