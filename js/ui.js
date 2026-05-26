@@ -11,7 +11,6 @@ export const activeLegendLayers = new Set();
 let legendBoxEl = null;
 
 const basemapInfo = {
-  esri: { label: 'Baggrund: Esri Imagery', value: 'Variable datoer', note: 'Mosaik fra forskellige år (Maxar). Brug Sentinel-2 hvis dato er kritisk.' },
   esri_hybrid: { label: 'Baggrund: Esri Hybrid', value: 'Variable datoer', note: 'Mosaik fra forskellige år (Maxar) + stednavne.' },
   s2_2024: { label: 'Baggrund: Sentinel-2 mosaik', value: 'Hele 2024', note: 'Sammensat af skyfri pixels.' },
   s2_2023: { label: 'Baggrund: Sentinel-2 mosaik', value: 'Hele 2023', note: 'Sammensat af skyfri pixels.' },

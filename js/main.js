@@ -18,6 +18,7 @@ import {
   addSpectralLegendBox, addPanelCollapseToggles,
 } from './ui.js';
 import { initValidation } from './validation.js';
+import { initPixelInfo } from './pixel-info.js';
 import './promice-viewer.js';  // side-effekt: registrerer window.__openPromiceViewer
 
 // 1. Lag-panelet — basemap-radioer, POI-overlays, geologi, terræn
@@ -30,6 +31,7 @@ initSentinelHubUI();
 // 3. Værktøjer
 addToolBar();
 loadDrawings();
+initPixelInfo();    // pixel-info værktøj (🔍) — indsætter knap i tool-bar
 
 // 4. Kort-overlays (badges, legend, koord-readout, mobile)
 addBasemapBadge();

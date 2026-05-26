@@ -107,7 +107,7 @@ export const basemaps = {
     maxZoom: 19,
   }),
   gebco: gebcoBathymetry,
-  modis_truecolor: gibsMODISTrueColor,
+  modis_truecolor: gibsMODISTrueColor,  // tilbageholdt for layer-control fallback
 };
 
 basemaps.esri.addTo(map);
