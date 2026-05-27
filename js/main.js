@@ -20,6 +20,7 @@ import {
 import { initValidation } from './validation.js';
 import { initPixelInfo } from './pixel-info.js';
 import './promice-viewer.js';  // side-effekt: registrerer window.__openPromiceViewer
+import './station-info.js';    // side-effekt: registrerer window.__openStationInfo
 
 // 1. Lag-panelet — basemap-radioer, POI-overlays, geologi, terræn
 buildAllLayerControls(updateBasemapBadge);

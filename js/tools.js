@@ -24,7 +24,13 @@ let activeDrawType = null;       // 'polygon' | 'polyline' | null
 let drawingPoints = [];
 let tempShape = null;
 let cursorLine = null;
+let vertexMarkers = [];          // klikbare vertex-markører (kan slettes)
 const drawnFeatures = [];
+let drawHintBarEl = null;        // hint-bar øverst i kort
+let drawHintBarCtrl = null;
+let measureHintBarEl = null;
+let measureHintBarCtrl = null;
+let nameDialogEl = null;         // modal til navngivning
 
 // ─── Toolbar UI ────────────────────────────────────────────────────────────────
 export function addToolBar() {
@@ -58,6 +64,11 @@ export function addToolBar() {
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') deactivateTool();
     if (e.key === 'Enter' && activeDrawType) finishDrawing();
+    // Cmd/Ctrl+Z fortryder sidste punkt mens man tegner
+    if ((e.metaKey || e.ctrlKey) && e.key === 'z' && activeDrawType && drawingPoints.length > 0) {
+      e.preventDefault();
+      undoLastPoint();
+    }
   });
 
   map.on('click', e => {
@@ -88,7 +99,11 @@ function activateTool(tool) {
   if (tool === 'polygon' || tool === 'polyline') {
     activeDrawType = tool;
     drawingPoints = [];
+    vertexMarkers = [];
     map.doubleClickZoom.disable();
+    showDrawHintBar();
+  } else if (tool === 'measure') {
+    showMeasureHintBar();
   }
 }
 
@@ -99,6 +114,8 @@ function deactivateTool() {
   document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('map').classList.remove('tool-active');
   map.doubleClickZoom.enable();
+  hideDrawHintBar();
+  hideMeasureHintBar();
 }
 
 // ─── MÅL AFSTAND ───────────────────────────────────────────────────────────────
@@ -176,12 +193,48 @@ function addDrawPoint(latlng) {
     if (map.distance(last, latlng) < 5) return;
   }
   drawingPoints.push(latlng);
-  L.circleMarker(latlng, {
-    radius: 3,
-    color: activeDrawType === 'polygon' ? '#D4763C' : '#0A0F3C',
-    fillColor: '#fff', fillOpacity: 1, weight: 2, interactive: false,
-  }).addTo(drawnLayer)._isTempVertex = true;
+  const idx = drawingPoints.length - 1;
+  const color = activeDrawType === 'polygon' ? '#D4763C' : '#0A0F3C';
+  // Klikbar vertex-markør: klik på den for at slette punktet (handy hvis man tager fejl)
+  const vm = L.circleMarker(latlng, {
+    radius: 5, color, fillColor: '#fff', fillOpacity: 1, weight: 2,
+  }).addTo(drawnLayer);
+  vm._isTempVertex = true;
+  vm._vertexIdx = idx;
+  vm.on('click', e => {
+    L.DomEvent.stopPropagation(e);
+    removeVertex(vm._vertexIdx);
+  });
+  vm.bindTooltip(`Punkt ${idx + 1} — klik for at slette`, { direction: 'top', offset: [0, -6] });
+  vertexMarkers.push(vm);
   redrawTempShape();
+  updateDrawHintBar();
+}
+
+function removeVertex(idx) {
+  if (idx < 0 || idx >= drawingPoints.length) return;
+  drawingPoints.splice(idx, 1);
+  // Genopbyg vertex-markører helt (indeks ændrer sig)
+  vertexMarkers.forEach(m => drawnLayer.removeLayer(m));
+  vertexMarkers = [];
+  const color = activeDrawType === 'polygon' ? '#D4763C' : '#0A0F3C';
+  drawingPoints.forEach((p, i) => {
+    const vm = L.circleMarker(p, {
+      radius: 5, color, fillColor: '#fff', fillOpacity: 1, weight: 2,
+    }).addTo(drawnLayer);
+    vm._isTempVertex = true;
+    vm._vertexIdx = i;
+    vm.on('click', e => { L.DomEvent.stopPropagation(e); removeVertex(vm._vertexIdx); });
+    vm.bindTooltip(`Punkt ${i + 1} — klik for at slette`, { direction: 'top', offset: [0, -6] });
+    vertexMarkers.push(vm);
+  });
+  redrawTempShape();
+  updateDrawHintBar();
+}
+
+function undoLastPoint() {
+  if (drawingPoints.length === 0) return;
+  removeVertex(drawingPoints.length - 1);
 }
 
 function redrawTempShape() {
@@ -203,6 +256,8 @@ function redrawTempShape() {
 function cancelDrawing() {
   if (cursorLine) { drawnLayer.removeLayer(cursorLine); cursorLine = null; }
   if (tempShape) { drawnLayer.removeLayer(tempShape); tempShape = null; }
+  vertexMarkers.forEach(m => drawnLayer.removeLayer(m));
+  vertexMarkers = [];
   drawnLayer.eachLayer(l => { if (l._isTempVertex) drawnLayer.removeLayer(l); });
   drawingPoints = [];
   activeDrawType = null;
@@ -211,52 +266,62 @@ function cancelDrawing() {
 function finishDrawing() {
   const minPoints = activeDrawType === 'polygon' ? 3 : 2;
   if (drawingPoints.length < minPoints) {
-    cancelDrawing(); deactivateTool(); return;
+    const isPoly = activeDrawType === 'polygon';
+    alert(`Du skal tilføje mindst ${minPoints} punkter for at lave ${isPoly ? 'et areal' : 'en linje'}.\n\nDu har ${drawingPoints.length}. Klik flere steder på kortet, eller tryk Esc for at annullere.`);
+    return;
   }
 
   const isPolygon = activeDrawType === 'polygon';
   const defaultName = isPolygon ? `Areal ${drawnFeatures.length + 1}` : `Linje ${drawnFeatures.length + 1}`;
-  const name = prompt(`Navn for ${isPolygon ? 'arealet' : 'linjen'}:`, defaultName);
-  if (name === null) { cancelDrawing(); deactivateTool(); return; }
-  const yearInput = prompt('Årstal (valgfrit — fx for gletsjerfront 2024):', new Date().getFullYear());
+  // Snapshot drawing-state — vi cancel'er først efter at modal'en bekræfter
+  const snapshotPoints = drawingPoints.slice();
+  const snapshotType = activeDrawType;
 
-  const id = 'd_' + Date.now();
-  const coords = drawingPoints.map(p => [p.lng, p.lat]);
-  let feature;
-
-  if (isPolygon) {
-    coords.push(coords[0]);
-    const area = computePolygonArea(drawingPoints);
-    feature = {
-      type: 'Feature',
-      properties: {
-        id, name: name || defaultName, type: 'polygon', color: '#D4763C',
-        year: yearInput ? Number(yearInput) || yearInput : null,
-        area_m2: Math.round(area),
-        area_km2: +(area / 1e6).toFixed(4),
-        created: new Date().toISOString(),
-      },
-      geometry: { type: 'Polygon', coordinates: [coords] },
-    };
-  } else {
-    const length = computePolylineLength(drawingPoints);
-    feature = {
-      type: 'Feature',
-      properties: {
-        id, name: name || defaultName, type: 'polyline', color: '#0A0F3C',
-        year: yearInput ? Number(yearInput) || yearInput : null,
-        length_m: Math.round(length),
-        length_km: +(length / 1000).toFixed(3),
-        created: new Date().toISOString(),
-      },
-      geometry: { type: 'LineString', coordinates: coords },
-    };
-  }
-
-  cancelDrawing();
-  addFeatureFromGeoJSON(feature, true);
-  saveDrawings();
-  deactivateTool();
+  openNameDialog({
+    title: isPolygon ? 'Navngiv areal' : 'Navngiv linje',
+    defaultName,
+    showYear: true,
+    onSave: (name, year) => {
+      const id = 'd_' + Date.now();
+      const coords = snapshotPoints.map(p => [p.lng, p.lat]);
+      let feature;
+      if (isPolygon) {
+        coords.push(coords[0]);
+        const area = computePolygonArea(snapshotPoints);
+        feature = {
+          type: 'Feature',
+          properties: {
+            id, name: name || defaultName, type: 'polygon', color: '#D4763C',
+            year: year ? (Number(year) || year) : null,
+            area_m2: Math.round(area),
+            area_km2: +(area / 1e6).toFixed(4),
+            created: new Date().toISOString(),
+          },
+          geometry: { type: 'Polygon', coordinates: [coords] },
+        };
+      } else {
+        const length = computePolylineLength(snapshotPoints);
+        feature = {
+          type: 'Feature',
+          properties: {
+            id, name: name || defaultName, type: 'polyline', color: '#0A0F3C',
+            year: year ? (Number(year) || year) : null,
+            length_m: Math.round(length),
+            length_km: +(length / 1000).toFixed(3),
+            created: new Date().toISOString(),
+          },
+          geometry: { type: 'LineString', coordinates: coords },
+        };
+      }
+      cancelDrawing();
+      addFeatureFromGeoJSON(feature, true);
+      saveDrawings();
+      deactivateTool();
+    },
+    onCancel: () => {
+      // Beholder tegningen åben så bruger kan fortsætte med at justere
+    },
+  });
 }
 
 function computePolygonArea(latlngs) {
@@ -396,4 +461,178 @@ function clearAll() {
   pinCounter = 0;
   map.closePopup();
   deactivateTool();
+}
+
+// ─── Hint-bar øverst i kortet når tegne-værktøj er aktivt ────────────────────
+function showDrawHintBar() {
+  if (drawHintBarCtrl) return;
+  drawHintBarCtrl = L.control({ position: 'topleft' });
+  drawHintBarCtrl.onAdd = function () {
+    const div = L.DomUtil.create('div', 'draw-hint-bar');
+    drawHintBarEl = div;
+    L.DomEvent.disableClickPropagation(div);
+    L.DomEvent.disableScrollPropagation(div);
+    return div;
+  };
+  drawHintBarCtrl.addTo(map);
+  updateDrawHintBar();
+}
+
+function hideDrawHintBar() {
+  if (drawHintBarCtrl) {
+    drawHintBarCtrl.remove();
+    drawHintBarCtrl = null;
+    drawHintBarEl = null;
+  }
+}
+
+function updateDrawHintBar() {
+  if (!drawHintBarEl) return;
+  const isPolygon = activeDrawType === 'polygon';
+  const minPts = isPolygon ? 3 : 2;
+  const n = drawingPoints.length;
+  const enoughPoints = n >= minPts;
+
+  let liveMeasure = '';
+  if (n >= 2) {
+    if (isPolygon && n >= 3) {
+      const area = computePolygonArea(drawingPoints);
+      liveMeasure = area < 1e6
+        ? `${Math.round(area).toLocaleString('da-DK')} m²`
+        : `${(area / 1e6).toFixed(3)} km²`;
+    } else {
+      const len = computePolylineLength(drawingPoints);
+      liveMeasure = len < 1000
+        ? `${Math.round(len)} m`
+        : `${(len / 1000).toFixed(2)} km`;
+    }
+  }
+
+  const typeLabel = isPolygon ? 'Tegner areal' : 'Tegner linje';
+  drawHintBarEl.innerHTML = `
+    <div class="hint-row hint-row-main">
+      <span class="hint-title">${typeLabel}</span>
+      <span class="hint-meta">${n} ${n === 1 ? 'punkt' : 'punkter'}${liveMeasure ? ' · ' + liveMeasure : ''}</span>
+    </div>
+    <div class="hint-row hint-row-actions">
+      <button type="button" class="hint-btn hint-btn-primary" data-act="finish" ${enoughPoints ? '' : 'disabled'} title="Afslut og gem (Enter)">Færdig ✓</button>
+      <button type="button" class="hint-btn" data-act="undo" ${n > 0 ? '' : 'disabled'} title="Fortryd sidste punkt (Cmd+Z)">↶ Fortryd</button>
+      <button type="button" class="hint-btn hint-btn-cancel" data-act="cancel" title="Annullér tegning (Esc)">✕ Annullér</button>
+    </div>
+    <div class="hint-help">
+      Klik på kortet for at tilføje punkter. Klik på et eksisterende punkt for at slette det.
+      ${enoughPoints ? '' : `<br>Du skal bruge mindst ${minPts} ${isPolygon ? 'hjørner' : 'punkter'} for at gemme.`}
+    </div>
+  `;
+  drawHintBarEl.querySelector('[data-act="finish"]')?.addEventListener('click', () => finishDrawing());
+  drawHintBarEl.querySelector('[data-act="undo"]')?.addEventListener('click', () => undoLastPoint());
+  drawHintBarEl.querySelector('[data-act="cancel"]')?.addEventListener('click', () => deactivateTool());
+}
+
+// ─── Mål-afstand hint-bar (mindre, simplere) ─────────────────────────────────
+function showMeasureHintBar() {
+  if (measureHintBarCtrl) return;
+  measureHintBarCtrl = L.control({ position: 'topleft' });
+  measureHintBarCtrl.onAdd = function () {
+    const div = L.DomUtil.create('div', 'draw-hint-bar measure-hint');
+    measureHintBarEl = div;
+    div.innerHTML = `
+      <div class="hint-row hint-row-main">
+        <span class="hint-title">Mål afstand</span>
+      </div>
+      <div class="hint-help">
+        Klik på kortet for at sætte målepunkter — distance opdateres mens du klikker.<br>
+        Tryk <b>Esc</b> eller klik værktøjs-knappen igen for at afslutte.
+      </div>
+    `;
+    L.DomEvent.disableClickPropagation(div);
+    return div;
+  };
+  measureHintBarCtrl.addTo(map);
+}
+
+function hideMeasureHintBar() {
+  if (measureHintBarCtrl) {
+    measureHintBarCtrl.remove();
+    measureHintBarCtrl = null;
+    measureHintBarEl = null;
+  }
+}
+
+// ─── Navngivnings-modal (erstatter prompt()) ──────────────────────────────────
+function openNameDialog({ title, defaultName, showYear, onSave, onCancel }) {
+  if (!nameDialogEl) {
+    nameDialogEl = document.createElement('div');
+    nameDialogEl.id = 'name-dialog';
+    nameDialogEl.innerHTML = `
+      <div class="name-dialog-backdrop"></div>
+      <div class="name-dialog-card">
+        <div class="name-dialog-header">
+          <h2 id="nd-title">Navngiv</h2>
+          <button type="button" id="nd-close">×</button>
+        </div>
+        <div class="name-dialog-body">
+          <label>Navn
+            <input type="text" id="nd-name" autocomplete="off">
+          </label>
+          <label id="nd-year-row">Årstal (valgfrit — fx for gletsjerfront 2024)
+            <input type="number" id="nd-year" min="1900" max="2100">
+          </label>
+          <div class="name-dialog-actions">
+            <button type="button" id="nd-cancel">Annullér</button>
+            <button type="button" id="nd-save" class="primary">Gem</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(nameDialogEl);
+  }
+
+  nameDialogEl.querySelector('#nd-title').textContent = title;
+  const nameIn = nameDialogEl.querySelector('#nd-name');
+  const yearIn = nameDialogEl.querySelector('#nd-year');
+  const yearRow = nameDialogEl.querySelector('#nd-year-row');
+  nameIn.value = defaultName;
+  yearIn.value = new Date().getFullYear();
+  yearRow.style.display = showYear ? '' : 'none';
+  nameDialogEl.classList.add('open');
+  setTimeout(() => { nameIn.focus(); nameIn.select(); }, 50);
+
+  const close = () => nameDialogEl.classList.remove('open');
+  const handleSave = () => {
+    const name = nameIn.value.trim();
+    const year = showYear ? (yearIn.value.trim() || null) : null;
+    close();
+    onSave?.(name || defaultName, year);
+  };
+  const handleCancel = () => { close(); onCancel?.(); };
+
+  // Clean op tidligere event-handlers ved at klone elements
+  const replaceHandler = (sel, handler) => {
+    const el = nameDialogEl.querySelector(sel);
+    const clone = el.cloneNode(true);
+    el.parentNode.replaceChild(clone, el);
+    clone.addEventListener('click', handler);
+    return clone;
+  };
+  replaceHandler('#nd-save', handleSave);
+  replaceHandler('#nd-cancel', handleCancel);
+  replaceHandler('#nd-close', handleCancel);
+  replaceHandler('.name-dialog-backdrop', handleCancel);
+
+  // Enter gemmer, Esc annullerer
+  const keyHandler = e => {
+    if (!nameDialogEl.classList.contains('open')) {
+      document.removeEventListener('keydown', keyHandler);
+      return;
+    }
+    if (e.key === 'Enter' && document.activeElement?.id !== 'nd-cancel') {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      handleCancel();
+    }
+  };
+  document.addEventListener('keydown', keyHandler);
 }

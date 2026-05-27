@@ -31,66 +31,99 @@ const VT_STATIONS = new Set(['TAS_L', 'TAS_U', 'TAS_A']);
 // Grupperingsstrategi: Van Tiggelen-variabler vises ØVERST (anbefalet kilde),
 // dernæst PROMICE rå-data (med tilt-bias-advarsel i label).
 const VARIABLES = {
-  // ─── FULD SEB (Van Tiggelen 2024 — anbefalet) ────────────────────────────
-  vt_rad_net:  { label: 'Netto al-bølge stråling Rn',           unit: 'W/m²', color: '#0A0F3C', group: 'SEB (Van Tiggelen)',
+  // ─── FULD ENERGI-BALANCE (Van Tiggelen 2024 — anbefalet) ─────────────────
+  // Hver variabel har "label" (kort), "desc" (plain dansk forklaring) og "interpretation"
+  // (hvad SIGER det her tal når man ser det).
+  vt_rad_net:  { label: 'Strålings-balance (sol + varme)',     unit: 'W/m²', color: '#0A0F3C', group: 'Energi-balance (anbefalet)',
                  compute: d => (d.vt_SWD != null && d.vt_SWU != null && d.vt_LWD != null && d.vt_LWU != null)
                    ? (d.vt_SWD - d.vt_SWU) + (d.vt_LWD - d.vt_LWU) : null,
-                 desc: 'Tilt-korrigeret SW + LW, flad overflade' },
-  vt_Qh:       { label: 'Qh — sensibel varmeflux',             unit: 'W/m²', color: '#cc6633', group: 'SEB (Van Tiggelen)',
-                 vtKey: 'Qh', desc: 'Positiv = varm luft varmer overfladen (vigtig over Tasiilaq pga. føhn)' },
-  vt_Qe:       { label: 'Qe — latent varmeflux',               unit: 'W/m²', color: '#33aaaa', group: 'SEB (Van Tiggelen)',
-                 vtKey: 'Qe', desc: 'Negativ = sublimation/fordampning tager energi væk' },
-  vt_G:        { label: 'G — subsurface flux (positiv op)',    unit: 'W/m²', color: '#8a5a3a', group: 'SEB (Van Tiggelen)',
-                 vtKey: 'G',  desc: 'Positiv op = sneens "kold-content" optager energi' },
-  seb_total:   { label: 'SEB total = Rn + Qh + Qe − G',        unit: 'W/m²', color: '#a02060', group: 'SEB (Van Tiggelen)',
+                 desc: 'Sol + varmestråling der GÅR IND i overfladen minus det der GÅR UD igen. Positiv = overfladen modtager netto energi fra stråling.',
+                 example: 'Sommeren over en mørk gletsjer-flade: ofte +100 W/m². Vinternat: −50 W/m² (overfladen mister varme til himlen).',
+               },
+  vt_Qh:       { label: 'Sensibel varme (luft → overflade)',   unit: 'W/m²', color: '#cc6633', group: 'Energi-balance (anbefalet)',
+                 vtKey: 'Qh',
+                 desc: 'Energi fra varm luft der blæser hen over kold is. Positiv = luften varmer overfladen. I Sermilik-området er dette ofte den STØRSTE energikilde til smelte — føhn-vinde fra Atlanten kan levere +50 W/m² over kold is.',
+                 example: 'På en føhn-dag: +100 W/m² (luften er meget varmere end isen). På en stille kold vinternat: tæt på 0.',
+               },
+  vt_Qe:       { label: 'Latent varme (fordampning/kondens)',  unit: 'W/m²', color: '#33aaaa', group: 'Energi-balance (anbefalet)',
+                 vtKey: 'Qe',
+                 desc: 'Energi der bruges når vand skifter form. Negativ = is fordamper direkte til damp (sublimation) og tager energi MED sig væk. Positiv = der dannes rim/dug og energi frigives.',
+                 example: 'Tør, blæsende sommerdag på sne: −30 W/m² (sneen sublimerer aktivt). Fugtig dag: tæt på 0.',
+               },
+  vt_G:        { label: 'Varmeflux ned i sneen',               unit: 'W/m²', color: '#8a5a3a', group: 'Energi-balance (anbefalet)',
+                 vtKey: 'G',
+                 desc: 'Energi der ledes NED i sneen for at varme den op (positiv om foråret) eller UD af sneen (negativ om vinteren). En kold snemark om foråret skal varmes til 0°C før smelte kan begynde — den energi går her.',
+                 example: 'Forår, kold sne: +20 W/m² (energi går ned). Sommer, allerede ved 0°C: tæt på 0.',
+               },
+  seb_total:   { label: 'Total energi-balance (alt sammen)',   unit: 'W/m²', color: '#a02060', group: 'Energi-balance (anbefalet)',
                  compute: d => {
                    if (d.vt_SWD == null || d.vt_SWU == null || d.vt_LWD == null || d.vt_LWU == null) return null;
                    if (d.vt_Qh == null || d.vt_Qe == null || d.vt_G == null) return null;
                    return (d.vt_SWD - d.vt_SWU) + (d.vt_LWD - d.vt_LWU) + d.vt_Qh + d.vt_Qe - d.vt_G;
                  },
-                 desc: 'Hele overflade-energi-budgettet. Residualen ER smelte-energi (når T_surf=0°C)' },
-  vt_melt_E:   { label: 'Smelte-energi (SEB-model)',           unit: 'W/m²', color: '#d44400', group: 'SEB (Van Tiggelen)',
-                 vtKey: 'melt_E', desc: 'Modelleret smelteenergi via fuld SEB. ∫dt giver kg vand smeltet.' },
-  vt_sw_net:   { label: 'SW_net tilt-korrigeret',              unit: 'W/m²', color: '#e69646', group: 'SEB (Van Tiggelen)',
-                 compute: d => (d.vt_SWD != null && d.vt_SWU != null) ? d.vt_SWD - d.vt_SWU : null },
-  vt_lw_net:   { label: 'LW_net tilt-korrigeret',              unit: 'W/m²', color: '#8c4a8c', group: 'SEB (Van Tiggelen)',
-                 compute: d => (d.vt_LWD != null && d.vt_LWU != null) ? d.vt_LWD - d.vt_LWU : null },
+                 desc: 'Summen af alle energi-strømme til/fra overfladen. Positiv = overfladen har "energi-overskud" der kan gå til smelte (hvis overfladen allerede er 0°C). Negativ = overfladen afkøles.',
+                 example: 'Varm sommerdag: ofte +150 W/m². Vinternat: −60 W/m².',
+               },
+  vt_melt_E:   { label: 'Smelte-energi (faktisk smelte)',      unit: 'W/m²', color: '#d44400', group: 'Energi-balance (anbefalet)',
+                 vtKey: 'melt_E',
+                 desc: 'Den del af energi-overskuddet der RENT FAKTISK går til smelte (kun positiv når overfladen står på 0°C). Integralet over tid fortæller hvor meget vand der blev produceret.',
+                 example: '1 MJ/m² = 3 mm smeltevand (vandækvivalent). Et helt sommerhalvår kan give 500-1500 MJ/m² = 1.5-4.5 m smeltevand.',
+               },
+  vt_sw_net:   { label: 'Netto sol-stråling (kort-bølge)',     unit: 'W/m²', color: '#e69646', group: 'Energi-balance (anbefalet)',
+                 compute: d => (d.vt_SWD != null && d.vt_SWU != null) ? d.vt_SWD - d.vt_SWU : null,
+                 desc: 'Sollys der rammer overfladen MINUS det der bliver reflekteret. Forskellen er hvad overfladen "fanger". Tilt-korrigeret = robust til energibudget.',
+               },
+  vt_lw_net:   { label: 'Netto varme-stråling (lang-bølge)',   unit: 'W/m²', color: '#8c4a8c', group: 'Energi-balance (anbefalet)',
+                 compute: d => (d.vt_LWD != null && d.vt_LWU != null) ? d.vt_LWD - d.vt_LWU : null,
+                 desc: 'Varmestråling fra atmosfæren NED på overfladen minus varmestrålingen overfladen sender op. Næsten altid negativ (overfladen taber mere varme end den får). Mest negativ ved klar nattehimmel.',
+               },
 
   // ─── PROMICE RÅ STRÅLINGSBALANCE — TILT-BIAS-ADVARSEL ────────────────────
   // Disse værdier kommer direkte fra pyranometer-bommen og er IKKE tilt-korrigerede.
-  // Bommen tipper sig over tid → systematisk overestimering af SW på 10-30 W/m².
-  // Egnet til hurtig "hvad ser instrumentet" — men IKKE til energibudget!
-  sw_net:      { label: 'SW_net rå (⚠ tilt-bias)',             unit: 'W/m²', color: '#e69646', group: 'PROMICE rå (tilt-uncorr)',
-                 compute: d => (d.dsr != null && d.usr != null) ? d.dsr - d.usr : null },
-  lw_net:      { label: 'LW_net rå',                           unit: 'W/m²', color: '#8c4a8c', group: 'PROMICE rå (tilt-uncorr)',
-                 compute: d => (d.dlr != null && d.ulr != null) ? d.dlr - d.ulr : null },
-  rad_net:     { label: 'Rn rå (⚠ tilt-bias — IKKE smelte-proxy)', unit: 'W/m²', color: '#5a6a8a', group: 'PROMICE rå (tilt-uncorr)',
+  sw_net:      { label: 'Netto sol-stråling (rå — kan have fejl)', unit: 'W/m²', color: '#e69646', group: 'Rå sensor-data (tjek-formål)',
+                 compute: d => (d.dsr != null && d.usr != null) ? d.dsr - d.usr : null,
+                 desc: 'Samme som ovenstående, men direkte fra pyranometeret. Sensoren tilter med masten over tid — derfor kan værdien være systematisk for høj. Brug "Netto sol-stråling" i Energi-balance-gruppen i stedet.' },
+  lw_net:      { label: 'Netto varme-stråling (rå)',           unit: 'W/m²', color: '#8c4a8c', group: 'Rå sensor-data (tjek-formål)',
+                 compute: d => (d.dlr != null && d.ulr != null) ? d.dlr - d.ulr : null,
+                 desc: 'Forskel mellem varmestråling ned og op. Pyrgeometeret er mindre påvirket af tilt end pyranometeret.' },
+  rad_net:     { label: 'Strålings-balance (rå — kan have fejl)', unit: 'W/m²', color: '#5a6a8a', group: 'Rå sensor-data (tjek-formål)',
                  compute: d => {
                    const sw = (d.dsr != null && d.usr != null) ? d.dsr - d.usr : null;
                    const lw = (d.dlr != null && d.ulr != null) ? d.dlr - d.ulr : null;
                    return (sw != null && lw != null) ? sw + lw : null;
-                 } },
-
-  // ─── RÅ STRÅLINGSKOMPONENTER ────────────────────────────────────────────
-  dsr:         { label: 'Indgående kort-bølge SW↓ (rå)',      unit: 'W/m²', color: '#f0a838', group: 'PROMICE rå (tilt-uncorr)' },
-  usr:         { label: 'Udgående kort-bølge SW↑ (rå)',       unit: 'W/m²', color: '#a05050', group: 'PROMICE rå (tilt-uncorr)' },
-  dlr:         { label: 'Indgående lang-bølge LW↓',           unit: 'W/m²', color: '#7c3a8c', group: 'PROMICE rå (tilt-uncorr)' },
-  ulr:         { label: 'Udgående lang-bølge LW↑',            unit: 'W/m²', color: '#3a3a8c', group: 'PROMICE rå (tilt-uncorr)' },
+                 },
+                 desc: '⚠ Tilt-uncorrected. Brug "Strålings-balance" i Energi-balance-gruppen til energibudgetter.' },
+  dsr:         { label: 'Sollys NED (kort-bølge ind)',         unit: 'W/m²', color: '#f0a838', group: 'Rå sensor-data (tjek-formål)',
+                 desc: 'Direkte solindstråling der rammer pyranometeret. Mest om sommeren, 0 om vinternatten.' },
+  usr:         { label: 'Sollys UD (reflekteret)',             unit: 'W/m²', color: '#a05050', group: 'Rå sensor-data (tjek-formål)',
+                 desc: 'Den del af sollyset overfladen reflekterer. Hvid sne reflekterer 80-90%, mørk is/sten kun 10-20%.' },
+  dlr:         { label: 'Varmestråling NED (fra himmel)',      unit: 'W/m²', color: '#7c3a8c', group: 'Rå sensor-data (tjek-formål)',
+                 desc: 'Infrarød stråling fra atmosfæren ned på overfladen. Større under skyer (skyer "lukker varmen inde") end ved klar nattehimmel.' },
+  ulr:         { label: 'Varmestråling UD (fra overflade)',    unit: 'W/m²', color: '#3a3a8c', group: 'Rå sensor-data (tjek-formål)',
+                 desc: 'Varmestråling overfladen selv sender op. Bruges til at beregne overflade-temperaturen.' },
 
   // ─── ALBEDO ─────────────────────────────────────────────────────────────
-  albedo_calc: { label: 'Albedo (beregnet usr/dsr)',          unit: '',     color: '#f0c020', yMin: 0, yMax: 1, group: 'Albedo' },
+  albedo_calc: { label: 'Albedo (refleksion)',                 unit: '',     color: '#f0c020', yMin: 0, yMax: 1, group: 'Albedo',
+                 desc: 'Forholdet mellem reflekteret og indkommende sollys. 1 = perfekt hvid spejl, 0 = sort. Frisk sne: 0.85. Smelte-sne: 0.6. Blank is: 0.4. Mørk is med støv: 0.15.' },
 
-  // ─── TEMPERATURER & METEOROLOGI ──────────────────────────────────────────
-  t_u:         { label: 'Luft-temperatur (2 m)',              unit: '°C',   color: '#cc3a3a', group: 'Meteorologi' },
-  t_surf:      { label: 'Overflade-temperatur (fra LWU)',     unit: '°C',   color: '#7a2a2a', group: 'Meteorologi' },
-  vt_t_surf_max: { label: 'Max daglig overflade-temp (Van T.)', unit: '°C', color: '#aa3030', group: 'Meteorologi',
-                 vtKey: 't_surf_max', desc: 'Vigtigt for at vide om smeltning OVERHOVEDET er mulig den dag (skal ≥ 0°C)' },
-  wspd_u:      { label: 'Vindhastighed',                      unit: 'm/s',  color: '#5a9a9a', group: 'Meteorologi' },
-  z_stake:     { label: 'Sne/is-stake-højde (PROMICE)',       unit: 'm',    color: '#8a5a3a', group: 'Meteorologi' },
-  vt_dz_boom:  { label: 'Daglig højdeændring (sonic boom)',   unit: 'm',    color: '#6a4a2a', group: 'Meteorologi',
-                 vtKey: 'dz_boom', desc: 'Daglig dz fra ultrasonic ranger. Negativ = afsmeltning + kompaktion + sublimation' },
-  vt_subl_day: { label: 'Daglig sublimation',                 unit: 'm',    color: '#3a8aaa', group: 'Meteorologi',
-                 vtKey: 'subl_day', desc: 'Højdeækvivalent — tab fra overflade som vanddamp (ikke flydende)' },
+  // ─── METEOROLOGI ─────────────────────────────────────────────────────────
+  t_u:         { label: 'Luft-temperatur (2 m)',              unit: '°C',   color: '#cc3a3a', group: 'Meteorologi',
+                 desc: 'Termometer i ventileret skærm. Den temperatur du ville mærke hvis du gik forbi stationen.' },
+  t_surf:      { label: 'Overflade-temperatur',                unit: '°C',   color: '#7a2a2a', group: 'Meteorologi',
+                 desc: 'Beregnet ud fra hvor meget varmestråling overfladen sender op. Når den når 0°C kan smelte begynde — IKKE før.' },
+  vt_t_surf_max: { label: 'Maks. overflade-temp (per dag)',    unit: '°C',   color: '#aa3030', group: 'Meteorologi',
+                 vtKey: 't_surf_max',
+                 desc: 'Den højeste overflade-temperatur stationen så på den dag. Hvis den ikke når 0°C, kan der ikke smelte den dag — uanset hvor meget sol der er.' },
+  wspd_u:      { label: 'Vindhastighed (10 m)',                unit: 'm/s',  color: '#5a9a9a', group: 'Meteorologi',
+                 desc: 'Anemometer øverst på masten. Vigtig — kraftigere vind øger turbulent varmeudveksling mellem luft og overflade.' },
+  z_stake:     { label: 'Sne/is-niveau (PROMICE-stake)',      unit: 'm',    color: '#8a5a3a', group: 'Meteorologi',
+                 desc: 'Højden af snefladen målt med ultralyd. Falder om sommeren (afsmeltning) og stiger om vinteren (akkumulation).' },
+  vt_dz_boom:  { label: 'Daglig sne/is-ændring',               unit: 'm',    color: '#6a4a2a', group: 'Meteorologi',
+                 vtKey: 'dz_boom',
+                 desc: 'Hvor meget snefladen flyttede sig på én dag. Negativ = overfladen er sunket (smelte + sammenpresning + sublimation). Positiv = ny sne.' },
+  vt_subl_day: { label: 'Daglig sublimation',                  unit: 'm',    color: '#3a8aaa', group: 'Meteorologi',
+                 vtKey: 'subl_day',
+                 desc: 'Hvor meget is/sne der gik direkte til vanddamp uden at smelte. Tæller med i samlet højde-tab men producerer ikke flydende vand.' },
 };
 
 // Hjælper: hent værdi fra record for variabel med vtKey-mapping
@@ -216,6 +249,7 @@ function buildModal() {
           <button type="button" id="pv-reset-zoom" title="Nulstil zoom (Ctrl+scroll for zoom · træk for at zoom på interval · Shift+drag for at panne)">Reset zoom</button>
           <div class="pv-info" id="pv-info"></div>
         </div>
+        <div class="pv-var-explain" id="pv-var-explain"></div>
         <div class="pv-chart-wrap">
           <canvas id="pv-chart"></canvas>
         </div>
@@ -333,6 +367,20 @@ function refresh() {
   const varKey = modalEl.querySelector('#pv-variable').value;
   const period = modalEl.querySelector('#pv-period').value;
   const info = VARIABLES[varKey];
+
+  // Vis plain-Danish forklaring af den valgte variabel
+  const explainEl = modalEl.querySelector('#pv-var-explain');
+  if (explainEl) {
+    if (info.desc || info.example) {
+      explainEl.innerHTML = `
+        ${info.desc ? `<div class="pv-explain-desc">${info.desc}</div>` : ''}
+        ${info.example ? `<div class="pv-explain-example"><b>Eksempel:</b> ${info.example}</div>` : ''}
+      `;
+      explainEl.style.display = 'block';
+    } else {
+      explainEl.style.display = 'none';
+    }
+  }
   // Brug valueFor() så afledte variabler (sw_net, lw_net, rad_net) virker
   const filtered = filterPeriod(currentStation.data, period)
     .map(d => ({ ...d, _v: valueFor(d, varKey) }))

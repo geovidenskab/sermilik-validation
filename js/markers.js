@@ -38,22 +38,28 @@ const stationLocations = {
   ser_b: {
     coords: [65.66, -38.155],
     title: 'PROMICE AWS — SER_B',
-    html: `<h3>PROMICE AWS: SER_B (Sermilik bedrock)</h3>
-      <p>Vejrstation ved kysten nær feltstationen. Ideel reference for energibalance
-         og temperaturinversioner mellem kyst og højere stationer.</p>
-      <p><button onclick="window.__openPromiceViewer('SER_B','SER_B Sermilik bedrock')" class="vp-photo-btn">Vis og plot data →</button></p>
-      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/hour/SER_B_hour.csv" target="_blank">Hent original timedata CSV →</a></p>`,
+    html: `<h3>SER_B — Sermilik bedrock</h3>
+      <p>Vejrstation på klippe ved Sermilik-fjordens kyst. Den måler det klima
+         der rammer fjorden — temperatur, vind, stråling — som reference for
+         hvad der sker længere oppe på gletsjeren.</p>
+      <p style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+        <button onclick="window.__openStationInfo('SER_B')" class="vp-photo-btn">Foto + info →</button>
+        <button onclick="window.__openPromiceViewer('SER_B','SER_B Sermilik bedrock')" class="vp-photo-btn">Vis og plot data →</button>
+      </p>`,
     icon: 'marker-aws',
     size: 14,
   },
   mit: {
     coords: [65.69, -37.83],
     title: 'PROMICE AWS — MIT (på gletsjer)',
-    html: `<h3>PROMICE AWS: MIT (Mittivakkat ablationszone)</h3>
-      <p>Station <em>på</em> gletsjeren, etableret 3. maj 2009. ~440 m.o.h.
-         Måler ablation/akkumulation i ablationszonen.</p>
-      <p><button onclick="window.__openPromiceViewer('MIT','MIT Mittivakkat ablationszone')" class="vp-photo-btn">Vis og plot data →</button></p>
-      <p><a href="https://thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/hour/MIT_hour.csv" target="_blank">Hent original timedata CSV →</a></p>`,
+    html: `<h3>MIT — Mittivakkat-gletsjeren</h3>
+      <p>Stationen står direkte på Mittivakkat-gletsjeren i ablations-zonen
+         (515 m.o.h.) — det område der MISTER masse om sommeren. Et af verdens
+         længst-løbende glaciale energi-budget-eksperimenter (siden 2009).</p>
+      <p style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+        <button onclick="window.__openStationInfo('MIT')" class="vp-photo-btn">Foto + info →</button>
+        <button onclick="window.__openPromiceViewer('MIT','MIT Mittivakkat')" class="vp-photo-btn">Vis og plot data →</button>
+      </p>`,
     icon: 'marker-aws',
     size: 14,
   },
@@ -61,15 +67,13 @@ const stationLocations = {
   tas_l: {
     coords: [65.6402, -38.8987],
     title: 'AWS — TAS_L (Tasiilaq kyst, 250 m)',
-    html: `<h3>TAS_L — Tasiilaq Lower (250 m.o.h.)</h3>
-      <p><b>65.6402°N · 38.8987°W</b> · PROMICE-station siden 2007 (<b>17 års serie</b>)</p>
-      <p>Lavt-elevation reference på kysten — perfekt til at sætte rammerne for hvad
-         vinter og sommer ser ud som ved havniveau.</p>
-      <p><b>Daglig SEB-data</b> (Van Tiggelen et al. 2024): SWD/SWU → albedo,
-         LWU → overfladetemperatur, smelteenergi, luft-temp. 6.000 dage data.</p>
-      <p><button onclick="window.__openPromiceViewer('TAS_L','TAS_L Tasiilaq Lower (250 m)')" class="vp-photo-btn">Vis og plot PROMICE data →</button></p>
-      <p><a href="./data/pangaea/GRL_TAS_L_AWS.tab" target="_blank">Daglig SEB (.tab, lokal)</a> ·
-         <a href="https://doi.org/10.1594/PANGAEA.970145" target="_blank">DOI</a></p>`,
+    html: `<h3>TAS_L — Tasiilaq Lower (250 m)</h3>
+      <p>Lavest af tre stationer på en transekt op mod indlandsisens kant.
+         Kører siden 2007 (17 års data). På 250 m er der typisk smelte hele sommeren.</p>
+      <p style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+        <button onclick="window.__openStationInfo('TAS_L')" class="vp-photo-btn">Foto + info →</button>
+        <button onclick="window.__openPromiceViewer('TAS_L','TAS_L Tasiilaq Lower')" class="vp-photo-btn">Vis og plot data →</button>
+      </p>`,
     icon: 'marker-aws',
     size: 14,
     pangaea: 'GRL_TAS_L_AWS.tab',
@@ -77,13 +81,13 @@ const stationLocations = {
   tas_u: {
     coords: [65.6978, -38.8668],
     title: 'AWS — TAS_U (Tasiilaq mellem, 570 m)',
-    html: `<h3>TAS_U — Tasiilaq Upper (570 m.o.h.)</h3>
-      <p><b>65.6978°N · 38.8668°W</b> · PROMICE-station 2008-2015</p>
-      <p>Mid-elevation på samme transekt som TAS_L og TAS_A — bruges til at se
-         hvordan albedo, overfladetemp og smelte ændrer sig op gennem ablationszonen.</p>
-      <p><button onclick="window.__openPromiceViewer('TAS_U','TAS_U Tasiilaq Upper (570 m)')" class="vp-photo-btn">Vis og plot PROMICE data →</button></p>
-      <p><a href="./data/pangaea/GRL_TAS_U_AWS.tab" target="_blank">Daglig SEB (.tab, lokal)</a> ·
-         <a href="https://doi.org/10.1594/PANGAEA.970156" target="_blank">DOI</a></p>`,
+    html: `<h3>TAS_U — Tasiilaq Upper (570 m)</h3>
+      <p>Midt-station omtrent i højde med ligevægtslinjen — den højde hvor
+         smelte om sommeren netop balancerer akkumulation om vinteren.</p>
+      <p style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+        <button onclick="window.__openStationInfo('TAS_U')" class="vp-photo-btn">Foto + info →</button>
+        <button onclick="window.__openPromiceViewer('TAS_U','TAS_U Tasiilaq Upper')" class="vp-photo-btn">Vis og plot data →</button>
+      </p>`,
     icon: 'marker-aws',
     size: 14,
     pangaea: 'GRL_TAS_U_AWS.tab',
@@ -91,13 +95,14 @@ const stationLocations = {
   tas_a: {
     coords: [65.7790, -38.8995],
     title: 'AWS — TAS_A (Tasiilaq top, 890 m)',
-    html: `<h3>TAS_A — Tasiilaq Accumulation (890 m.o.h.)</h3>
-      <p><b>65.7790°N · 38.8995°W</b> · PROMICE-station 2013-2023</p>
-      <p>Højeste station på Tasiilaq-transekten — nær akkumulationszonen.
-         Vis hvor 0 °C-grænsen ligger om sommeren ved at sammenligne med TAS_L (250 m).</p>
-      <p><button onclick="window.__openPromiceViewer('TAS_A','TAS_A Tasiilaq Accumulation (890 m)')" class="vp-photo-btn">Vis og plot PROMICE data →</button></p>
-      <p><a href="./data/pangaea/GRL_TAS_A_AWS.tab" target="_blank">Daglig SEB (.tab, lokal)</a> ·
-         <a href="https://doi.org/10.1594/PANGAEA.970152" target="_blank">DOI</a></p>`,
+    html: `<h3>TAS_A — Tasiilaq Apex (890 m)</h3>
+      <p>Højest af de tre stationer — tæt på indlandsisens kant. Normalt for
+         koldt til smelte hele sommeren, men under varme år kan der ske kraftig
+         smelte. Viser hvor klimaforandringer presser smelte-zonen op ad bjerget.</p>
+      <p style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+        <button onclick="window.__openStationInfo('TAS_A')" class="vp-photo-btn">Foto + info →</button>
+        <button onclick="window.__openPromiceViewer('TAS_A','TAS_A Tasiilaq Apex')" class="vp-photo-btn">Vis og plot data →</button>
+      </p>`,
     icon: 'marker-aws',
     size: 14,
     pangaea: 'GRL_TAS_A_AWS.tab',

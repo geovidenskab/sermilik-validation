@@ -1208,6 +1208,20 @@ header .meta { font-size: 0.8rem; opacity: 0.75; }
 .pv-meta a { color: #0A0F3C; }
 .pv-empty { color: #aaa; font-style: italic; }
 
+.pv-var-explain {
+  background: #f0f6fc;
+  border-left: 3px solid #0A0F3C;
+  padding: 0.5rem 0.7rem;
+  border-radius: 3px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #1a2a4a;
+  display: none;
+}
+.pv-explain-desc { margin-bottom: 0.3rem; }
+.pv-explain-example { font-size: 0.78rem; color: #4a5a7a; }
+.pv-explain-example b { color: #0A0F3C; }
+
 /* Mobile: stack results under canvas */
 @media (max-width: 720px) {
   .pa-modal-body {
@@ -1356,6 +1370,293 @@ header .meta { font-size: 0.8rem; opacity: 0.75; }
 /* Aktiv værktøjs-cursor på kortet */
 .tool-active .leaflet-grab,
 .tool-active .leaflet-interactive { cursor: crosshair !important; }
+
+/* ─── Tegne-hint-bar (vises mens man tegner) ───────────────────────────────── */
+.draw-hint-bar {
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  padding: 0.55rem 0.7rem;
+  min-width: 260px;
+  max-width: 340px;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  border-left: 4px solid #D4763C;
+}
+.draw-hint-bar.measure-hint { border-left-color: #0A0F3C; }
+.hint-row { display: flex; align-items: center; gap: 0.4rem; }
+.hint-row-main { justify-content: space-between; margin-bottom: 0.35rem; }
+.hint-title {
+  font-weight: 600;
+  color: #0A0F3C;
+  font-size: 0.85rem;
+}
+.hint-meta {
+  font-family: ui-monospace, Menlo, monospace;
+  color: #5a4a1a;
+  background: #fff8dc;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+}
+.hint-row-actions { gap: 0.3rem; margin-bottom: 0.4rem; }
+.hint-btn {
+  flex: 1;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid #c8d0d8;
+  background: #f8f9fb;
+  color: #1a1a1a;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+.hint-btn:hover:not(:disabled) { background: #e8eef5; border-color: #0A0F3C; }
+.hint-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.hint-btn-primary {
+  background: #2a7a2a;
+  color: #fff;
+  border-color: #2a7a2a;
+}
+.hint-btn-primary:hover:not(:disabled) { background: #1a6a1a !important; border-color: #1a6a1a !important; }
+.hint-btn-cancel { color: #c44; }
+.hint-btn-cancel:hover:not(:disabled) { background: #fdf0f0 !important; border-color: #c44 !important; }
+.hint-help {
+  font-size: 0.72rem;
+  color: #666;
+  line-height: 1.35;
+  margin-top: 0.2rem;
+}
+
+/* ─── Navngivnings-modal ───────────────────────────────────────────────────── */
+#name-dialog {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 7000;
+  align-items: center;
+  justify-content: center;
+}
+#name-dialog.open { display: flex; }
+.name-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 15, 60, 0.5);
+}
+.name-dialog-card {
+  position: relative;
+  background: #fff;
+  border-radius: 6px;
+  width: min(420px, 92vw);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+.name-dialog-header {
+  background: #0A0F3C;
+  color: #fff;
+  padding: 0.7rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.name-dialog-header h2 { margin: 0; font-size: 1rem; font-weight: 600; }
+#nd-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.3rem;
+}
+.name-dialog-body { padding: 1rem 1.2rem; }
+.name-dialog-body label {
+  display: block;
+  margin-bottom: 0.8rem;
+  font-size: 0.82rem;
+  color: #333;
+}
+.name-dialog-body input {
+  display: block;
+  width: 100%;
+  margin-top: 0.2rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid #c8d0d8;
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+.name-dialog-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid #e8eaef;
+}
+.name-dialog-actions button {
+  padding: 0.5rem 1.2rem;
+  border-radius: 3px;
+  border: 1px solid #b8c4cc;
+  background: #f8f9fb;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.name-dialog-actions button.primary {
+  background: #0A0F3C;
+  color: #fff;
+  border-color: #0A0F3C;
+}
+.name-dialog-actions button.primary:hover { background: #2a2f6c; }
+.name-dialog-actions button:not(.primary):hover { background: #e8eef5; }
+
+/* ─── Station-info modal ───────────────────────────────────────────────────── */
+#si-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 6800;
+  align-items: center;
+  justify-content: center;
+}
+#si-modal.open { display: flex; }
+.si-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 15, 60, 0.55);
+}
+.si-modal-card {
+  position: relative;
+  background: #fff;
+  border-radius: 6px;
+  width: min(640px, 95vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+.si-modal-header {
+  background: #0A0F3C;
+  color: #fff;
+  padding: 0.7rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.si-modal-header h2 { margin: 0; font-size: 1.05rem; font-weight: 600; }
+#si-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.3rem;
+}
+.si-modal-body {
+  padding: 0;
+  overflow-y: auto;
+}
+.si-photo {
+  width: 100%;
+  max-height: 280px;
+  overflow: hidden;
+  background: #0A0F3C;
+  position: relative;
+}
+.si-photo img {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 280px;
+  object-fit: cover;
+}
+.si-photo-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(10, 15, 60, 0.7);
+  color: #fff;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.72rem;
+  font-style: italic;
+}
+.si-photo-placeholder {
+  height: 140px;
+  background: linear-gradient(135deg, #e8eaf0 0%, #c8d0e0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+.si-photo-pl-icon { font-size: 2.4rem; opacity: 0.5; }
+.si-photo-pl-text { font-size: 0.85rem; color: #1a2a4a; }
+.si-photo-pl-text a { color: #0A0F3C; font-weight: 500; }
+
+.si-meta {
+  padding: 0.75rem 1.2rem;
+  background: #f5f7fa;
+  border-bottom: 1px solid #e8eaef;
+  font-size: 0.82rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem 1rem;
+}
+.si-meta-label {
+  color: #5a6378;
+  font-size: 0.72rem;
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.si-section {
+  padding: 0.8rem 1.2rem;
+  border-bottom: 1px solid #f0f2f5;
+}
+.si-section:last-child { border-bottom: none; }
+.si-section h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.88rem;
+  color: #0A0F3C;
+  font-weight: 600;
+}
+.si-section p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #2a2a2a;
+}
+.si-instruments {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.si-instruments li {
+  padding: 0.4rem 0;
+  border-bottom: 1px dotted #e0e3e8;
+  font-size: 0.82rem;
+}
+.si-instruments li:last-child { border-bottom: none; }
+.si-instruments li b { color: #0A0F3C; }
+.si-instruments .si-what {
+  color: #5a6378;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+.si-external {
+  display: inline-block;
+  padding: 0.45rem 0.8rem;
+  background: #0A0F3C;
+  color: #fff !important;
+  text-decoration: none;
+  border-radius: 3px;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+.si-external:hover { background: #2a2f6c; }
 
 /* Værktøj-popup styling */
 .tool-popup button {
