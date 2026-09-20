@@ -1,24 +1,21 @@
-// Pixel-info værktøj — klik et punkt eller markér en bbox på kortet og få
-// satellit-pixel-værdier for det område.
+// Pixel-info værktøj — tryk på kortet og se, hvad satellitten måler dér.
 //
-// Henter via Sentinel Hub Statistical API (genbrug fra sentinel-stats.js):
-//   - Sentinel-2 albedo (Liang)
-//   - Sentinel-2 NDVI
-//   - Sentinel-2 NDSI
-//   - Landsat overfladetemperatur
-//
-// Plus ArcticDEM elevation via Esri ImageServer Identify endpoint.
+// Henter via proxyen /sermilik/api (sentinel-stats.js → sampleMulti): Sentinel-2
+// albedo (Liang), NDVI og NDSI i ét kald. På Grønlandskortet også ArcticDEM-højde.
 //
 // UI-flow:
-//   1. Klik værktøjs-knap "🔍" i toolbar → mode aktiveres
-//   2. Klik på kortet → 20×20 m bbox (2×2 Sentinel-2-pixels)
-//      ELLER træk-rektangel → større bbox, viser middel + range
-//   3. Modal popup med tabeller af alle målte værdier
-//   4. Tabel kan kopieres / eksporteres som CSV
+//   1. Tryk på ⓘ i værktøjslinjen → mode aktiveres
+//   2. Tryk på kortet → punktet (20×20 m) OG omgivelserne (100×100 m) hentes,
+//      så man kan se om fladen er ensartet eller blandet. Virker også på telefon.
+//      ELLER træk en firkant (kun med mus) → middel, min og max for firkanten.
+//   3. Modal i elevsprog: albedo som stort tal, plantedække, optagedato,
+//      ensartet/blandet flade. Alle tal ligger under «Detaljer».
+//   4. Perioden følger kortets datovalg (getShDates) — ikke en selvstændig standard.
 
 import { map } from './map.js';
-import { samplePoint } from './sentinel-stats.js';
-import { SH_DEFAULT_DATES, SH_DATE_LS_KEY, ARCTICDEM_URL } from './config.js';
+import { sampleMulti } from './sentinel-stats.js';
+import { getShDates } from './sentinel-hub.js';
+import { ARCTICDEM_URL } from './config.js';
 import { erDK } from './profiles.js';
 
 // Et klik henter 2×2 Sentinel-2-pixels (20×20 m). Det svarer til opløsningen i
@@ -27,6 +24,10 @@ import { erDK } from './profiles.js';
 const KLIK_SIDE_M = 20;
 // Længste halve søgevindue proxyen accepterer (se sentinel-stats.js)
 const MAX_HALVT_VINDUE = 30;
+// Ved et klik hentes også omgivelserne, så man kan se om fladen er ensartet
+const OMGIVELSER_SIDE_M = 100;
+// Spredning i albedo (standardafvigelse) under denne grænse = ensartet flade
+const ENSARTET_STD = 0.02;
 
 let active = false;
 let toolButton = null;
@@ -47,7 +48,7 @@ export function initPixelInfo() {
   const btn = document.createElement('button');
   btn.className = 'tool-btn';
   btn.dataset.tool = 'pixel-info';
-  btn.title = 'Pixel-info — klik på kortet for at hente satellit-værdier (albedo, NDVI, temp, elevation). Træk-rektangel for større område.';
+  btn.title = 'Aflæs albedo — tryk her, og tryk så på det sted på kortet, I vil måle.';
   btn.textContent = 'ⓘ';
   const exportBtn = toolBar.querySelector('[data-tool="export"]');
   if (exportBtn) toolBar.insertBefore(btn, exportBtn);
@@ -111,7 +112,8 @@ function onMouseUp(e) {
   // Hvis brugeren bare klikkede (mindre end 5 px) — brug fast bbox omkring punktet
   // Ellers brug det tegnede rektangel
   let bboxLatLng;
-  if (distPx < 5) {
+  const erKlik = distPx < 5;
+  if (erKlik) {
     bboxLatLng = makePointBbox(e.latlng, KLIK_SIDE_M);
   } else {
     bboxLatLng = L.latLngBounds(drawing.startLatLng, e.latlng);
@@ -119,7 +121,7 @@ function onMouseUp(e) {
   if (drawing.currentRect) { map.removeLayer(drawing.currentRect); }
   drawing = null;
   dragStartPos = null;
-  openInfoModal(bboxLatLng);
+  openInfoModal(bboxLatLng, erKlik);
 }
 
 function makePointBbox(latlng, sideMeters) {
@@ -139,12 +141,10 @@ function buildModal() {
     <div class="px-modal-backdrop"></div>
     <div class="px-modal-card">
       <div class="px-modal-header">
-        <h2>Pixel-info</h2>
-        <button type="button" id="px-close">×</button>
+        <h2>Det måler satellitten her</h2>
+        <button type="button" id="px-close" aria-label="Luk">×</button>
       </div>
       <div class="px-modal-body">
-        <div class="px-bbox-info" id="px-bbox"></div>
-        <div class="px-date-info" id="px-date"></div>
         <div class="px-results" id="px-results">Henter…</div>
         <div class="px-actions">
           <button type="button" id="px-copy">Kopiér som tekst</button>
@@ -164,7 +164,26 @@ function closeModal() {
   if (modalEl) modalEl.classList.remove('open');
 }
 
-async function openInfoModal(bboxLatLng) {
+// Søgevinduet følger det datovalg, kortlagene bruger lige nu (sentinel-hub.js):
+//   Bestemt dag → skyfri scene nærmest dagen, mindst ±5 dage
+//   Periode     → NYESTE skyfri scene i perioden, som i kortets mosaik
+function soegevindue() {
+  const d = getShDates();
+  const iso = (dt) => dt.toISOString().slice(0, 10);
+  if (d.mode === 'single') {
+    const tol = Math.min(Math.max(d.tolerance ?? 5, 5), MAX_HALVT_VINDUE);
+    const t = new Date(d.target);
+    const fra = new Date(t); fra.setDate(t.getDate() - tol);
+    const til = new Date(t); til.setDate(t.getDate() + tol);
+    return { mode: 'single', fromIso: iso(fra), toIso: iso(til), wantedIso: d.target, prefer: 'nearest', maxcc: d.maxcc ?? 60 };
+  }
+  const til = new Date(d.to);
+  const tidligst = new Date(til); tidligst.setDate(til.getDate() - 2 * MAX_HALVT_VINDUE);
+  const fra = new Date(Math.max(new Date(d.from).getTime(), tidligst.getTime()));
+  return { mode: 'range', fromIso: iso(fra), toIso: iso(til), wantedIso: null, prefer: 'latest', maxcc: d.maxcc ?? 60 };
+}
+
+async function openInfoModal(bboxLatLng, erKlik = true) {
   if (!modalEl) buildModal();
   modalEl.classList.add('open');
 
@@ -172,137 +191,145 @@ async function openInfoModal(bboxLatLng) {
   const ne = bboxLatLng.getNorthEast();
   const centerLat = (sw.lat + ne.lat) / 2;
   const centerLng = (sw.lng + ne.lng) / 2;
-  // Beregn cirka størrelse i meter
   const widthM = Math.round((ne.lng - sw.lng) * 111320 * Math.cos(centerLat * Math.PI / 180));
   const heightM = Math.round((ne.lat - sw.lat) * 111320);
+  const sideM = Math.max(widthM, heightM, KLIK_SIDE_M);
+  const vindue = soegevindue();
 
-  // Læs Sentinel Hub-datoperiode fra localStorage (samme dato-vælger som WMS)
-  const shDates = { ...SH_DEFAULT_DATES, ...(JSON.parse(localStorage.getItem(SH_DATE_LS_KEY) || '{}')) };
-  let from, to, tol;
-  if (shDates.mode === 'single') {
-    tol = shDates.tolerance ?? 15;
-    const t = new Date(shDates.target);
-    from = new Date(t); from.setDate(t.getDate() - tol);
-    to = new Date(t); to.setDate(t.getDate() + tol);
-  } else {
-    from = new Date(shDates.from);
-    to = new Date(shDates.to);
-  }
-  const fromIso = from.toISOString().slice(0, 10);
-  const toIso = to.toISOString().slice(0, 10);
-  const centerIso = new Date((from.getTime() + to.getTime()) / 2).toISOString().slice(0, 10);
-  const halfDays = Math.round((to - from) / 86400000 / 2);
-
-  modalEl.querySelector('#px-bbox').innerHTML = `
-    <b>Område:</b> ${widthM}×${heightM} m omkring
-    ${centerLat.toFixed(5)}°N · ${formatLng(centerLng)}
-  `;
-  const effHalf = Math.min(Math.max(halfDays, 5), MAX_HALVT_VINDUE);
-  modalEl.querySelector('#px-date').innerHTML = `
-    <b>Tidsperiode:</b> ${fromIso} → ${toIso}${shDates.maxcc != null ? ` · maks ${shDates.maxcc}% skydække` : ''}
-    <span class="px-eff">· søger nærmeste skyfri scene ±${effHalf} dage</span>
-  `;
-
-  // Hent alle 4 satellit-lag parallelt + ArcticDEM
-  modalEl._wantedIso = centerIso;
   const resultsEl = modalEl.querySelector('#px-results');
   resultsEl.innerHTML = '<div class="px-loading">Henter satellit-data…</div>';
 
-  // Brug centerLat/lng + tilpasset side-meter til samplePoint
-  const sideM = Math.max(widthM, heightM, KLIK_SIDE_M);
-  const layers = [
-    { key: 'S2_ALBEDO', label: 'Sentinel-2 albedo (Liang)', unit: '', decimals: 3 },
-    { key: 'S2_NDVI', label: 'Sentinel-2 NDVI', unit: '', decimals: 3 },
-    { key: 'S2_NDSI', label: 'Sentinel-2 NDSI (sne)', unit: '', decimals: 3 },
-    // LANDSAT_LST fjernet 2026-08 sammen med de termiske lag i panelet
-  ];
-  // Start alle 4 + ArcticDEM
-  const promises = layers.map(l =>
-    samplePoint(l.key, centerLat, centerLng, centerIso, effHalf, {
-      sideMeters: sideM,
-      maxcc: shDates.maxcc ?? 60,
-    }).catch(e => ({ value: null, error: e.message }))
-  );
-  // ArcticDEM dækker kun Arktis — på Danmarkskortet udelades højderækken
-  const arcticPromise = erDK
+  const opts = { maxcc: vindue.maxcc, prefer: vindue.prefer, wantedIso: vindue.wantedIso };
+  const fejl = (e) => ({ sceneDate: null, layers: {}, error: e.message });
+  const punktP = sampleMulti(centerLat, centerLng, vindue.fromIso, vindue.toIso, { ...opts, sideMeters: sideM }).catch(fejl);
+  // Ved et klik hentes omgivelserne med i samme ombæring — så kan man se, om
+  // fladen er ensartet, uden at skulle tegne en firkant (det kan man ikke på en telefon).
+  const omgivP = erKlik
+    ? sampleMulti(centerLat, centerLng, vindue.fromIso, vindue.toIso, { ...opts, sideMeters: OMGIVELSER_SIDE_M }).catch(fejl)
+    : Promise.resolve(null);
+  const arcticP = erDK
     ? Promise.resolve(null)
     : fetchArcticDEMElevation(centerLat, centerLng).catch(e => ({ value: null, error: e.message }));
-  const all = await Promise.all([...promises, arcticPromise]);
-  const arctic = all[all.length - 1];
-  const satResults = all.slice(0, -1);
+  const [punkt, omgiv, arctic] = await Promise.all([punktP, omgivP, arcticP]);
 
-  // Render
-  const rows = layers.map((l, i) => renderResultRow(l, satResults[i]));
-  const arcticRow = erDK ? '' : renderArcticRow(arctic);
-  resultsEl.innerHTML = `
-    <table class="px-table">
-      <thead><tr><th>Variabel</th><th>Værdi</th><th>Min / Max</th><th>Std</th><th>n px</th><th>Scene</th></tr></thead>
-      <tbody>${arcticRow}${rows.join('')}</tbody>
-    </table>
-    <div class="px-tip">Tip: <b>klik</b> på kortet for et punkt (${KLIK_SIDE_M}×${KLIK_SIDE_M} m = 2×2 satellitpixels) eller <b>træk-rektangel</b> for større område.</div>
-  `;
-  // Gem til kopiering
-  modalEl._lastResult = { centerLat, centerLng, widthM, heightM, fromIso, toIso, arctic, layers, satResults };
+  const r = { centerLat, centerLng, widthM: erKlik ? KLIK_SIDE_M : widthM, heightM: erKlik ? KLIK_SIDE_M : heightM, erKlik, vindue, punkt, omgiv, arctic };
+  modalEl._lastResult = r;
+  resultsEl.innerHTML = renderResultat(r);
 }
 
-function renderResultRow(layerInfo, stats) {
-  if (!stats || stats.value == null) {
-    const err = stats?.error ? `<span class="px-err" title="${escapeHtml(stats.error)}">${escapeHtml(stats.error)}</span>` : '<span class="px-empty">ingen data</span>';
-    return `<tr><th>${layerInfo.label}</th><td>${err}</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>`;
-  }
-  const v = stats.value.toFixed(layerInfo.decimals);
-  const mn = stats.min != null ? stats.min.toFixed(layerInfo.decimals) : '—';
-  const mx = stats.max != null ? stats.max.toFixed(layerInfo.decimals) : '—';
-  const sd = stats.stDev != null ? stats.stDev.toFixed(layerInfo.decimals) : '—';
-  const sceneDate = stats.sceneDate ? new Date(stats.sceneDate).toISOString().slice(0, 10) : '—';
-  // Marker scenedatoen tydeligt hvis den afviger fra den ønskede dato — det er
-  // forskellen mellem at måle en dato og at måle "noget i nærheden af" en dato.
-  const wanted = modalEl?._wantedIso;
-  const diffDays = (wanted && stats.sceneDate)
-    ? Math.round(Math.abs(new Date(sceneDate) - new Date(wanted)) / 86400000) : 0;
-  const sceneCell = diffDays > 0
-    ? `<span class="px-warn" title="Scenen er ${diffDays} dag(e) fra den ønskede dato ${wanted}">${sceneDate} (±${diffDays}d)</span>`
-    : sceneDate;
-  return `<tr>
-    <th>${layerInfo.label}</th>
-    <td><b>${v}${layerInfo.unit}</b></td>
-    <td>${mn} / ${mx}</td>
-    <td>${sd}</td>
-    <td>${stats.count}</td>
-    <td>${sceneCell}</td>
-  </tr>`;
+// ─── Visning ─────────────────────────────────────────────────────────────────
+const tal = (v, dec = 2) => (v == null || !Number.isFinite(v)) ? '—'
+  : v.toLocaleString('da-DK', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+const datoTekst = (isoStr) => new Date(isoStr).toLocaleDateString('da-DK', { day: 'numeric', month: 'long', year: 'numeric' });
+
+function ndviTekst(v) {
+  if (v == null) return '';
+  if (v < 0.2) return 'næsten ingen planter';
+  if (v < 0.5) return 'lidt grønt';
+  return 'tæt grønt';
 }
 
-function renderArcticRow(arctic) {
-  if (!arctic || arctic.value == null) {
-    return `<tr><th>ArcticDEM elevation</th><td><span class="px-empty">${arctic?.error || 'ingen data'}</span></td><td>—</td><td>—</td><td>—</td><td>2 m DEM</td></tr>`;
+// Vand har også højt NDSI (lyst i grønt, sort i kortbølge-infrarødt), så albedoen
+// må afgøre, om det er vand eller sne/is.
+function ndsiTekst(v, albedo) {
+  if (v == null) return '';
+  if (v > 0.4 && albedo != null && albedo < 0.06) return 'vand eller meget mørk is';
+  if (v > 0.4) return 'sne eller is';
+  if (v > 0) return 'blandet — lidt sne eller is';
+  return 'ingen sne';
+}
+
+function sceneTekst(r) {
+  const scene = r.punkt.sceneDate;
+  if (!scene) return '';
+  const sceneIso = new Date(scene).toISOString().slice(0, 10);
+  if (r.vindue.mode === 'single') {
+    const dage = Math.round((new Date(sceneIso) - new Date(r.vindue.wantedIso)) / 86400000);
+    if (dage === 0) return `Optaget <b>${datoTekst(scene)}</b> — den dag I valgte.`;
+    return `<span class="px-warn">Satellitten har ikke et skyfrit billede fra ${datoTekst(r.vindue.wantedIso)}.</span>
+      Det nærmeste er fra <b>${datoTekst(scene)}</b> (${Math.abs(dage)} ${Math.abs(dage) === 1 ? 'dag' : 'dage'} ${dage < 0 ? 'før' : 'efter'}).`;
   }
-  return `<tr>
-    <th>ArcticDEM elevation</th>
-    <td><b>${arctic.value.toFixed(1)} m.o.h.</b></td>
-    <td>—</td>
-    <td>—</td>
-    <td>1</td>
-    <td>2 m DEM</td>
-  </tr>`;
+  return `Optaget <b>${datoTekst(scene)}</b> — det nyeste skyfri billede i den periode, I har valgt.`;
+}
+
+function renderResultat(r) {
+  const sted = `${r.centerLat.toFixed(5)}°N · ${formatLng(r.centerLng)}`;
+  if (r.punkt.error || !r.punkt.layers?.S2_ALBEDO) {
+    return `<div class="px-besked"><b>Ingen måling her.</b> ${escapeHtml(r.punkt.error || 'Ukendt fejl')}.
+      Prøv en længere periode eller et højere «Max sky %» i panelet.</div>
+      <div class="px-sted">${sted}</div>`;
+  }
+  const A = r.punkt.layers.S2_ALBEDO, V = r.punkt.layers.S2_NDVI, S = r.punkt.layers.S2_NDSI;
+  const pct = Math.round(A.value * 100);
+  const omraade = r.erKlik
+    ? `et felt på ${KLIK_SIDE_M} × ${KLIK_SIDE_M} meter, hvor I trykkede`
+    : `jeres firkant på ${r.widthM} × ${r.heightM} meter`;
+  const indeks = erDK
+    ? `<div class="px-indeks"><span>Plantedække (NDVI)</span><b>${tal(V?.value)}</b><i>${ndviTekst(V?.value)}</i></div>`
+    : `<div class="px-indeks"><span>Sne og is (NDSI)</span><b>${tal(S?.value)}</b><i>${ndsiTekst(S?.value, A.value)}</i></div>
+       <div class="px-indeks"><span>Plantedække (NDVI)</span><b>${tal(V?.value)}</b><i>${ndviTekst(V?.value)}</i></div>`;
+
+  let omgivHtml = '';
+  const O = r.erKlik ? r.omgiv?.layers?.S2_ALBEDO : A;
+  if (O) {
+    const ensartet = O.stDev != null && O.stDev <= ENSARTET_STD;
+    omgivHtml = `
+      <div class="px-omgiv ${ensartet ? 'ens' : 'blandet'}">
+        <h3>${r.erKlik ? `Omgivelserne (${OMGIVELSER_SIDE_M} × ${OMGIVELSER_SIDE_M} meter)` : 'Inden for firkanten'}</h3>
+        <p>Albedo fra <b>${tal(O.min)}</b> til <b>${tal(O.max)}</b>, i gennemsnit ${tal(O.value)}.</p>
+        <p class="px-dom">${ensartet
+          ? '<b>Ensartet flade.</b> Satellitten ser næsten det samme overalt — godt sted at sammenligne med jeres egen måling.'
+          : '<b>Blandet flade.</b> Satellitten ser flere slags overflader her. Er I uenige med den, kan det være en blandet pixel.'}</p>
+      </div>`;
+  }
+
+  const raekke = (navn, l, dec = 3) => l
+    ? `<tr><th>${navn}</th><td><b>${tal(l.value, dec)}</b></td><td>${tal(l.min, dec)} / ${tal(l.max, dec)}</td><td>${tal(l.stDev, dec)}</td><td>${l.count}</td></tr>`
+    : '';
+  const og = r.erKlik ? r.omgiv?.layers : null;
+  const hoejde = (!erDK && r.arctic) ? `<p>Højde (ArcticDEM): ${r.arctic.value != null ? tal(r.arctic.value, 1) + ' m.o.h.' : escapeHtml(r.arctic.error || 'ingen data')}</p>` : '';
+  const detaljer = `
+    <details class="px-detaljer"><summary>Detaljer og tal til rapporten</summary>
+      <p>${sted} · søgt ${r.vindue.fromIso} → ${r.vindue.toIso} · maks ${r.vindue.maxcc} % skydække · ${r.punkt.antalSkyfri} skyfri ${r.punkt.antalSkyfri === 1 ? 'dag' : 'dage'} fundet</p>
+      ${hoejde}
+      <table class="px-table">
+        <thead><tr><th>Variabel</th><th>Middel</th><th>Min / max</th><th>Spredning</th><th>Pixels</th></tr></thead>
+        <tbody>
+          ${raekke('Albedo (Liang 2001)', A)}${raekke('NDVI', V)}${raekke('NDSI', S)}
+          ${og ? raekke(`Albedo, ${OMGIVELSER_SIDE_M} m`, og.S2_ALBEDO) + raekke(`NDVI, ${OMGIVELSER_SIDE_M} m`, og.S2_NDVI) : ''}
+        </tbody>
+      </table>
+    </details>`;
+
+  return `
+    <div class="px-hoved">
+      <div class="px-stortal"><span>Albedo</span><b>${tal(A.value)}</b></div>
+      <p>Overfladen kaster <b>${pct} %</b> af sollyset tilbage og beholder ${100 - pct} %.
+         Tallet gælder ${omraade}.</p>
+    </div>
+    ${indeks}
+    <p class="px-scene">${sceneTekst(r)}</p>
+    ${omgivHtml}
+    ${detaljer}`;
 }
 
 function copyAsText() {
   const r = modalEl._lastResult;
-  if (!r) return;
+  if (!r || !r.punkt?.layers?.S2_ALBEDO) return;
+  const L = r.punkt.layers;
   const lines = [
-    `Pixel-info — ${r.centerLat.toFixed(5)}°N · ${formatLng(r.centerLng)}`,
-    `Område: ${r.widthM} × ${r.heightM} m   Periode: ${r.fromIso} → ${r.toIso}`,
+    `Satellitmåling — ${r.centerLat.toFixed(5)}°N · ${formatLng(r.centerLng)}`,
+    `Område: ${r.widthM} × ${r.heightM} m   Optaget: ${new Date(r.punkt.sceneDate).toISOString().slice(0, 10)}`,
     '',
-    'Variabel\tVærdi\tMin\tMax\tStd\tn\tScene',
+    'Variabel\tMiddel\tMin\tMax\tSpredning\tPixels',
   ];
-  if (r.arctic?.value != null) lines.push(`ArcticDEM elevation\t${r.arctic.value.toFixed(1)} m.o.h.\t\t\t\t1\t2 m DEM`);
-  r.layers.forEach((l, i) => {
-    const s = r.satResults[i];
-    if (s?.value != null) {
-      lines.push(`${l.label}\t${s.value.toFixed(l.decimals)}${l.unit}\t${s.min?.toFixed(l.decimals) || ''}\t${s.max?.toFixed(l.decimals) || ''}\t${s.stDev?.toFixed(l.decimals) || ''}\t${s.count}\t${s.sceneDate?.slice(0,10) || ''}`);
-    }
-  });
+  const linje = (navn, l) => { if (l) lines.push(`${navn}\t${tal(l.value, 3)}\t${tal(l.min, 3)}\t${tal(l.max, 3)}\t${tal(l.stDev, 3)}\t${l.count}`); };
+  linje('Albedo', L.S2_ALBEDO); linje('NDVI', L.S2_NDVI); linje('NDSI', L.S2_NDSI);
+  if (r.erKlik && r.omgiv?.layers) {
+    linje(`Albedo, omgivelser ${OMGIVELSER_SIDE_M} m`, r.omgiv.layers.S2_ALBEDO);
+    linje(`NDVI, omgivelser ${OMGIVELSER_SIDE_M} m`, r.omgiv.layers.S2_NDVI);
+  }
+  if (r.arctic?.value != null) lines.push(`Højde (ArcticDEM)\t${tal(r.arctic.value, 1)} m.o.h.`);
   navigator.clipboard.writeText(lines.join('\n')).then(() => {
     const btn = modalEl.querySelector('#px-copy');
     const orig = btn.textContent;

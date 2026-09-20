@@ -139,7 +139,7 @@ export function addCoordReadout() {
   coordReadout.onAdd = function () {
     const div = L.DomUtil.create('div', 'coord-readout');
     div.id = 'coord-readout';
-    div.textContent = 'Bevæg musen over kortet';
+    div.textContent = (window.matchMedia('(pointer: coarse)').matches ? 'Tryk på kortet' : 'Bevæg musen over kortet');
     return div;
   };
   coordReadout.addTo(map);
@@ -152,7 +152,7 @@ export function addCoordReadout() {
       `${Math.abs(lat).toFixed(5)}°${ns}, ${Math.abs(lng).toFixed(5)}°${ew}`;
   });
   map.on('mouseout', () => {
-    document.getElementById('coord-readout').textContent = 'Bevæg musen over kortet';
+    document.getElementById('coord-readout').textContent = (window.matchMedia('(pointer: coarse)').matches ? 'Tryk på kortet' : 'Bevæg musen over kortet');
   });
 }
 

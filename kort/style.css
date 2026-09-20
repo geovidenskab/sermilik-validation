@@ -1345,6 +1345,33 @@ header .meta { font-size: 0.8rem; opacity: 0.75; }
   background: #f9fafb;
   border-radius: 0;
 }
+/* Pixel-info i elevsprog: stort albedotal, indeks, omgivelser */
+.px-hoved { display: flex; gap: 1rem; align-items: center; margin-bottom: 0.6rem; }
+.px-hoved p { margin: 0; font-size: 0.9rem; line-height: 1.5; color: #222; }
+.px-stortal { flex: none; background: #0A0F3C; color: #fff; padding: 0.5rem 0.9rem; text-align: center; min-width: 5.5rem; }
+.px-stortal span { display: block; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; }
+.px-stortal b { display: block; font-size: 1.9rem; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.px-indeks { display: flex; gap: 0.6rem; align-items: baseline; font-size: 0.88rem; padding: 0.35rem 0; border-top: 1px solid #e6eaef; }
+.px-indeks span { flex: 1; color: #444; }
+.px-indeks b { color: #0A0F3C; font-variant-numeric: tabular-nums; }
+.px-indeks i { color: #666; font-size: 0.82rem; min-width: 8.5rem; text-align: right; }
+.px-scene { font-size: 0.82rem; color: #555; margin: 0.5rem 0 0.7rem; padding-top: 0.45rem; border-top: 1px solid #e6eaef; line-height: 1.5; }
+.px-omgiv { border-left: 3px solid #999; background: #f6f8fa; padding: 0.6rem 0.8rem; margin: 0.4rem 0 0.7rem; }
+.px-omgiv.ens { border-left-color: #2e8b57; background: #f1faf4; }
+.px-omgiv.blandet { border-left-color: #e0a020; background: #fffaef; }
+.px-omgiv h3 { margin: 0 0 0.25rem; font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; color: #0A0F3C; }
+.px-omgiv p { margin: 0.2rem 0; font-size: 0.86rem; line-height: 1.5; }
+.px-besked { background: #fffaef; border-left: 3px solid #e0a020; padding: 0.7rem 0.9rem; font-size: 0.88rem; line-height: 1.5; }
+.px-sted { font-size: 0.75rem; color: #888; margin-top: 0.5rem; }
+.px-detaljer { margin: 0.2rem 0 0.4rem; font-size: 0.8rem; }
+.px-detaljer summary { cursor: pointer; color: #0A0F3C; font-weight: 600; padding: 0.3rem 0; }
+.px-detaljer p { margin: 0.3rem 0; color: #555; }
+@media (max-width: 480px) {
+  .px-hoved { align-items: flex-start; }
+  .px-indeks i { min-width: 0; }
+  .px-table { font-size: 0.72rem; }
+}
+
 .px-actions {
   display: flex;
   gap: 0.5rem;
@@ -1690,7 +1717,12 @@ header .meta { font-size: 0.8rem; opacity: 0.75; }
     box-shadow: 4px 0 12px rgba(0,0,0,0.15);
   }
   #panel.open { transform: translateX(0); }
-  #toggle-panel { display: block; }
+  /* Leaflets knapper har z-index 1000 — panelet skal ligge over dem, ellers
+     dækker værktøjslinjen og baggrundsmærkaten for panelets tekst. */
+  #panel { z-index: 1500; padding-top: 3.2rem; }
+  #toggle-panel { display: block; z-index: 1600; }
+  /* ☰-knappen står øverst til venstre; skub kortets egne knapper ned under den */
+  .leaflet-top.leaflet-left { top: 2.9rem; }
 }
 
 /* Scene-info: hvilke satellitscener vises i udsnittet (sentinel-hub.js) */

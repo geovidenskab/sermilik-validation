@@ -9,11 +9,14 @@
 // API-doku: https://documentation.dataspace.copernicus.eu/APIs/SentinelHub/Statistical.html
 
 // Lokalt (dev på :5173) kaldes den rigtige proxy; den tillader denne origin.
-const STATS_PROXY = (typeof location !== 'undefined' && location.hostname === 'geo.sg.dk')
+// Med ?api=local i adressen bruges en proxy der kører lokalt på port 3018.
+const STATS_PROXY = (typeof location === 'undefined' || location.hostname === 'geo.sg.dk')
   ? '/sermilik/api/stats'
-  : 'https://geo.sg.dk/sermilik/api/stats';
+  : (new URLSearchParams(location.search).get('api') === 'local'
+      ? 'http://localhost:3018/api/stats'
+      : 'https://geo.sg.dk/sermilik/api/stats');
 
-const STATS_CACHE_KEY = 'sermilik_sh_stats_cache_v3';  // v3: proxy + width/height i pixels
+const STATS_CACHE_KEY = 'sermilik_sh_stats_cache_v4';  // v4: proxy, width/height i pixels, samlet opslag
 const MAX_TOLERANCE_DAGE = 30;                         // proxyen tillader højst 62 dages vindue
 
 // Visningsinfo pr. lag. Evalscripts ligger i proxyen.
@@ -101,6 +104,72 @@ export async function samplePoint(layerKey, lat, lng, centerDateIso, toleranceDa
     sceneDate: interval.interval?.from,
     fetchedAt: new Date().toISOString(),
   };
+  writeStatsCache(cacheKey, result);
+  return result;
+}
+
+// ─── Samlet opslag: albedo, NDVI og NDSI i ét kald ───────────────────────────
+const MULTI_BAAND = { S2_ALBEDO: 'B0', S2_NDVI: 'B1', S2_NDSI: 'B2' };
+
+/**
+ * Hent albedo, NDVI og NDSI for et område i ÉT kald til proxyen.
+ *
+ * @param {number} lat
+ * @param {number} lng
+ * @param {string} fromIso - 'YYYY-MM-DD'
+ * @param {string} toIso
+ * @param {object} opts - { sideMeters, maxcc, prefer: 'latest'|'nearest', wantedIso }
+ *   prefer 'latest'  = nyeste skyfri scene i vinduet (matcher kortets mosaik)
+ *   prefer 'nearest' = skyfri scene nærmest wantedIso (bestemt dag)
+ * @returns {Promise<{sceneDate, layers: {S2_ALBEDO, S2_NDVI, S2_NDSI}, error?}>}
+ */
+export async function sampleMulti(lat, lng, fromIso, toIso, opts = {}) {
+  const side = Math.round(opts.sideMeters ?? 20);
+  const maxcc = opts.maxcc ?? 60;
+  const prefer = opts.prefer === 'nearest' ? 'nearest' : 'latest';
+  const cacheKey = `MULTI|${lat.toFixed(5)},${lng.toFixed(5)}|${side}|${fromIso}|${toIso}|${maxcc}|${prefer}|${opts.wantedIso || ''}`;
+  const cached = readStatsCache(cacheKey);
+  if (cached) return { ...cached, cached: true };
+
+  const res = await fetch(STATS_PROXY, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ layer: 'S2_MULTI', lat, lng, side, from: fromIso, to: toIso, maxcc }),
+  });
+  if (!res.ok) {
+    let besked = `HTTP ${res.status}`;
+    try { besked = (await res.json()).error || besked; } catch { /* ikke JSON */ }
+    throw new Error(`Satellitopslag fejlede: ${besked}`);
+  }
+  const data = await res.json();
+
+  // Ét bucket pr. scene-dag. Behold kun dage hvor området ikke er sky-maskeret.
+  const gyldige = (data?.data || []).filter(iv => {
+    const st = iv?.outputs?.default?.bands?.B0?.stats;
+    return st && st.sampleCount - (st.noDataCount || 0) > 0;
+  });
+  if (!gyldige.length) {
+    return { sceneDate: null, layers: {}, error: data?.data?.length ? 'Ingen skyfri scene i perioden' : 'Ingen scene fundet i perioden' };
+  }
+  const tid = iv => new Date(iv.interval?.from).getTime();
+  let valgt;
+  if (prefer === 'nearest' && opts.wantedIso) {
+    const oensket = new Date(opts.wantedIso).getTime();
+    valgt = gyldige.reduce((a, b) => (Math.abs(tid(b) - oensket) < Math.abs(tid(a) - oensket) ? b : a));
+  } else {
+    valgt = gyldige.reduce((a, b) => (tid(b) > tid(a) ? b : a));
+  }
+  const layers = {};
+  for (const [key, baand] of Object.entries(MULTI_BAAND)) {
+    const st = valgt.outputs.default.bands[baand]?.stats;
+    if (!st) continue;
+    layers[key] = {
+      value: st.mean, stDev: st.stDev, min: st.min, max: st.max,
+      count: st.sampleCount, validCount: st.sampleCount - (st.noDataCount || 0),
+      sceneDate: valgt.interval?.from,
+    };
+  }
+  const result = { sceneDate: valgt.interval?.from, layers, antalSkyfri: gyldige.length, fetchedAt: new Date().toISOString() };
   writeStatsCache(cacheKey, result);
   return result;
 }
