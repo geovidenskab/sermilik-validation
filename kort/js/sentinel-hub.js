@@ -546,16 +546,28 @@ function setShMaxcc(val, save = true) {
   onLayersChanged();
 }
 
+// Seneste AFSLUTTEDE eller igangværende sommer (1. juni–30. sept.): før 1. juni
+// er det sidste års, ellers i år.
+function sommerAar() {
+  const now = new Date();
+  return now.getMonth() < 5 ? now.getFullYear() - 1 : now.getFullYear();
+}
+
 const datePresets = {
-  'latest-summer': () => {
+  'this-summer': () => [`${sommerAar()}-06-01`, `${sommerAar()}-09-30`],
+  'latest-summer': () => [`${sommerAar() - 1}-06-01`, `${sommerAar() - 1}-09-30`],
+  // Seneste afsluttede vinter (1. dec.–28. feb.)
+  'last-winter': () => {
     const now = new Date();
-    const lastJulyYear = now.getMonth() < 9 ? now.getFullYear() - 1 : now.getFullYear();
-    return [`${lastJulyYear}-06-01`, `${lastJulyYear}-09-30`];
+    const y = now.getMonth() < 2 ? now.getFullYear() - 1 : now.getFullYear();
+    return [`${y - 1}-12-01`, `${y}-02-28`];
   },
-  'this-summer': () => {
-    const y = new Date().getFullYear();
-    return [`${y}-06-01`, `${y}-09-30`];
+  'last-90': () => {
+    const til = new Date();
+    const fra = new Date(til.getTime() - 90 * 864e5);
+    return [fra.toISOString().slice(0, 10), til.toISOString().slice(0, 10)];
   },
+  // Faste år på Grønlandskortet — bevidst uændrede, så 2020 og 2024 kan sammenlignes
   'winter': () => ['2024-02-01', '2024-04-30'],
   'full-2024': () => ['2024-01-01', '2024-12-31'],
   'full-2020': () => ['2020-01-01', '2020-12-31'],

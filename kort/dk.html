@@ -31,7 +31,7 @@
 
     <h2>Satellitbilledet</h2>
 
-    <div id="sh-config">
+    <div id="sh-config" class="connected">
       <div class="sh-mangler">
         <strong>Satellitlagene mangler en dansk instans</strong>
         <p>Sentinel Hub-instansen for dette forløb er afgrænset til Sermilik-området i Østgrønland — det er sådan, forbruget holdes nede. Der skal oprettes en tilsvarende instans afgrænset til Danmark i Copernicus-dashboardet, og id'et indsættes nedenfor.</p>
@@ -67,11 +67,10 @@
           <input type="date" id="sh-to">
         </div>
         <div class="presets">
-          <button data-preset="latest-summer">Sidste sommer</button>
-          <button data-preset="this-summer">I sommer</button>
-          <button data-preset="winter">Vinter '24</button>
-          <button data-preset="full-2024">Hele 2024</button>
-          <button data-preset="full-2020">Hele 2020</button>
+          <button data-preset="last-90">Seneste 3 mdr.</button>
+          <button data-preset="this-summer">Seneste sommer</button>
+          <button data-preset="latest-summer">Sommeren før</button>
+          <button data-preset="last-winter">Sidste vinter</button>
         </div>
         <p class="hint">Et sammenklip af alle skyfrie optagelser i perioden. Godt til at få noget at se — men datoen er ikke én bestemt dag. Vil du sammenligne med din egen måling, så skift til «Bestemt dag».</p>
       </div>
