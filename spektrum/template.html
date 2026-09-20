@@ -878,7 +878,7 @@ overgange i oxideret jern absorberer kraftigt i UV og blå og aftager gennem gr�
         <td>Lys, kornet is — det lyseste på gletsjeren</td></tr>
       <tr><td>Beskidt is</td><td class="n">26,0 %</td><td>Almindelig overflade med støv og sediment</td></tr>
       <tr><td>Gletsjerens nederste del</td><td class="n">26,5 %</td><td>Gennemsnit over hele ablationszonen</td></tr>
-      <tr class="hi"><td>Vandløb</td><td class="n">10,7 %</td><td>Smeltevandskanal — det mørkeste</td></tr>
+      <tr class="hi"><td>Mørk is</td><td class="n">10,7 %</td><td>Våd is med meget sediment — det mørkeste</td></tr>
     </tbody>
   </table>
 
@@ -904,7 +904,7 @@ overgange i oxideret jern absorberer kraftigt i UV og blå og aftager gennem gr�
   <div class="grid g3">
     <div class="stat"><div class="k">Fra det hvide felt</div><div class="v">273</div>
       <div class="d">W/m² · albedo 57,5 %, smeltet 20 cm</div></div>
-    <div class="stat"><div class="k">Fra vandløbet</div><div class="v">260</div>
+    <div class="stat"><div class="k">Fra den mørke is</div><div class="v">260</div>
       <div class="d">W/m² · albedo 10,7 %, smeltet 40 cm</div></div>
     <div class="stat"><div class="k">Afvigelse</div><div class="v">5 %</div>
       <div class="d">To uafhængige målinger, samme svar</div></div>
@@ -958,14 +958,14 @@ overgange i oxideret jern absorberer kraftigt i UV og blå og aftager gennem gr�
 <!-- ============================ SATELLIT ============================ -->
 <section id="satellit">
   <h2><span class="num">08</span>Fra spektrum til satellit</h2>
-  <p class="lede">Otte af Sentinel-2's ti optiske bånd ligger inden for instrumentets
-     rækkevidde. Nedenfor holdes feltmålingerne op mod
+  <p class="lede">Otte af de ti bånd, Sentinel-2 bruger til at se på Jordens overflade,
+     ligger inden for instrumentets rækkevidde. Nedenfor holdes feltmålingerne op mod
      <a href="../kort/">Sermilik Validation-GIS</a> — og de stemmer inden for 15 %,
      når man måler på det rigtige sted.</p>
 
   <p>En satellit måler ikke spektre. Den måler nogle få brede bånd, og af dem beregnes
-     de indeks som klimaovervågning bygger på. Sentinel-2 har ti optiske bånd; et
-     spektrometer som dette har 571 punkter. Folder man de målte spektre med satellittens
+     de indeks som klimaovervågning bygger på. Sentinel-2 har 13 bånd — ti rettet mod
+     overfladen og tre mod atmosfæren; et spektrometer som dette har 571 punkter. Folder man de målte spektre med satellittens
      faktiske båndbredder, får man <b>præcis de tal Sentinel-2 ville rapportere</b> for
      netop den overflade — og så kan de sammenlignes med, hvad satellitten faktisk sagde.</p>
 
@@ -1104,8 +1104,8 @@ overgange i oxideret jern absorberer kraftigt i UV og blå og aftager gennem gr�
   </figure>
 
   <p>Randzonen er et af de mest heterogene steder man kan vælge: mørke sedimentbånd,
-     smeltevandskanaler og bar is inden for få meter. En Sentinel-2-pixel på 20 × 20 m
-     gennemsnitter det hele, mens et referencekort på jorden måler den flade det tilfældigvis
+     smeltevandskanaler og bar is inden for få meter. Albedoen beregnes af bånd med pixels på både
+     10 × 10 og 20 × 20 m, så hvert tal gennemsnitter det hele over op til 20 × 20 m, mens et referencekort på jorden måler den flade det tilfældigvis
      ligger på.</p>
 
   <div class="callout">
@@ -1119,15 +1119,19 @@ overgange i oxideret jern absorberer kraftigt i UV og blå og aftager gennem gr�
        mellem faktor tre og 15 %.</p>
   </div>
 
-  <div class="callout warn">
-    <h4>Et værktøj der skal efterses</h4>
-    <p>Slår man punktet op med pixel-info-værktøjet i Validation-GIS'en, får man
-       albedo 0,616, NDSI 0,106 og NDVI 0,003. Henter man de samme tal direkte fra
-       Copernicus for samme punkt og samme scene, får man <b>0,132, +0,851 og −0,260</b>.</p>
-    <p>Alle tre afviger, og fortegnet på to af dem er vendt. Værktøjet blev desuden bedt
-       om 2026-08-07 med ±0 dages tolerance, men leverede en scene fra <b>23. juli</b> med
-       70 % skydække — mens der fandtes en næsten skyfri scene fra selve datoen.
-       Tallene herover er hentet uden om værktøjet, direkte fra kilden.</p>
+  <div class="callout">
+    <h4>Et værktøj der blev efterset</h4>
+    <p>Da sammenligningen blev lavet, gav pixel-info-værktøjet i Validation-GIS'en
+       albedo 0,616, NDSI 0,106 og NDVI 0,003 for punktet — mens de samme tal hentet
+       direkte fra Copernicus var <b>0,132, +0,851 og −0,260</b>. Fejlen lå ikke hos
+       satellitten. Værktøjet lagde alle scener i søgevinduet sammen, skyer inklusive, og
+       skrev vinduets første dato på resultatet. Derfor stod der <b>23. juli</b> og 70 %
+       skydække, selv om der fandtes en næsten skyfri scene fra selve dagen.</p>
+    <p>Nu henter værktøjet én scene-dag ad gangen, maskerer skyer og skyskygger ud og
+       vælger den skyfri dag, der ligger nærmest den ønskede. Efterprøvet 20. september
+       2026: et punkt på gletsjeren giver for 7. august albedo 0,266, NDSI +0,947 og
+       NDVI −0,135 — fortegn og størrelse som bar is skal have. Tallene i tabellen
+       herover er hentet direkte fra kilden.</p>
   </div>
 
   <h3>Hvad der vil stramme sammenligningen yderligere</h3>
@@ -1758,7 +1762,7 @@ const ctlRefl = document.getElementById("ctl-refl");
   const model = a => 100 * Q*(1-a)*T/(RHO*LF);          // cm is
   const line = [];
   for (let a = 0; a <= 0.70; a += 0.01) line.push([100*a, model(a)]);
-  const MAAL = [[57.48, 20, "Hvidt felt"], [10.7, 40, "Vandløb"]];
+  const MAAL = [[57.48, 20, "Hvidt felt"], [10.7, 40, "Mørk is"]];
   const AFL  = [[26.0, model(0.26), "Beskidt is"], [26.5, model(0.265), "Gletsjer-middel"]];
   const dot = (p,c) => { const d=[]; for (let k=0;k<=360;k+=24)
       d.push([p[0]+0.85*Math.cos(k*Math.PI/180), p[1]+0.85*Math.sin(k*Math.PI/180)]); return d; };
@@ -1773,7 +1777,7 @@ const ctlRefl = document.getElementById("ctl-refl");
     ],
     annotations:[
       {x:57.5, y:20, lx:52, ly:14.6, text:"Hvidt felt · målt 20 cm", color:"#8c1c1c"},
-      {x:10.7, y:40, lx:22, ly:45.0, text:"Vandløb · målt 40 cm", color:"#8c1c1c"},
+      {x:10.7, y:40, lx:22, ly:45.0, text:"Mørk is · målt 40 cm", color:"#8c1c1c"},
       {x:26.2, y:34, lx:40, ly:38.5, text:"Beskidt is og gletsjer-middel", color:"#1c5fb8"}
     ]
   });

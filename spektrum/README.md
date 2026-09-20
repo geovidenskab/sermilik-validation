@@ -43,12 +43,17 @@ Den første sammenligning blev lavet nær isranden og gav faktor tre — fordi a
 tredobles over under to kilometer dér. Lektionen er valg af måleflade, ikke instrumentfejl:
 mål midt på en ensartet flade på mindst 40 × 40 m.
 
-**GIS'ens pixel-info rapporterer forkerte tal.** Samme punkt, samme scene (23. juli):
-værktøjet giver albedo 0,616 / NDSI 0,106 / NDVI 0,003; direkte fra Copernicus giver det
-0,132 / +0,851 / −0,260. Fortegnet på to af dem er vendt. Værktøjet blev desuden bedt om
-2026-08-07 ±0 dage men leverede en 23.-juli-scene med 70 % skydække, skønt en næsten
-skyfri scene fandtes på selve datoen. Alle satellittal på siden er hentet uden om
-værktøjet, via WMS GetFeatureInfo på instansen.
+**GIS'ens pixel-info rapporterede forkerte tal — rettet.** For feltpunktet gav værktøjet
+albedo 0,616 / NDSI 0,106 / NDVI 0,003, hvor Copernicus direkte gav 0,132 / +0,851 / −0,260.
+Årsag: alle scener i søgevinduet blev midlet i ét bucket uden skymaske, og "scenedatoen"
+(23. juli) var vinduets startdato. Rettet til dags-buckets + SCL-skymaske + nærmeste skyfri
+dag. Kaldene går nu gennem proxyen `GEO_site/Sermilik_api` (OAuth-klienten i den offentlige
+kode udløb 2026-09-03). Efterprøvet 2026-09-20: gletsjerpunkt 7. august giver 0,266 /
++0,947 / −0,135. Satellittallene på siden er hentet via WMS GetFeatureInfo på instansen.
+
+**10,7 % er mørk is med meget sediment, ikke en smeltevandskanal** (rettet 2026-09-20,
+bekræftet af Philip; fladen omkring kortet i `IMG_5584` giver 10–13 % med den gamle metode).
+Originalfotos ligger i `figurer/felt-originaler/` (uden for git og deploy).
 
 Afviste hypoteser undervejs, dokumenteret så de ikke skal genopfindes:
 * **Gamma/sRGB-linearisering i appen** — målt på referencekortet i felten giver appens
