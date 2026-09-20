@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Øvelsesvejledning — mål albedo</title>
+<style>
+/* Samme designsystem som undervisningssiden: én skriftfamilie, fem
+   størrelser, retvinklede kanter. Kan printes som elevark. */
+:root{
+  --navy:#0A0F3C; --teal:#63DAD6; --ink:#161c2e; --muted:#5a6376;
+  --line:#e3e7ee; --bg:#fbfcfd; --varm:#c9761f;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --fs-xs:.82rem; --fs-sm:.94rem; --fs-md:1rem; --fs-lg:1.15rem;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:var(--fs-md);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+header{background:var(--navy);color:#fff;padding:1.6rem 1.5rem}
+header .wrap{max-width:820px;margin:0 auto}
+header h1{margin:0 0 .3rem;font-size:1.6rem;letter-spacing:-.015em}
+header p{margin:0;opacity:.85;font-size:var(--fs-sm)}
+header a{color:var(--teal);font-size:var(--fs-xs);text-decoration:none}
+
+main{max-width:820px;margin:0 auto;padding:1.6rem 1.5rem 4rem}
+h2{font-size:1.25rem;color:var(--navy);margin:2.2rem 0 .5rem;
+  padding-bottom:.35rem;border-bottom:2px solid var(--navy)}
+h2:first-of-type{margin-top:1rem}
+h3{font-size:var(--fs-lg);color:var(--navy);margin:1.5rem 0 .4rem}
+p{margin:.7rem 0;max-width:70ch}
+strong,b{font-weight:640}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.9em;background:#eef1f6;padding:.1em .35em}
+.formel{font-family:ui-monospace,Menlo,monospace;font-size:var(--fs-sm);
+  background:#eef1f6;padding:.7rem .85rem;overflow-x:auto}
+
+.mat{background:#fff;border:1px solid var(--line);padding:1rem 1.2rem;margin:1.2rem 0}
+.mat ul{margin:.4rem 0;padding-left:1.2rem}
+.mat li{margin:.25rem 0;font-size:var(--fs-sm)}
+
+ol.trin-liste{counter-reset:t;list-style:none;padding:0;margin:1.2rem 0}
+ol.trin-liste li{counter-increment:t;position:relative;padding:0 0 1rem 2.8rem;max-width:70ch}
+ol.trin-liste li::before{content:counter(t);position:absolute;left:0;top:.1rem;width:1.75rem;
+  height:1.75rem;background:var(--navy);color:#fff;font-size:var(--fs-xs);font-weight:650;
+  display:flex;align-items:center;justify-content:center}
+ol.trin-liste li b{color:var(--navy)}
+
+table{border-collapse:collapse;width:100%;font-size:var(--fs-sm);margin:1rem 0}
+th,td{text-align:left;padding:.5rem .7rem;border-bottom:1px solid var(--line)}
+th{font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+  font-weight:600;border-bottom:1.5px solid #ccd3dd}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.hi td{background:#fff9ee}
+
+.skala{display:flex;height:32px;margin:1rem 0 .3rem;border:1px solid var(--line)}
+.skala div{flex:1;display:flex;align-items:center;justify-content:center;
+  font-size:var(--fs-xs);font-weight:600;font-variant-numeric:tabular-nums}
+.skala-tekst{display:flex;justify-content:space-between;font-size:var(--fs-xs);
+  color:var(--muted);margin-bottom:1.2rem}
+
+.opg{border-left:3px solid var(--varm);background:#fff6ed;padding:.9rem 1.1rem;margin:1.2rem 0}
+.opg h4{margin:0 0 .4rem;font-size:var(--fs-md);color:var(--navy)}
+.opg p{margin:.4rem 0;font-size:var(--fs-sm);max-width:none}
+.info{border-left:3px solid var(--teal);background:#f1fbfb;padding:.9rem 1.1rem;margin:1.2rem 0}
+.info h4{margin:0 0 .4rem;font-size:var(--fs-md);color:var(--navy)}
+.info p{margin:.4rem 0;font-size:var(--fs-sm);max-width:none}
+
+.knapper{display:flex;flex-wrap:wrap;gap:.6rem;margin:1.2rem 0}
+.knapper a{background:var(--navy);color:#fff;text-decoration:none;padding:.6rem 1.1rem;
+  font-weight:600;font-size:var(--fs-sm)}
+.knapper a.sek{background:#fff;color:var(--navy);box-shadow:inset 0 0 0 1.5px var(--navy)}
+.knapper a:hover{opacity:.9}
+
+.fejl li{font-size:var(--fs-sm);margin:.45rem 0}
+
+@media print{
+  body{background:#fff;font-size:10.5pt}
+  header{background:#fff;color:#000;border-bottom:2px solid #000;padding:0 0 .4rem}
+  header a,.knapper{display:none}
+  header h1{font-size:15pt}
+  main{padding:.6rem 0}
+  h2{margin-top:1.1rem;font-size:12pt}
+  .opg,.info,.mat{break-inside:avoid}
+  @page{size:A4;margin:14mm}
+}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <h1>Øvelsesvejledning: mål albedo</h1>
+  <p>Fra skolegården til satellitten — elevark til forløbet om afsmeltning</p>
+  <p style="margin-top:.5rem"><a href="./">← Tilbage til forløbet</a></p>
+</div></header>
+
+<main>
+
+<div class="mat">
+  <b>Det skal I bruge</b>
+  <ul>
+    <li>En telefon med kamera</li>
+    <li>Det printede referencekort (sort/hvid, mat papir, 100 % skalering)</li>
+    <li>Albedo-appen på geo.sg.dk/albedo</li>
+    <li>Ca. 20 minutter udenfor</li>
+  </ul>
+</div>
+
+<div class="knapper">
+  <a href="referencekort.html">Print referencekortet</a>
+  <a href="https://geo.sg.dk/albedo">Åbn albedo-appen</a>
+  <a class="sek" href="../kort/">Åbn satellitkortet</a>
+</div>
+
+<!-- ══════════ DEL 1 ══════════ -->
+<h2>Del 1 · Mål albedo i skolegården</h2>
+
+<ol class="trin-liste">
+  <li><b>Print kortet</b> i sort/hvid på mat papir, 100 % skalering. Blankt papir
+    giver genskin og ødelægger målingen.</li>
+  <li><b>Vælg jeres overflader.</b> Asfalt, græs, lyse fliser, en mørk måtte, en hvid
+    væg — og sne, hvis det er vinter. Jo større spredning, jo tydeligere resultat.</li>
+  <li><b>Læg kortet på overfladen</b> og fotografér <b>lige ned</b> ovenfra, så både
+    kort og overflade er med i samme billede. Pas på din egen skygge.</li>
+  <li><b>Åbn appen</b>, læg billedet ind, og markér det sorte felt, så det hvide —
+    og derefter overfladen.</li>
+  <li><b>Notér albedoen</b> for hver overflade. Mål gerne det samme sted to gange for
+    at se hvor meget resultatet svinger.</li>
+</ol>
+
+<div class="info">
+  <h4>Hvorfor skal der ligge et referencekort i billedet?</h4>
+  <p>Et kamera måler ikke lys i absolutte enheder. Det samme græs bliver lyst i solskin
+    og mørkt i skygge, og telefonen justerer selv undervejs. Men ligger der felter med
+    <i>kendt</i> albedo i samme billede, kan man sammenligne: kortets sorte felt
+    reflekterer ca. 5 % og det hvide papir ca. 75 % — så kan alt derimellem regnes ud
+    af forholdet.</p>
+  <p><b>Belysningen forsvinder ud af regnestykket.</b> Det er hele tricket, og det er
+    præcis samme princip som satellitter bruger.</p>
+</div>
+
+<h3>Hvad I kan forvente</h3>
+<div class="skala">
+  <div style="background:#1a1a1a;color:#fff">0,10</div>
+  <div style="background:#3d3d3d;color:#fff">0,20</div>
+  <div style="background:#6b6b6b;color:#fff">0,35</div>
+  <div style="background:#9c9c9c;color:#222">0,50</div>
+  <div style="background:#cfcfcf;color:#222">0,65</div>
+  <div style="background:#f2f2f2;color:#222">0,85</div>
+</div>
+<div class="skala-tekst"><span>mørkt — absorberer næsten alt</span><span>lyst — kaster næsten alt tilbage</span></div>
+
+<table>
+  <thead><tr><th>Overflade</th><th class="n">Albedo</th><th class="n">Absorberer</th></tr></thead>
+  <tbody>
+    <tr><td>Vand</td><td class="n">0,05–0,10</td><td class="n">~93 %</td></tr>
+    <tr class="hi"><td>Asfalt</td><td class="n">0,10–0,15</td><td class="n">~87 %</td></tr>
+    <tr><td>Græs</td><td class="n">0,20–0,25</td><td class="n">~78 %</td></tr>
+    <tr><td>Lyse fliser, beton</td><td class="n">0,30–0,40</td><td class="n">~65 %</td></tr>
+    <tr><td>Hvid mur</td><td class="n">0,60–0,80</td><td class="n">~30 %</td></tr>
+    <tr class="hi"><td>Frisk sne</td><td class="n">0,75–0,85</td><td class="n">~20 %</td></tr>
+  </tbody>
+</table>
+
+<div class="opg">
+  <h4>Opgave 1 · Spørgsmål at tage med ind</h4>
+  <p><b>a)</b> Hvilken overflade i skolegården bliver varmest på en solskinsdag?
+    Passer det med jeres målinger?</p>
+  <p><b>b)</b> Asfalt absorberer omkring 87 % af sollyset, græs omkring 78 %.
+    Hvad betyder det for temperaturen i en by med meget asfalt og lidt græs?</p>
+  <p><b>c)</b> Mål det samme sted igen når der ligger sne. Hvor meget flytter
+    albedoen sig — og hvad sker der med den absorberede energi?</p>
+</div>
+
+<h3>Typiske fejl</h3>
+<ul class="fejl">
+  <li><b>Skygge hen over kortet</b> — stil jer så jeres skygge falder væk fra kortet,
+    eller mål i jævnt overskyet vejr.</li>
+  <li><b>Skråt billede</b> — så ser kameraet mest de solvendte flader, og albedoen
+    bliver for høj. Hold telefonen lodret ned.</li>
+  <li><b>Genskin i papiret</b> — brug mat papir, og undgå at solen spejler sig.</li>
+  <li><b>Gråt eller stribet sort felt</b> — printerens tonerbesparelse er slået til.
+    Slå den fra og print igen.</li>
+</ul>
+
+<!-- ══════════ DEL 2 ══════════ -->
+<h2>Del 2 · Se det samme sted fra rummet</h2>
+
+<p>Satellitten Sentinel-2 måler albedo over hele Jorden hver femte dag. Den ser Jorden
+  i ti farvebånd og beregner albedo ud fra fem af dem. Hver måling dækker et felt på
+  <b>10 × 10 meter</b>.</p>
+
+<div class="opg">
+  <h4>Opgave 2 · Find jeres egen skole</h4>
+  <p><b>1)</b> Slå skolens position op i satellitkortet og aflæs albedoen for feltet.</p>
+  <p><b>2)</b> Sammenlign med det I målte på jorden. Er de ens?</p>
+  <p><b>3)</b> Hvis de er forskellige — <i>hvorfor?</i> Kig på hvad der ligger inden for
+    de ti meter satellitten dækker.</p>
+</div>
+
+<div class="info">
+  <h4>Sådan beregner satellitten albedo (Liang 2001)</h4>
+  <p>Satellitten måler reflektansen i hvert af sine bånd, og albedoen er et vægtet
+    gennemsnit af fem af dem:</p>
+  <p class="formel">albedo = 0,356·B02 + 0,130·B04 + 0,373·B08 + 0,085·B11 + 0,072·B12 − 0,0018</p>
+  <p>B02 er blåt lys, B04 rødt, B08 nær-infrarødt og B11/B12 kortbølge-infrarødt.
+    Vægtene afspejler hvor meget af solens energi der ligger i hvert område af spektret.
+    Bemærk at jeres referencekort kun ser det synlige lys, mens satellitten også tæller
+    det infrarøde med — det er en af grundene til at de to metoder kan afvige nogle procent.</p>
+</div>
+
+<h3>Det I sandsynligvis opdager</h3>
+<p>Jeres asfalt målte måske 0,12. Satellitten siger måske 0,25 for feltet. Ingen af jer
+  tager fejl — <b>I måler bare ikke det samme.</b> Satellitten lægger alt sammen inden
+  for sine ti meter: asfalten, græsplænen ved siden af, det lyse tag, cykelskuret.
+  Det hedder en <b>blandet pixel</b>, og det er et af de største problemer i al
+  satellitovervågning.</p>
+
+<!-- ══════════ DEL 3 ══════════ -->
+<h2>Del 3 · Regn på afsmeltningen</h2>
+
+<p>Energien der smelter isen, er den del af sollyset overfladen <i>ikke</i> kaster tilbage.
+  Absorberet effekt er <code>Q · (1 − albedo)</code>. Over seks døgn bliver det til en
+  energimængde, og deler man med smeltevarmen får man massen af smeltet is.</p>
+
+<table>
+  <thead><tr><th>Størrelse</th><th>Værdi</th></tr></thead>
+  <tbody>
+    <tr><td>Sollys på isen, døgnmiddel i august</td><td>ca. 265 W/m²</td></tr>
+    <tr><td>Smeltevarme for is</td><td>334 000 J/kg</td></tr>
+    <tr><td>Isens massefylde</td><td>900 kg/m³</td></tr>
+  </tbody>
+</table>
+
+<div class="opg">
+  <h4>Opgave 3 · Eftergør forskernes resultat</h4>
+  <p><b>a)</b> Beregn hvor mange centimeter is der smelter på seks døgn ved albedo
+    <b>0,58</b> (det lyse felt) og ved albedo <b>0,11</b> (en smeltevandskanal).</p>
+  <p><b>b)</b> Sammenlign med det målte: 20 cm og 40 cm. Passer det?</p>
+  <p><b>c)</b> Gletsjerens gennemsnitlige albedo blev målt til <b>0,27</b>. Hvor meget
+    smelter der så — og hvor meget mere er det end det lyse felt?</p>
+</div>
+
+<div class="knapper">
+  <a class="sek" href="./">← Tilbage til forløbet</a>
+</div>
+
+</main>
+</body>
+</html>

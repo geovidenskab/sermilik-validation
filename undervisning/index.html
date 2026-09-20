@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mørk is smelter dobbelt så hurtigt</title>
+<style>
+/* ---------------------------------------------------------------------------
+   Typografi: ÉN skriftfamilie (system-sans). Monospace bruges kun til formlen,
+   hvor tegnbredden har en funktion. Størrelser er låst til en skala på fem
+   trin — ingen løsrevne px-værdier rundt om i arket.
+
+   Kanter: alt er retvinklet. Ingen border-radius nogen steder.
+   --------------------------------------------------------------------------- */
+:root{
+  --navy:#0A0F3C; --teal:#63DAD6; --ink:#161c2e; --muted:#5a6376;
+  --line:#e3e7ee; --bg:#fbfcfd; --card:#fff;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  /* typeskala */
+  --fs-xs:.82rem;   /* etiketter, billedtekst, småt */
+  --fs-sm:.94rem;   /* sekundær tekst, tabeller, knapper */
+  --fs-md:1rem;     /* brødtekst */
+  --fs-lg:1.15rem;  /* manchet, mellemrubrik */
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:60px}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.65;
+  font-family:var(--sans);font-size:var(--fs-md);-webkit-font-smoothing:antialiased}
+
+/* ---------- hero ---------- */
+.hero{position:relative;min-height:min(58vh,520px);display:flex;align-items:flex-end;
+  background:#0a0f2c center/cover no-repeat}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  object-position:22% 25%}  /* silhuetterne øverst tv. skal blive i billedet ved beskæring */
+.hero::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(6,10,32,.34) 0%,rgba(6,10,32,.12) 38%,rgba(6,10,32,.9) 100%)}
+.hero .inner{position:relative;z-index:2;max-width:1000px;margin:0 auto;
+  padding:0 1.5rem 3.4rem;color:#fff;width:100%}
+.hero .kicker{font-size:var(--fs-xs);letter-spacing:.12em;text-transform:uppercase;
+  opacity:.85;margin:0 0 .7rem;font-weight:600}
+.hero h1{font-size:clamp(1.9rem,4.6vw,3.1rem);line-height:1.1;margin:0 0 .9rem;
+  font-weight:660;letter-spacing:-.02em;text-shadow:0 2px 18px rgba(0,0,0,.35)}
+.hero p{font-size:var(--fs-lg);max-width:56ch;margin:0;opacity:.94}
+
+/* ---------- navigation + værktøjslinje ---------- */
+nav.toc{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav.toc .wrap{max-width:1000px;margin:0 auto;padding:.5rem 1.5rem;display:flex;
+  gap:1.3rem;overflow-x:auto;font-size:var(--fs-sm);align-items:center}
+nav.toc a{color:var(--muted);text-decoration:none;white-space:nowrap;padding:.2rem 0;
+  border-bottom:2px solid transparent}
+nav.toc a:hover{color:var(--navy);border-bottom-color:var(--teal)}
+nav.toc .navcta{margin-left:auto;display:flex;gap:.5rem}
+nav.toc .navcta a{background:var(--navy);color:#fff;padding:.36rem .85rem;
+  font-weight:600;border-bottom:none}
+nav.toc .navcta a.sek{background:#fff;color:var(--navy);box-shadow:inset 0 0 0 1.5px var(--navy)}
+nav.toc .navcta a:hover{border-bottom:none;opacity:.9}
+
+
+/* ---------- brødtekst ---------- */
+main{max-width:1000px;margin:0 auto;padding:0 1.5rem 5rem}
+section{padding:2.3rem 0 .6rem;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:none}
+.trin{display:inline-block;font-size:var(--fs-xs);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--teal);background:var(--navy);
+  padding:.3rem .8rem;margin-bottom:.9rem;font-weight:600}
+h2{font-size:clamp(1.4rem,2.6vw,1.9rem);margin:0 0 .5rem;letter-spacing:-.015em;color:var(--navy)}
+h3{font-size:var(--fs-lg);margin:2rem 0 .5rem;color:var(--navy)}
+.lede{font-size:var(--fs-lg);color:var(--muted);margin:.2rem 0 1.1rem;max-width:68ch}
+p{margin:.95rem 0;max-width:72ch}
+strong{font-weight:640}
+a{color:#1a5cb0}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.9em;background:#eef1f6;padding:.1em .35em}
+
+/* ---------- figurer ---------- */
+figure{margin:1.2rem 0;background:var(--card);border:1px solid var(--line);
+  padding:.75rem .75rem .3rem;overflow:hidden}
+figure img{display:block;width:100%;height:auto;max-height:340px;object-fit:cover}
+figure.helt img{max-height:none}   /* motiver hvor hele kompositionen bærer pointen */
+figure video{display:block;width:100%;height:auto;background:#0a0f2c}
+.videoer{display:grid;gap:1.2rem;grid-template-columns:1fr 1fr;margin:1.2rem 0}
+.videoer figure{margin:0}
+@media(max-width:760px){.videoer{grid-template-columns:1fr}}
+figcaption{font-size:var(--fs-xs);color:var(--muted);padding:.75rem .4rem .55rem;line-height:1.55}
+figcaption b{color:var(--ink)}
+.to-op{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin:1.6rem 0}
+.to-op figure{margin:0}
+.to-op figure img{max-height:230px}
+
+
+/* ---------- bokse og kort ---------- */
+.boks{border-left:3px solid var(--teal);background:#f1fbfb;padding:1.05rem 1.25rem;margin:1.6rem 0}
+.boks h4{margin:0 0 .45rem;font-size:var(--fs-md);color:var(--navy)}
+.boks figure{margin:.9rem 0 .2rem;background:none;border:none;padding:0}
+.boks figure img{max-height:300px}
+.boks figcaption{padding:.55rem 0 .2rem}
+.boks p{margin:.45rem 0;font-size:var(--fs-sm);max-width:none}
+.boks p:last-child{margin-bottom:0}
+
+/* Måletal holdes dæmpede — de skal kunne læses, ikke råbe */
+.kort-grid{display:grid;gap:1.6rem;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  margin:1.4rem 0;padding-top:.9rem;border-top:1px solid var(--line)}
+.kort .k{font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.06em;
+  color:var(--muted);margin-bottom:.2rem;font-weight:600}
+.kort .v{font-size:var(--fs-lg);font-weight:640;line-height:1.2;color:var(--ink);
+  font-variant-numeric:tabular-nums}
+.kort .d{font-size:var(--fs-xs);color:var(--muted);margin-top:.2rem;line-height:1.5}
+
+/* ---------- knapper ---------- */
+.cta{display:flex;flex-wrap:wrap;gap:.7rem;margin:1.5rem 0}
+.cta a{display:inline-flex;align-items:center;gap:.5rem;background:var(--navy);color:#fff;
+  text-decoration:none;padding:.72rem 1.25rem;font-weight:600;font-size:var(--fs-sm)}
+.cta a:hover{opacity:.9}
+.cta a.sek{background:#fff;color:var(--navy);box-shadow:inset 0 0 0 1.5px var(--navy)}
+
+
+
+/* ---------- folde-ud ---------- */
+details.fold{margin:1.1rem 0;border:1px solid var(--line);background:#fff}
+details.fold summary{cursor:pointer;padding:.7rem 1rem;font-weight:600;font-size:var(--fs-sm);
+  color:var(--navy);list-style:none;display:flex;align-items:center;gap:.5rem}
+details.fold summary::before{content:"+";width:.9rem;color:var(--muted);font-weight:600}
+details.fold[open] summary::before{content:"–"}
+details.fold .fold-inner{padding:0 1.1rem .9rem}
+details.fold .fold-inner p{margin:.6rem 0;font-size:var(--fs-sm)}
+
+footer{background:var(--navy);color:#fff;padding:2.4rem 1.5rem;font-size:var(--fs-sm)}
+footer .wrap{max-width:1000px;margin:0 auto}
+footer a{color:var(--teal)}
+footer .links{display:flex;flex-wrap:wrap;gap:1.5rem;margin-bottom:1.2rem}
+footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
+
+@media (max-width:700px){
+  main{padding:0 1.1rem 3rem}
+  table{display:block;overflow-x:auto;white-space:nowrap}
+  .hero .inner{padding-bottom:2.2rem}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <img src="foto/hero.jpg" alt="To personer i dis på Mittivakkat-gletsjerens knudrede, gråmelerede isoverflade">
+  <div class="inner">
+    <p class="kicker">Sermilik feltstation · Østgrønland</p>
+    <h1>Mørk is smelter dobbelt så hurtigt</h1>
+    <p>Forskerne målte det på en gletsjer i Grønland. I kan måle det samme
+       i skolegården — med en telefon og et stykke papir.</p>
+  </div>
+</header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#casen">Casen</a>
+  <a href="#skolegaarden">1 · Mål selv</a>
+  <a href="#rummet">2 · Fra rummet</a>
+  <a href="#gronland">3 · Tilbage til Grønland</a>
+  <a href="#gletsjeren">Gå med på isen</a>
+  <span class="navcta">
+    <a href="oevelsesvejledning.html">Øvelsesvejledning</a>
+    <a class="sek" href="https://geo.sg.dk/albedo">Albedo-app</a>
+    <a class="sek" href="../kort/dk.html">Satellitkort</a>
+  </span>
+</div></nav>
+
+
+<main>
+
+<!-- ============ CASEN ============ -->
+<section id="casen">
+  <h2>To pletter is, få meter fra hinanden</h2>
+  <p class="lede">I august 2026 lagde en gruppe forskere felter ud på en gletsjer i
+     Østgrønland. Nogle felter blev dækket med mørkt sediment, andre fik lov at
+     ligge som ren is. Så satte de pinde i og ventede seks dage.</p>
+
+  <div class="to-op">
+    <figure>
+      <img src="foto/felt-moerkt.jpg" alt="Et felt på gletsjeren dækket med mørkt sediment, markeret med pinde og grønne flag">
+      <figcaption><b>Det mørke felt.</b> Sediment spredt ud på isen. Pindene måler
+        hvor meget overfladen synker.</figcaption>
+    </figure>
+    <figure>
+      <img src="foto/felt-lyst.jpg" alt="Et lyst felt af kornet is, der står højere end den mørkere is omkring">
+      <figcaption><b>Det lyse felt.</b> Efter seks dage står det <i>højere</i> end
+        isen omkring — forskellen i højde er forskellen i smeltning.</figcaption>
+    </figure>
+  </div>
+
+  <p>Resultatet kunne ses uden at måle: den lyse plet stod som en lille forhøjning,
+     fordi den havde smeltet langsommere end alt omkring. Med pindene blev det til tal.</p>
+
+  <div class="kort-grid">
+    <div class="kort"><div class="k">Lys overflade</div><div class="v">20 cm</div>
+      <div class="d">smeltet på seks dage</div></div>
+    <div class="kort"><div class="k">Mørk overflade</div><div class="v">40 cm</div>
+      <div class="d">smeltet på seks dage — dobbelt så meget</div></div>
+    <div class="kort"><div class="k">Forskellen</div><div class="v">Albedo</div>
+      <div class="d">hvor stor en del af sollyset overfladen kaster tilbage</div></div>
+  </div>
+
+  <p><strong>Albedo</strong> er det eneste der adskilte de to felter. Samme sol,
+     samme luft, samme is nedenunder. Den mørke overflade kastede mindre lys tilbage,
+     absorberede mere energi — og smeltede dobbelt så hurtigt.</p>
+
+  <div class="boks">
+    <h4>Ikke en detalje&hellip;</h4>
+    <p>Grønlands indlandsis taber masse på to måder, som vejer omtrent lige tungt.
+       Cirka <b>halvdelen</b> sker på <b>overfladen</b>, hvor sollyset smelter is og sne.
+       Den anden halvdel sker ved at isen <b>flyder ud i havet</b> og kalver som isbjerge.</p>
+
+    <figure>
+      <img src="foto/apusiaajik.jpg" alt="Apusiaajik-gletsjerens kalvefront møder havet, med isstykker i vandet og bjerge i tåge bagved">
+      <figcaption><b>Apusiaajik-gletsjeren</b>, få kilometer fra feltstationen. Her ender
+        isen i havet og brækker af som isbjerge. Gletsjeren har trukket sig
+        <b>flere kilometer tilbage</b> de seneste 50 år — det brune, bare land i
+        forgrunden lå under is inden for et menneskeliv.</figcaption>
+    </figure>
+
+    <p>Albedo styrer den første halvdel. Og albedo er noget I kan måle — med en telefon
+       og et stykke papir.</p>
+  </div>
+</section>
+
+<!-- ============ SKOLEGÅRDEN ============ -->
+<section id="skolegaarden">
+  <div class="trin">Trin 1</div>
+  <h2>Mål albedo i skolegården</h2>
+  <p class="lede">Metoden forskerne brugte på isen virker lige så godt på asfalt,
+     græs og fliser. I skal bruge en telefon, et printet referencekort og ti minutter udenfor.</p>
+
+  <figure>
+    <img src="foto/kort-i-brug.jpg" alt="En hånd lægger referencekortet på isoverfladen for at fotografere det sammen med isen">
+    <figcaption><b>Sådan gjorde forskerne.</b> Referencekortet lægges på overfladen og
+      fotograferes sammen med den. Felterne på kortet har kendt albedo — resten regner appen ud.</figcaption>
+  </figure>
+
+  <p>Selve fremgangsmåden — de fem trin, forventede værdier for asfalt, græs og sne,
+     og spørgsmålene til klassen — står i øvelsesvejledningen. Den kan printes som elevark.</p>
+
+  <div class="cta">
+    <a href="oevelsesvejledning.html">Åbn øvelsesvejledningen</a>
+    <a class="sek" href="referencekort.html">Print referencekortet</a>
+    <a class="sek" href="https://geo.sg.dk/albedo">Åbn albedo-appen</a>
+  </div>
+</section>
+
+<!-- ============ FRA RUMMET ============ -->
+<section id="rummet">
+  <div class="trin">Trin 2</div>
+  <h2>Se det samme sted fra rummet</h2>
+  <p class="lede">Satellitten Sentinel-2 måler albedo over hele Jorden hver femte dag.
+     Nu hvor I har målt jeres egen skolegård, kan I slå den op — og sammenligne.</p>
+
+  <p>Sentinel-2 ser Jorden i ti farvebånd og beregner albedo ud fra fem af dem.
+     Hver måling dækker et felt på <strong>10 × 10 meter</strong>. Det lyder småt,
+     men prøv at se skolegården for jer: hvor meget asfalt, græs, tag og grus ligger
+     der inden for ti meter?</p>
+
+  <figure>
+    <img src="foto/vejrstation.jpg" alt="PROMICE-vejrstationen på klippen ved Mittivakkat-gletsjeren med gletsjersø i baggrunden">
+    <figcaption><b>Sandheden på jorden.</b> Vejrstationen ved Mittivakkat måler albedo
+      hvert eneste døgn med to pyranometre — ét der vender op, ét der vender ned.
+      Den 7. august 2026 målte stationen <b>0,227</b>, satellitten <b>0,231</b> og
+      referencekortet <b>0,265</b>. Tre uafhængige metoder, samme svar.</figcaption>
+  </figure>
+
+  <div class="cta">
+    <a href="../kort/dk.html">Åbn jeres eget sted i satellitkortet</a>
+    <a class="sek" href="oevelsesvejledning.html">Opgaven står i øvelsesvejledningen</a>
+  </div>
+
+  <h3>Det I sandsynligvis opdager</h3>
+  <p>Jeres asfalt målte måske 0,12. Satellitten siger måske 0,25 for feltet.
+     Ingen af jer tager fejl — <strong>I måler bare ikke det samme.</strong> Satellitten
+     lægger alt sammen inden for sine ti meter: asfalten, græsplænen ved siden af,
+     det lyse tag, cykelskuret.</p>
+  <p>Det hedder en <strong>blandet pixel</strong>, og det er et af de største problemer
+     i al satellitovervågning. Man kan ikke se af tallet alene, hvad der ligger bagved.</p>
+
+  <details class="fold"><summary>Præcis samme fælde ramte forskerne på gletsjeren</summary>
+  <div class="fold-inner">
+    <p>Da målingerne fra Grønland første gang blev sammenlignet med satellitten, var de
+       <b>tre gange</b> fra hinanden. Forskerne havde målt tæt på iskanten — et sted hvor
+       mørke sedimentbånd, smeltevandskanaler og ren is ligger inden for få meter.</p>
+    <p>Flyttede man sammenligningen ind på en ensartet flade længere oppe, passede det:
+       <b>satellit 0,23 mod jordmåling 0,27</b>. Ikke fordi instrumenterne blev bedre,
+       men fordi man målte det rigtige sted.</p>
+  </div></details>
+</section>
+
+<!-- ============ TILBAGE TIL GRØNLAND ============ -->
+<section id="gronland">
+  <div class="trin">Trin 3</div>
+  <h2>Tilbage til isen — hvad betyder det for Grønland?</h2>
+  <p class="lede">Nu har I metoden. Så kan I regne på det samme som klimaforskerne gør,
+     med tallene fra gletsjeren.</p>
+
+  <figure class="helt">
+    <img src="foto/smeltevand.jpg" alt="Turkis smeltevandsgryde i gletsjeroverfladen, omgivet af ru, lys is med bjerge i baggrunden">
+    <figcaption><b>Kontrasten er hele historien.</b> Den turkise gryde og den lyse is
+      omkring den ligger under samme sol — men vandet har albedo omkring <b>0,06</b>
+      og isen omkring <b>0,4–0,6</b>. Vandet absorberer altså næsten alt og smelter sig
+      dybere ned, mens isen ved siden af bliver stående — få meter fra hinanden.</figcaption>
+  </figure>
+
+  <h3>Regn selv: hvor meget smelter der?</h3>
+  <p>Energien der smelter isen, er den del af sollyset overfladen <i>ikke</i> kaster
+     tilbage: <code>Q · (1 − albedo)</code>. Med sollyset på isen i august, smeltevarmen
+     for is og isens massefylde kan I regne jer frem til de 20 og 40 centimeter selv —
+     regneopgaven med alle tal står i øvelsesvejledningen.</p>
+
+  <div class="cta">
+    <a href="oevelsesvejledning.html">Åbn øvelsesvejledningen</a>
+  </div>
+
+  <details class="fold"><summary>Den onde spiral — hvorfor smeltningen forstærker sig selv</summary>
+  <div class="fold-inner">
+  <p>Når sne og is smelter, bliver støv, sod og sand liggende tilbage på overfladen.
+     Det bliver koncentreret, overfladen bliver mørkere, albedoen falder — og så smelter
+     det endnu hurtigere. <strong>Smeltningen forstærker sig selv.</strong></p>
+  <p>Det er derfor der findes et bælte langs Grønlands vestkyst hvor isen er markant
+     mørkere end omgivelserne. Det kaldes <strong>mørkezonen</strong>, det er vokset
+     gennem de seneste årtier, og det er en af de ting der gør fremtidens afsmeltning
+     svær at forudsige.</p>
+  </div></details>
+
+  <details class="fold"><summary>Hvad forskerne stadig ikke ved præcist</summary>
+  <div class="fold-inner">
+    <p>Urenhederne på isen er ikke jævnt fordelt, de skifter fra år til år, og en del af
+       dem er <b>levende</b> — snealger vokser når det bliver varmere og gør isen mørkere.
+       En klimamodel der regner med fast albedo, rammer derfor systematisk for lavt.</p>
+    <p>Og så er der den anden halvdel: isen der flyder ud i havet. Ved Sermilik løber
+       <b>Helheim Gletsjer</b> ud i fjorden, hvor varmt atlanterhavsvand når helt ind til
+       gletsjerfronten og smelter den nedefra. Den del kan et referencekort ikke måle —
+       men den fylder lige så meget i regnskabet.</p>
+  </div></details>
+</section>
+
+
+<!-- ============ GAA MED PAA ISEN ============ -->
+<section id="gletsjeren">
+  <div class="trin">Til sidst</div>
+  <h2>Gå med på gletsjeren</h2>
+  <p class="lede">I har målt jeres egen asfalt, fundet stedet fra rummet, opdaget den blandede
+     pixel og regnet på hvor meget der smelter. Så er der kun ét tilbage: at se det.</p>
+
+  <div class="videoer">
+    <figure>
+      <video controls preload="none" playsinline poster="video/gletsjer-invitation.jpg">
+        <source src="video/gletsjer-invitation.mp4" type="video/mp4">
+        Din browser kan ikke afspille videoen.
+      </video>
+      <figcaption><b>Kom med.</b> Optaget på Mittivakkat-gletsjeren 8. august 2026.
+        Bag i billedet ligger fjorden fuld af isbjerge — og under fødderne den is,
+        alle tallene i dette forløb handler om.</figcaption>
+    </figure>
+
+    <figure>
+      <video controls preload="none" playsinline poster="video/smeltevandsgryde-drone.jpg">
+        <source src="video/smeltevandsgryde-drone.mp4" type="video/mp4">
+        Din browser kan ikke afspille videoen.
+      </video>
+      <figcaption><b>Se det bevæge sig.</b> Billedet ovenfor viser kontrasten; her løber
+        vandet. Følg smeltevandskanalerne — de er skåret ned i isen af netop den energi,
+        det mørke vand har optaget. Midtvejs træder en person ind i billedet, og først dér
+        ser man, hvor dybe gryderne egentlig er.</figcaption>
+    </figure>
+  </div>
+
+  <h3>Mål gletsjeren med jeres eget værktøj</h3>
+  <p>Sæt dronevideoen på pause et sted hvor både gryden og den lyse is er i billedet, og
+     tag et skærmbillede. Læg det ind i <a href="https://geo.sg.dk/albedo">albedo-appen</a> —
+     nøjagtig den samme, I brugte på skolegården. Markér vandet, markér isen ved siden af,
+     og brug isen som reference.</p>
+  <p>Nu måler I grønlandsk albedo med jeres eget instrument. <strong>Og så er spørgsmålet
+     igen det samme som i trin 2:</strong> hvor meget kan I stole på tallet? Billedet er
+     taget skråt fra en drone, lyset rammer skævt, og kameraet har selv justeret
+     eksponeringen undervejs. Diskutér hvilke af de fejlkilder der ville forsvinde, hvis I
+     stod på isen med et pyranometer — og hvilke der ikke ville.</p>
+
+  <div class="cta">
+    <a href="https://geo.sg.dk/albedo">Åbn albedo-appen</a>
+    <a class="sek" href="../kort/">Se Mittivakkat i satellitkortet</a>
+  </div>
+</section>
+
+
+</main>
+
+<footer><div class="wrap">
+  <div class="links">
+    <a href="referencekort.html">Referencekort til print</a>
+    <a href="https://geo.sg.dk/albedo">Albedo-appen</a>
+    <a href="../kort/">Kort med satellitdata</a>
+    <a href="../spektrum/">Det faglige grundlag</a>
+  </div>
+  <p class="sml">Feltarbejde ved Sermilik feltstation, Ammassalik Ø, Østgrønland
+    (65°41′N · 37°55′V), august 2026. Satellitdata: Sentinel-2 fra Copernicus /ESA.<br>
+    Sans Science · undervisning med SANS</p>
+</div></footer>
+
+</body>
+</html>

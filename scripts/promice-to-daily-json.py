@@ -66,7 +66,7 @@ def aggregate_csv(path):
     return out
 
 def main():
-    src_dir = Path(__file__).parent.parent / 'data' / 'promice'
+    src_dir = Path(__file__).parent.parent / 'kort' / 'data' / 'promice'  # flyttet ved omstrukturering aug 2026
     if not src_dir.exists():
         sys.exit(f'No source dir: {src_dir}')
 

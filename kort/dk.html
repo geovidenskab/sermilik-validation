@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="da" data-profil="dk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jordens albedo — set i skolegården og fra rummet</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<header>
+  <h1>Jordens albedo <em>— set i skolegården og fra rummet</em></h1>
+  <div class="meta">Sentinel-2 over Danmark · sammenlign satellitten med din egen måling</div>
+</header>
+
+<div id="app">
+  <button id="toggle-panel">☰ Kortlag</button>
+
+  <aside id="panel">
+    <p class="intro">
+      Du har målt albedo på jorden. Her måler satellitten det samme sted fra 786 km oppe.
+      Find stedet på luftfotoet, vælg en dag hvor Sentinel-2 fløj over, tænd albedokortet
+      — og se, om I er enige.
+    </p>
+    <p class="intro" style="margin-top:0.2rem;">
+      <a href="../undervisning/">← Undervisningsforløbet</a> ·
+      <a href="../undervisning/oevelsesvejledning.html">Øvelsesvejledningen</a> ·
+      <a href="./">Grønlandskortet</a>
+    </p>
+
+    <h2>Satellitbilledet</h2>
+
+    <div id="sh-config">
+      <div class="sh-mangler">
+        <strong>Satellitlagene mangler en dansk instans</strong>
+        <p>Sentinel Hub-instansen for dette forløb er afgrænset til Sermilik-området i Østgrønland — det er sådan, forbruget holdes nede. Der skal oprettes en tilsvarende instans afgrænset til Danmark i Copernicus-dashboardet, og id'et indsættes nedenfor.</p>
+        <p>Luftfoto, kort og måleværktøjer virker allerede.</p>
+      </div>
+      <div class="sh-ok">
+        <div class="sh-status-row">
+          <span class="status ok">✓ Sentinel Hub forbundet</span>
+          <button type="button" id="sh-toggle-edit" class="link-btn">skift instans</button>
+        </div>
+      </div>
+      <div id="sh-instance-edit" style="display:none;">
+        <input type="text" id="sh-instance-input" placeholder="indsæt instans-ID (UUID)">
+        <button id="sh-save-btn">Gem</button>
+      </div>
+    </div>
+
+    <div id="sh-dates">
+      <strong>📅 Hvornår fløj satellitten over?</strong>
+
+      <div class="mode-toggle">
+        <button type="button" data-mode="range" class="active">Periode (mosaik)</button>
+        <button type="button" data-mode="single">Bestemt dag</button>
+      </div>
+
+      <div id="mode-range">
+        <div class="date-row">
+          <label for="sh-from">Fra</label>
+          <input type="date" id="sh-from">
+        </div>
+        <div class="date-row">
+          <label for="sh-to">Til</label>
+          <input type="date" id="sh-to">
+        </div>
+        <div class="presets">
+          <button data-preset="latest-summer">Sidste sommer</button>
+          <button data-preset="this-summer">I sommer</button>
+          <button data-preset="winter">Vinter '24</button>
+          <button data-preset="full-2024">Hele 2024</button>
+          <button data-preset="full-2020">Hele 2020</button>
+        </div>
+        <p class="hint">Et sammenklip af alle skyfrie optagelser i perioden. Godt til at få noget at se — men datoen er ikke én bestemt dag. Vil du sammenligne med din egen måling, så skift til «Bestemt dag».</p>
+      </div>
+
+      <div id="mode-single" style="display:none;">
+        <div class="date-row">
+          <label for="sh-target">Dato</label>
+          <input type="date" id="sh-target">
+        </div>
+        <div class="scrub-row">
+          <button type="button" data-scrub="-30" title="−1 måned">«</button>
+          <button type="button" data-scrub="-7" title="−1 uge">‹‹</button>
+          <button type="button" data-scrub="-1" title="−1 dag">‹</button>
+          <button type="button" data-scrub="1" title="+1 dag">›</button>
+          <button type="button" data-scrub="7" title="+1 uge">››</button>
+          <button type="button" data-scrub="30" title="+1 måned">»</button>
+        </div>
+        <div class="tolerance-row">
+          <label for="sh-tolerance">Tolerance ±</label>
+          <input type="range" id="sh-tolerance" min="0" max="14" value="5" step="1">
+          <span class="val" id="sh-tolerance-val">5 dage</span>
+        </div>
+        <p class="hint">Sentinel-2 passerer Danmark hver 2.-3. dag, men skyerne bestemmer, om der er noget at se. Nederst til venstre står det, hvilke optagelser der faktisk findes i dit udsnit.</p>
+      </div>
+
+      <div class="maxcc-row">
+        <label for="sh-maxcc">Max sky %</label>
+        <input type="range" id="sh-maxcc" min="0" max="100" value="30" step="1">
+        <span class="val" id="sh-maxcc-val">30%</span>
+      </div>
+    </div>
+
+    <div class="layer-group" id="spectral-layers" style="margin-top: 0.7rem;"></div>
+
+    <h2>Albedokortet</h2>
+    <p style="font-size:0.78rem; color:#555; margin: 0 0 0.4rem;">
+      Beregnet ud fra satellittens råbånd med samme formel, som forskerne bruger på indlandsisen.
+      Farverne her er skaleret til danske overflader — vand og asfalt i bunden, sne i toppen.
+    </p>
+    <div class="layer-group" id="glacial-layers"></div>
+
+    <h2>Baggrundskort</h2>
+    <div class="layer-group" id="basemaps-dk"></div>
+    <h3 class="layer-subhead">Andre kort</h3>
+    <div class="layer-group" id="basemaps-vektor"></div>
+    <div class="layer-group" id="basemaps-none"></div>
+
+    <div class="external-links">
+      <h2 style="margin-top:0;">Baggrund</h2>
+      <a href="../undervisning/#rummet">Hvorfor får I ikke det samme som satellitten?</a>
+      <a href="../spektrum/">Det faglige grundlag — spektralmålinger fra felten</a>
+      <a href="https://geo.sg.dk/albedo">Albedo-appen — mål fra dine egne fotos</a>
+      <a href="https://dataforsyningen.dk/" target="_blank">Dataforsyningen — de danske luftfotos</a>
+    </div>
+  </aside>
+
+  <div id="map"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>

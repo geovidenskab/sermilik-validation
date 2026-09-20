@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="da" data-profil="dk"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jordens albedo — set i skolegården og fra rummet</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<header>
+  <h1>Jordens albedo <em>— set i skolegården og fra rummet</em></h1>
+  <div class="meta">Sentinel-2 over Danmark · sammenlign satellitten med din egen måling</div>
+</header>
+
+<div id="app">
+  <button id="toggle-panel">☰ Kortlag</button>
+
+  <aside id="panel">
+    <p class="intro">
+      Du har målt albedo på jorden. Her måler satellitten det samme sted fra 786 km oppe.
+      Find stedet på luftfotoet, vælg en dag hvor Sentinel-2 fløj over, tænd albedokortet
+      — og se, om I er enige.
+    </p>
+    <p class="intro" style="margin-top:0.2rem;">
+      <a href="../undervisning/">← Undervisningsforløbet</a> ·
+      <a href="../undervisning/oevelsesvejledning.html">Øvelsesvejledningen</a> ·
+      <a href="./">Grønlandskortet</a>
+    </p>
+
+    <h2 class="collapsible" role="button" tabindex="0">Satellitbilledet</h2><div class="collapse-content"><div id="sh-config" class="connected">
+      <div class="sh-mangler">
+        <strong>Satellitlagene mangler en dansk instans</strong>
+        <p>Sentinel Hub-instansen for dette forløb er afgrænset til Sermilik-området i Østgrønland — det er sådan, forbruget holdes nede. Der skal oprettes en tilsvarende instans afgrænset til Danmark i Copernicus-dashboardet, og id'et indsættes nedenfor.</p>
+        <p>Luftfoto, kort og måleværktøjer virker allerede.</p>
+      </div>
+      <div class="sh-ok">
+        <div class="sh-status-row">
+          <span class="status ok">✓ Sentinel Hub forbundet</span>
+          <button type="button" id="sh-toggle-edit" class="link-btn">skift instans</button>
+        </div>
+      </div>
+      <div id="sh-instance-edit" style="display:none;">
+        <input type="text" id="sh-instance-input" placeholder="indsæt instans-ID (UUID)">
+        <button id="sh-save-btn">Gem</button>
+      </div>
+    </div><div id="sh-dates" style="display: block;">
+      <strong>📅 Hvornår fløj satellitten over?</strong>
+
+      <div class="mode-toggle">
+        <button type="button" data-mode="range" class="active">Periode (mosaik)</button>
+        <button type="button" data-mode="single">Bestemt dag</button>
+      </div>
+
+      <div id="mode-range" style="display: block;">
+        <div class="date-row">
+          <label for="sh-from">Fra</label>
+          <input type="date" id="sh-from">
+        </div>
+        <div class="date-row">
+          <label for="sh-to">Til</label>
+          <input type="date" id="sh-to">
+        </div>
+        <div class="presets">
+          <button data-preset="latest-summer">Sidste sommer</button>
+          <button data-preset="this-summer">I sommer</button>
+          <button data-preset="winter">Vinter '24</button>
+          <button data-preset="full-2024">Hele 2024</button>
+          <button data-preset="full-2020">Hele 2020</button>
+        </div>
+        <p class="hint">Et sammenklip af alle skyfrie optagelser i perioden. Godt til at få noget at se — men datoen er ikke én bestemt dag. Vil du sammenligne med din egen måling, så skift til «Bestemt dag».</p>
+      </div>
+
+      <div id="mode-single" style="display:none;">
+        <div class="date-row">
+          <label for="sh-target">Dato</label>
+          <input type="date" id="sh-target">
+        </div>
+        <div class="scrub-row">
+          <button type="button" data-scrub="-30" title="−1 måned">«</button>
+          <button type="button" data-scrub="-7" title="−1 uge">‹‹</button>
+          <button type="button" data-scrub="-1" title="−1 dag">‹</button>
+          <button type="button" data-scrub="1" title="+1 dag">›</button>
+          <button type="button" data-scrub="7" title="+1 uge">››</button>
+          <button type="button" data-scrub="30" title="+1 måned">»</button>
+        </div>
+        <div class="tolerance-row">
+          <label for="sh-tolerance">Tolerance ±</label>
+          <input type="range" id="sh-tolerance" min="0" max="14" value="5" step="1">
+          <span class="val" id="sh-tolerance-val">5 dage</span>
+        </div>
+        <p class="hint">Sentinel-2 passerer Danmark hver 2.-3. dag, men skyerne bestemmer, om der er noget at se. Nederst til venstre står det, hvilke optagelser der faktisk findes i dit udsnit.</p>
+      </div>
+
+      <div class="maxcc-row">
+        <label for="sh-maxcc">Max sky %</label>
+        <input type="range" id="sh-maxcc" min="0" max="100" value="30" step="1">
+        <span class="val" id="sh-maxcc-val">30%</span>
+      </div>
+    </div><div class="layer-group" id="spectral-layers" style="margin-top: 0.7rem;"><label class="layer" title="Native Sentinel-2 RGB med kendt dato. Lavere skydække end EOX-mosaikken når man rammer en god dag."><input type="checkbox"><div class="label"><div class="name">True Color (B4-B3-B2)</div></div><div class="layer-controls-row" style="display: none;">
+    <span>Transparens</span>
+    <input type="range" class="layer-opacity-slider" min="0" max="100" value="100" step="5">
+    <span class="layer-opacity-val">100%</span>
+  </div></label><label class="layer" title="Vegetation lyser rødt. Pioneer-planter på morænerne fra Lille Istid bliver tydelige."><input type="checkbox"><div class="label"><div class="name">Color Infrared (B8-B4-B3)</div></div><div class="layer-controls-row" style="display: none;">
+    <span>Transparens</span>
+    <input type="range" class="layer-opacity-slider" min="0" max="100" value="100" step="5">
+    <span class="layer-opacity-val">100%</span>
+  </div></label><label class="layer" title="Grønt = vegetation. Kvantificér prograderede områder siden Mittivakkats tilbagetrækning."><input type="checkbox"><div class="label"><div class="name">NDVI — vegetationsindeks</div></div><div class="layer-controls-row" style="display: none;">
+    <span>Transparens</span>
+    <input type="range" class="layer-opacity-slider" min="0" max="100" value="100" step="5">
+    <span class="layer-opacity-val">100%</span>
+  </div></label><label class="layer" title="Fugtighed i terrænet — finder smelteområder og våde overflader."><input type="checkbox"><div class="label"><div class="name">Moisture Index (B8A-B11)</div></div><div class="layer-controls-row" style="display: none;">
+    <span>Transparens</span>
+    <input type="range" class="layer-opacity-slider" min="0" max="100" value="100" step="5">
+    <span class="layer-opacity-val">100%</span>
+  </div></label></div></div>
+
+    
+
+    
+
+    
+
+    <h2 class="collapsible" role="button" tabindex="0">Albedokortet</h2><div class="collapse-content"><p style="font-size:0.78rem; color:#555; margin: 0 0 0.4rem;">
+      Beregnet ud fra satellittens råbånd med samme formel, som forskerne bruger på indlandsisen.
+      Farverne her er skaleret til danske overflader — vand og asfalt i bunden, sne i toppen.
+    </p><div class="layer-group" id="glacial-layers"><label class="layer" title="Liang-formel fra B2, B4, B8, B11, B12, med farveskala til danske overflader (0,00–0,45). Mørkeblå = vand og asfalt, grøn = græs, gul = tørre marker og sand, lys = beton og lyse tage, hvid = sne. Sammenlign feltet med din egen måling."><input type="checkbox"><div class="label"><div class="name">Albedokort — hvor meget kastes tilbage?</div></div><div class="layer-controls-row" style="display: none;">
+    <span>Transparens</span>
+    <input type="range" class="layer-opacity-slider" min="0" max="100" value="70" step="5">
+    <span class="layer-opacity-val">70%</span>
+  </div></label></div></div>
+    
+    
+
+    <h2 class="collapsible collapsed" role="button" tabindex="0">Baggrundskort</h2><div class="collapse-content" style="display: none;"><div class="layer-group" id="basemaps-dk"><label class="layer" title="Forårsflyvning fra Dataforsyningen. Så skarpt at én Sentinel-2 pixel på 10 m dækker 80×80 af disse — det er her, den blandede pixel bliver synlig."><input type="radio" name="basemap"><div class="label"><div class="name">Ortofoto — luftfoto (12,5 cm)</div></div></label><label class="layer" title="Almindeligt dansk kort med veje, bygninger og stednavne. Godt til at finde adressen, før du skifter til luftfoto."><input type="radio" name="basemap"><div class="label"><div class="name">Skærmkort (Dataforsyningen)</div></div></label></div><h3 class="layer-subhead">Andre kort</h3><div class="layer-group" id="basemaps-vektor"><label class="layer" title="Højdekurver og terrænskygning."><input type="radio" name="basemap"><div class="label"><div class="name">Topografisk (OpenTopoMap)</div></div></label><label class="layer" title="Standardkort med byer, veje og navne."><input type="radio" name="basemap"><div class="label"><div class="name">OpenStreetMap</div></div></label></div><div class="layer-group" id="basemaps-none"><label class="layer" title="Tom baggrund — godt hvis du kun vil se overlay-lag."><input type="radio" name="basemap"><div class="label"><div class="name">Intet baggrundskort</div></div></label></div><div class="external-links">
+      <h2 style="margin-top:0;" class="collapsible" role="button" tabindex="0">Baggrund</h2><div class="collapse-content"><a href="../undervisning/#rummet">Hvorfor får I ikke det samme som satellitten?</a><a href="../spektrum/">Det faglige grundlag — spektralmålinger fra felten</a><a href="https://geo.sg.dk/albedo">Albedo-appen — mål fra dine egne fotos</a><a href="https://dataforsyningen.dk/" target="_blank">Dataforsyningen — de danske luftfotos</a></div>
+      
+      
+      
+      
+    </div></div>
+    
+    
+    
+    
+
+    
+  </aside>
+
+  <div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"><div class="leaflet-pane leaflet-map-pane" style="transform: translate3d(0px, 0px, 0px);"><div class="leaflet-pane leaflet-tile-pane"><div class="leaflet-layer " style="z-index: 1; opacity: 1;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 21; transform: translate3d(0px, 0px, 0px) scale(1);"><img alt="" src="https://api.dataforsyningen.dk/orto_foraar_DAF?token=c8725b58105e6e82957fe8042350c856&amp;service=WMS&amp;request=GetMap&amp;layers=orto_foraar_12_5&amp;styles=&amp;format=image%2Fjpeg&amp;transparent=false&amp;version=1.1.1&amp;width=256&amp;height=256&amp;srs=EPSG%3A3857&amp;bbox=1067672.411087342,7594783.130415111,1068895.4035399049,7596006.122867675" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(151px, -45px, 0px); opacity: 0.13;"><img alt="" src="https://api.dataforsyningen.dk/orto_foraar_DAF?token=c8725b58105e6e82957fe8042350c856&amp;service=WMS&amp;request=GetMap&amp;layers=orto_foraar_12_5&amp;styles=&amp;format=image%2Fjpeg&amp;transparent=false&amp;version=1.1.1&amp;width=256&amp;height=256&amp;srs=EPSG%3A3857&amp;bbox=1068895.4035399049,7594783.130415111,1070118.3959924676,7596006.122867675" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(407px, -45px, 0px); opacity: 0.38;"><img alt="" src="https://api.dataforsyningen.dk/orto_foraar_DAF?token=c8725b58105e6e82957fe8042350c856&amp;service=WMS&amp;request=GetMap&amp;layers=orto_foraar_12_5&amp;styles=&amp;format=image%2Fjpeg&amp;transparent=false&amp;version=1.1.1&amp;width=256&amp;height=256&amp;srs=EPSG%3A3857&amp;bbox=1067672.411087342,7593560.13796255,1068895.4035399049,7594783.130415111" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(151px, 211px, 0px); opacity: 0.46;"><img alt="" src="https://api.dataforsyningen.dk/orto_foraar_DAF?token=c8725b58105e6e82957fe8042350c856&amp;service=WMS&amp;request=GetMap&amp;layers=orto_foraar_12_5&amp;styles=&amp;format=image%2Fjpeg&amp;transparent=false&amp;version=1.1.1&amp;width=256&amp;height=256&amp;srs=EPSG%3A3857&amp;bbox=1068895.4035399049,7593560.13796255,1070118.3959924676,7594783.130415111" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(407px, 211px, 0px); opacity: 0.47;"><img alt="" src="https://api.dataforsyningen.dk/orto_foraar_DAF?token=c8725b58105e6e82957fe8042350c856&amp;service=WMS&amp;request=GetMap&amp;layers=orto_foraar_12_5&amp;styles=&amp;format=image%2Fjpeg&amp;transparent=false&amp;version=1.1.1&amp;width=256&amp;height=256&amp;srs=EPSG%3A3857&amp;bbox=1066449.418634779,7594783.130415111,1067672.411087342,7596006.122867675" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-105px, -45px, 0px); opacity: 0.145;"><img alt="" src="https://api.dataforsyningen.dk/orto_foraar_DAF?token=c8725b58105e6e82957fe8042350c856&amp;service=WMS&amp;request=GetMap&amp;layers=orto_foraar_12_5&amp;styles=&amp;format=image%2Fjpeg&amp;transparent=false&amp;version=1.1.1&amp;width=256&amp;height=256&amp;srs=EPSG%3A3857&amp;bbox=1070118.3959924676,7594783.130415111,1071341.3884450307,7596006.122867675" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(663px, -45px, 0px); opacity: 0.355;"><img alt="" src="https://api.dataforsyningen.dk/orto_foraar_DAF?token=c8725b58105e6e82957fe8042350c856&amp;service=WMS&amp;request=GetMap&amp;layers=orto_foraar_12_5&amp;styles=&amp;format=image%2Fjpeg&amp;transparent=false&amp;version=1.1.1&amp;width=256&amp;height=256&amp;srs=EPSG%3A3857&amp;bbox=1066449.418634779,7593560.13796255,1067672.411087342,7594783.130415111" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-105px, 211px, 0px); opacity: 0;"><img alt="" src="https://api.dataforsyningen.dk/orto_foraar_DAF?token=c8725b58105e6e82957fe8042350c856&amp;service=WMS&amp;request=GetMap&amp;layers=orto_foraar_12_5&amp;styles=&amp;format=image%2Fjpeg&amp;transparent=false&amp;version=1.1.1&amp;width=256&amp;height=256&amp;srs=EPSG%3A3857&amp;bbox=1070118.3959924676,7593560.13796255,1071341.3884450307,7594783.130415111" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(663px, 211px, 0px); opacity: 0.48;"></div></div></div><div class="leaflet-pane leaflet-overlay-pane"></div><div class="leaflet-pane leaflet-shadow-pane"></div><div class="leaflet-pane leaflet-marker-pane"></div><div class="leaflet-pane leaflet-tooltip-pane"></div><div class="leaflet-pane leaflet-popup-pane"></div><div class="leaflet-proxy leaflet-zoom-animated"></div></div><div class="leaflet-control-container"><div class="leaflet-top leaflet-left"><div class="leaflet-control-zoom leaflet-bar leaflet-control"><a class="leaflet-control-zoom-in" href="#" title="Zoom in" role="button" aria-label="Zoom in" aria-disabled="false"><span aria-hidden="true">+</span></a><a class="leaflet-control-zoom-out" href="#" title="Zoom out" role="button" aria-label="Zoom out" aria-disabled="false"><span aria-hidden="true">−</span></a></div><div class="tool-bar leaflet-bar leaflet-control">
+      <button class="tool-btn" data-tool="measure" title="Mål afstand (klik waypoints, dobbeltklik afslutter, Esc annullerer)">⟷</button>
+      <button class="tool-btn" data-tool="pin" title="Afsæt punkt — klik på kortet for at lægge en markør med koordinat">◉</button>
+      <button class="tool-btn" data-tool="polygon" title="Tegn areal — klik vertices, dobbeltklik afslutter. Bruges fx til ablationsområde.">⬡</button>
+      <button class="tool-btn" data-tool="polyline" title="Tegn linje — klik vertices, dobbeltklik afslutter. Bruges fx til gletsjerfront.">∿</button>
+      <button class="tool-btn" data-tool="pixel-info" title="Pixel-info — klik på kortet for at hente satellit-værdier (albedo, NDVI, temp, elevation). Træk-rektangel for større område.">ⓘ</button><button class="tool-btn" data-tool="validation" title="Afsæt validation-punkt — klik på kortet for at tilføje foto + ground-måling">◎</button><button class="tool-btn" data-tool="export" title="Eksportér alle tegninger som GeoJSON (åbnes direkte i QGIS)">⇩</button>
+      <button class="tool-btn danger" data-tool="clear" title="Ryd målinger og pins (tegninger bevares — slet enkelt-tegninger via popup)">✕</button>
+    </div></div><div class="leaflet-top leaflet-right"><div class="basemap-info leaflet-control" id="basemap-badge">
+    <div class="label">Baggrund: Ortofoto</div>
+    <div class="value">12,5 cm</div>
+    <div class="note">Dataforsyningens forårsflyvning — 80× skarpere end en Sentinel-2 pixel.</div>
+  </div></div><div class="leaflet-bottom leaflet-left"><div class="sh-scene-info leaflet-control" style="display: none;"></div><div class="coord-readout leaflet-control" id="coord-readout">Bevæg musen over kortet</div><div class="leaflet-control-scale leaflet-control"><div class="leaflet-control-scale-line" style="width: 75px;">200 m</div></div></div><div class="leaflet-bottom leaflet-right"><div class="legend-box leaflet-control" id="legend-box" style="display: none;"></div><div class="leaflet-control-attribution leaflet-control"><a href="https://leafletjs.com" title="A JavaScript library for interactive maps"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"></path><path fill="#FFD500" d="M0 4h12v3H0z"></path><path fill="#E0BC00" d="M0 7h12v1H0z"></path></svg> Leaflet</a> <span aria-hidden="true">|</span> Dataforsyningen</div></div></div></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script type="module" src="./js/main.js"></script>
+
+
+</body></html>

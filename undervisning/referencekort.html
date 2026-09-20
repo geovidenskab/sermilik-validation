@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Referencekort til albedomåling — print</title>
+<style>
+  :root{ --navy:#0A0F3C; }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:#eef1f5;color:#12172b;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    print-color-adjust:exact;-webkit-print-color-adjust:exact}
+
+  .skaerm{max-width:760px;margin:0 auto;padding:1.6rem 1.5rem .6rem}
+  .skaerm h1{font-size:1.5rem;margin:0 0 .4rem;color:var(--navy)}
+  .skaerm p{line-height:1.6;margin:.6rem 0}
+  .knap{display:inline-block;background:var(--navy);color:#fff;border:none;
+    padding:.7rem 1.4rem;font:inherit;font-weight:600;cursor:pointer;margin:.5rem 0 .8rem}
+  .knap:hover{opacity:.9}
+  .advarsel{border-left:3px solid #e0a020;background:#fffaef;padding:.8rem 1.1rem;margin:1rem 0;font-size:.93rem;line-height:1.55}
+
+  .ark{background:#fff;width:210mm;margin:1.2rem auto;padding:10mm 12mm;
+    box-shadow:0 2px 14px rgba(10,15,60,.14);min-height:297mm}
+
+  /* ── SIDE 1: selve kortet — felterne fylder næsten hele arket ── */
+  .side1 h2{font-size:13pt;margin:0 0 1mm}
+  .side1 .sub{font-size:9pt;color:#444;margin:0 0 4mm}
+  .feltlabel{font-size:11pt;font-weight:700;margin:2.5mm 0 1.5mm}
+  .feltlabel span{font-weight:400;color:#444;font-size:9pt}
+  svg.sortfelt{display:block;width:100%;height:112mm}
+  .hvidfelt{width:100%;height:112mm;border:0.6mm dashed #999;position:relative}
+  .hvidfelt em{position:absolute;left:3mm;bottom:2mm;font-size:8pt;color:#999;font-style:normal}
+  .fod1{margin-top:3mm;font-size:8pt;color:#666;display:flex;justify-content:space-between}
+
+  /* ── SIDE 2: instruktion ── */
+  .side2{page-break-before:always}
+  .side2 h2{font-size:14pt;margin:0 0 4mm;color:#000}
+  .side2 h3{font-size:11pt;margin:6mm 0 2mm}
+  .side2 p,.side2 li{font-size:10.5pt;line-height:1.55}
+  .side2 ol{padding-left:6mm;margin:2mm 0}
+  .side2 .boks{border:0.3mm solid #bbb;padding:4mm 5mm;margin:4mm 0;
+    font-size:10pt;line-height:1.5}
+
+  @media print{
+    body{background:#fff}
+    .skaerm{display:none}
+    .ark{width:auto;margin:0;padding:8mm 10mm;box-shadow:none;min-height:0}
+    @page{size:A4;margin:8mm}
+  }
+</style>
+</head>
+<body>
+
+<div class="skaerm">
+  <h1>Referencekort til albedomåling</h1>
+  <p>Side 1 er selve kortet — ét stort <b>sort felt</b> (trykt, albedo ≈ 5 %) og ét
+    stort <b>hvidt felt</b> (selve papiret, albedo ≈ 75 %). Side 2 er instruktionen.
+    Store felter gør målingen bedre: de er lette at markere i appen og mindre
+    følsomme for skygger og enkeltpixels.</p>
+  <button class="knap" onclick="window.print()">Print (2 sider)</button>
+  <div class="advarsel">
+    <b>Vigtigt:</b> print i sort/hvid, <b>100 % skalering</b>, på <b>mat papir</b>.
+    Ser det sorte felt gråt eller stribet ud, er printerens tonerbesparelse slået til —
+    slå den fra. Det hvide felt skal være helt upåtrykt.
+  </div>
+</div>
+
+<!-- ═══ SIDE 1 — KORTET ═══ -->
+<div class="ark side1">
+  <h2>Referencekort — albedomåling <span style="font-weight:400;font-size:9pt;color:#666">· geo.sg.dk/albedo · instruktion på side 2</span></h2>
+
+  <div class="feltlabel">SORT FELT — albedo ≈ 5 % <span>(fuldt tonerdækket · ±3 procentpoint)</span></div>
+  <!-- SVG frem for CSS-baggrund: baggrundsfarver udelades ofte ved print, det gør billeder ikke -->
+  <svg class="sortfelt" viewBox="0 0 100 60" preserveAspectRatio="none"
+       xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="100" height="60" fill="#000"/></svg>
+
+  <div class="feltlabel" style="margin-top:4mm">HVIDT FELT — albedo ≈ 75 % <span>(upåtrykt mat papir · ±5 procentpoint — den stiplede kant er kun en markering)</span></div>
+  <div class="hvidfelt"><em>upåtrykt papir — her må intet printes</em></div>
+
+  <div class="fod1">
+    <span>Sans Science · geo.sg.dk/albedo</span>
+    <span>Print sort/hvid · 100 % · mat papir</span>
+  </div>
+</div>
+
+<!-- ═══ SIDE 2 — INSTRUKTION ═══ -->
+<div class="ark side2">
+  <h2>Sådan måler du albedo med kortet</h2>
+
+  <ol>
+    <li><b>Læg kortet fladt</b> på den overflade du vil måle — asfalt, græs, sne, fliser.
+      Glat det ud, og undgå skygge fra dig selv og genskin fra solen.</li>
+    <li><b>Fotografér lige oppefra</b> (1–2 m højde), så både kortets to felter og
+      overfladen omkring det er med i samme billede, i samme lys.</li>
+    <li><b>Åbn appen</b> på geo.sg.dk/albedo, vælg “Selvtaget foto”, og læg billedet ind.</li>
+    <li><b>Markér felterne i rækkefølge:</b> først det <b>sorte felt</b>, så det
+      <b>hvide felt</b> — og derefter de overflader du vil måle.</li>
+    <li><b>Aflæs albedoen</b> for hvert område, og gem/eksportér målingen.</li>
+  </ol>
+
+  <h3>Hvorfor sort og hvid — og ikke gråtoner?</h3>
+  <p>Kortet skal have felter med <i>kendt</i> albedo. Fuldt tonerdækket sort reflekterer
+    omkring <b>5 %</b>, og almindeligt hvidt, mat kontorpapir reflekterer omkring
+    <b>75 %</b> — begge er egenskaber ved materialerne. Et printet <i>gråt</i> felt
+    derimod afhænger af printerens rastermønster og tonekurve, så man kan ikke skrive en
+    troværdig albedo på det.</p>
+
+  <div class="boks">
+    <b>Hvad appen gør:</b> den kender de to felters albedo (5 % og 75 %) og måler
+    deres lysstyrke i dit billede. Dermed kan den regne enhver anden lysstyrke i samme
+    billede om til albedo — uanset om der var solskin eller overskyet, og uanset
+    hvordan telefonen har eksponeret.
+    <br><br>
+    <b>Eget referencepapir?</b> Har I et andet referenceark med kendte albedo-værdier
+    (1–3 felter), kan felterne og deres officielle værdier rettes direkte i appen
+    under “Referencefelter”.
+  </div>
+
+  <h3>Typiske fejl</h3>
+  <ol>
+    <li><b>Skygge hen over kortet</b> — stil dig så din skygge falder <i>væk</i> fra
+      kortet, eller mål i jævnt overskyet vejr.</li>
+    <li><b>Skråt billede</b> — så ser kameraet mest de solvendte flader, og albedoen
+      bliver for høj. Hold telefonen lodret ned.</li>
+    <li><b>Genskin i papiret</b> — brug mat papir, og undgå at solen spejler sig.</li>
+    <li><b>Gråt/stribet sort felt</b> — printerens tonerbesparelse; slå den fra og print igen.</li>
+  </ol>
+
+  <p style="margin-top:6mm"><b>Albedo</b> er den andel af sollyset en overflade kaster
+    tilbage. Frisk sne: op mod 85 %. Asfalt: omkring 10 %. Resten bliver til varme —
+    og det er derfor mørke overflader smelter is hurtigere.</p>
+</div>
+
+</body>
+</html>

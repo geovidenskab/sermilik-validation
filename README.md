@@ -1,9 +1,33 @@
 # Sermilik feltstation — On-ground validation
 
-Interaktivt GIS-kort til feltarbejde og satellit-ground-validation omkring
-Mittivakkat-gletsjeren og Sermilik feltstation, Østgrønland.
+Undervisningssite + GIS-kort til feltarbejde og satellit-ground-validation
+omkring Mittivakkat-gletsjeren og Sermilik feltstation, Østgrønland.
 
 **Live**: https://geo.sg.dk/sermilik
+
+## Struktur (siden august 2026)
+
+| Sti | Indhold |
+|---|---|
+| `/` | Redirect til `undervisning/` — forsiden er elevforløbet |
+| `undervisning/` | Undervisningssiden: casen, albedo i skolegården, satellit, referencekort til print |
+| `kort/` | Validation-GIS (Leaflet + Sentinel Hub). Lå tidligere i roden |
+| `spektrum/` | Det faglige grundlag: spektralmålinger, feltforsøg, jord-mod-satellit |
+
+I august 2026 blev NASA GIBS-overlays og Landsat-termiske lag fjernet fra
+kortpanelet (lav opløsning hhv. ikke-validerbare; koden ligger stadig i
+`kort/js/`). Samtidig blev to fejl rettet i pixel-info:
+
+1. **Statistikken midlede over hele søgevinduet** (ét P30D-bucket), så "værdien"
+   var et gennemsnit af alle scener i perioden — skyer inklusive — og
+   "scene"-datoen var vinduets startdato. Nu P1D-buckets og valg af nærmeste
+   skyfri scene-dag.
+2. **Ingen skymaskering** — SCL-klasserne 3/8/9/10 maskeres nu ud i alle
+   Sentinel-2 stats-evalscripts.
+
+Desuden viser pixel-info nu det reelle søgevindue og advarer når scenen
+afviger fra den ønskede dato. Stats-cachen er versioneret (`_v2`), så gamle
+værdier ikke overlever i brugernes localStorage.
 
 ## Formål
 

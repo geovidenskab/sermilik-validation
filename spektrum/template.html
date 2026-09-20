@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sollys ved Sermilik — spektralanalyse</title>
+<style>
+:root{
+  --navy:#0A0F3C; --teal:#63DAD6; --ink:#1b2030; --muted:#5d6577;
+  --line:#e2e6ec; --bg:#fbfcfd; --card:#fff;
+  --sun:#d9a441; --sky:#3b7dd8; --plant:#2e9451; --plant2:#c98a2b; --rock:#8a7a6d;
+  --solar:#10243f; --tell:#8c1c1c;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  line-height:1.65;-webkit-font-smoothing:antialiased}
+
+header.top{background:var(--navy);color:#fff;padding:2.6rem 1.5rem 2.2rem;
+  border-bottom:3px solid var(--teal)}
+header.top .wrap{max-width:1080px;margin:0 auto}
+header.top h1{margin:0 0 .5rem;font-size:1.95rem;font-weight:650;letter-spacing:-.01em;line-height:1.2}
+header.top .sub{font-size:1.02rem;opacity:.88;margin:0 0 1.1rem;max-width:62ch}
+header.top .meta{font-size:.82rem;opacity:.62;font-family:ui-monospace,Menlo,monospace;
+  display:flex;flex-wrap:wrap;gap:.5rem 1.4rem}
+
+nav.toc{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav.toc .wrap{max-width:1080px;margin:0 auto;padding:.55rem 1.5rem;
+  display:flex;gap:1.3rem;overflow-x:auto;font-size:.82rem}
+nav.toc a{color:var(--muted);text-decoration:none;white-space:nowrap;padding:.2rem 0;
+  border-bottom:2px solid transparent}
+nav.toc a:hover{color:var(--navy);border-bottom-color:var(--teal)}
+
+main{max-width:1080px;margin:0 auto;padding:0 1.5rem 5rem}
+section{padding:3rem 0 1rem;border-bottom:1px solid var(--line)}
+section:last-child{border-bottom:none}
+h2{font-size:1.5rem;margin:0 0 .3rem;letter-spacing:-.01em;color:var(--navy)}
+h2 .num{color:var(--teal);font-family:ui-monospace,Menlo,monospace;font-size:1rem;
+  margin-right:.6rem;vertical-align:.12em}
+h3{font-size:1.05rem;margin:2rem 0 .5rem;color:var(--navy)}
+.lede{font-size:1.05rem;color:var(--muted);margin:.2rem 0 1.6rem;max-width:70ch}
+p{margin:.9rem 0;max-width:74ch}
+a{color:#1c5fb8}
+strong{font-weight:640}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.88em;background:#eef1f5;
+  padding:.1em .35em;border-radius:3px}
+
+figure{margin:1.8rem 0;background:var(--card);border:1px solid var(--line);
+  border-radius:10px;padding:1.1rem 1.1rem .6rem;box-shadow:0 1px 3px rgba(10,15,60,.04)}
+figure svg{display:block;width:100%;height:auto}
+figure img{display:block;width:100%;height:auto;border-radius:6px}
+figcaption{font-size:.84rem;color:var(--muted);margin-top:.7rem;padding-top:.7rem;
+  border-top:1px solid var(--line);line-height:1.55}
+figcaption b{color:var(--ink)}
+
+.controls{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.8rem}
+.controls button{font:inherit;font-size:.79rem;padding:.28rem .7rem;border-radius:20px;
+  border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer;
+  transition:all .12s}
+.controls button:hover{border-color:var(--teal)}
+.controls button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.controls .swatch{display:inline-block;width:8px;height:8px;border-radius:50%;
+  margin-right:.4rem;vertical-align:.02em}
+
+table{border-collapse:collapse;width:100%;font-size:.87rem;margin:1.2rem 0}
+th,td{text-align:left;padding:.48rem .7rem;border-bottom:1px solid var(--line)}
+th{font-size:.73rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+  font-weight:600;border-bottom:1.5px solid #cfd6df}
+td.n{text-align:right;font-family:ui-monospace,Menlo,monospace;font-size:.86em}
+tr.hi td{background:#fffbf0}
+.tag{font-size:.68rem;padding:.1rem .45rem;border-radius:3px;font-weight:600;
+  letter-spacing:.02em;white-space:nowrap}
+.tag.sol{background:#e4ecf7;color:var(--solar)}
+.tag.atm{background:#fae9e9;color:var(--tell)}
+
+.callout{border-left:3px solid var(--teal);background:#f2fbfb;padding:1rem 1.2rem;
+  margin:1.6rem 0;border-radius:0 6px 6px 0}
+.callout.warn{border-left-color:#e0a020;background:#fffaef}
+.callout h4{margin:0 0 .4rem;font-size:.94rem;color:var(--navy)}
+.eq{font-family:ui-monospace,Menlo,monospace;font-size:.88rem;line-height:2;
+  background:#f4f6f9;border:1px solid var(--line);border-radius:8px;
+  padding:1rem 1.2rem;margin:1.2rem 0;overflow-x:auto;white-space:pre}
+.eq .hl{background:#fff3cd;padding:.1em .2em;border-radius:3px}
+.eq .gone{color:#aab1bd;text-decoration:line-through}
+.eq .keep{color:#1c5fb8;font-weight:700}
+.eq .cmt{color:var(--muted);font-style:italic;font-family:inherit}
+.steps{counter-reset:s;list-style:none;padding:0;margin:1.4rem 0}
+.steps li{counter-increment:s;position:relative;padding:0 0 1.1rem 2.6rem;max-width:74ch}
+.steps li::before{content:counter(s);position:absolute;left:0;top:.05rem;width:1.75rem;
+  height:1.75rem;border-radius:50%;background:var(--navy);color:#fff;font-size:.8rem;
+  font-weight:650;display:flex;align-items:center;justify-content:center}
+.steps li b{color:var(--navy)}
+.callout p{margin:.4rem 0;font-size:.93rem;max-width:none}
+.callout p:last-child{margin-bottom:0}
+
+.grid{display:grid;gap:1rem;margin:1.5rem 0}
+.grid.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:1rem 1.1rem}
+.stat .v{font-size:1.75rem;font-weight:650;letter-spacing:-.02em;line-height:1.1;
+  font-family:ui-monospace,Menlo,monospace}
+.stat .k{font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+  margin-bottom:.35rem}
+.stat .d{font-size:.83rem;color:var(--muted);margin-top:.35rem;line-height:1.45}
+
+.readout{font-family:ui-monospace,Menlo,monospace;font-size:.78rem;color:var(--muted);
+  height:1.2em;margin-bottom:.2rem}
+.readout b{color:var(--ink);font-weight:600}
+
+footer{background:var(--navy);color:#fff;padding:2.2rem 1.5rem;font-size:.85rem}
+footer .wrap{max-width:1080px;margin:0 auto;opacity:.8}
+footer a{color:var(--teal)}
+footer code{background:rgba(255,255,255,.13);color:#dfe6f2}
+
+@media (max-width:700px){
+  header.top h1{font-size:1.45rem}
+  h2{font-size:1.25rem}
+  main{padding:0 1rem 3rem}
+  figure{padding:.7rem .7rem .4rem}
+  /* tabeller scroller selv i stedet for at presse siden bredere end skærmen */
+  table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch}
+  .callout p{overflow-wrap:anywhere}
+}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <h1>Sollys ved Sermilik</h1>
+  <p class="sub">Testmålinger ved Sermilik feltstation — metodegrundlag for
+     on-ground-validation til
+     <a href="../kort/" style="color:var(--teal)">Sermilik Validation-GIS</a>.</p>
+  <div class="meta">
+    <span>65°41′N · 37°55′V · Ammassalik Ø</span>
+    <span>380–950 nm · 1 nm</span>
+    <span>Ocean Optics Red Tide USB-650</span>
+    <span>571 målepunkter pr. spektrum</span>
+  </div>
+</div></header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#data">Datasættet</a>
+  <a href="#sol">1 · Solen</a>
+  <a href="#himmel">2 · Himlen</a>
+  <a href="#planter">3 · Planterne</a>
+  <a href="#klippe">4 · Klippe og jord</a>
+  <a href="#blanding">5 · Blandingen</a>
+  <a href="#sne">6 · Sneen</a>
+  <a href="#feltforsoeg">7 · Feltforsøg</a>
+  <a href="#satellit">8 · Satellit</a>
+  <a href="#undervisning">9 · Anvendelse</a>
+</div></nav>
+
+<main>
+
+<!-- ============================ DATA ============================ -->
+<section id="data">
+  <h2><span class="num">00</span>Datasættet</h2>
+  <p class="lede">Fem spektre, samme instrument, samme dag: direkte sollys, blå himmel,
+     to grønne planter og en klippe.</p>
+
+  <div class="readout" id="ro-raw"></div>
+  <figure>
+    <div class="controls" id="ctl-raw"></div>
+    <div id="ch-raw"></div>
+    <figcaption><b>De fem rå spektre.</b> Klik på knapperne for at tænde og slukke.
+      Y-aksen er rå detektorsignal.</figcaption>
+  </figure>
+
+  <p>Kurverne herunder er <b>ikke</b> Solens spektrum alene. De er Solen ganget med
+     atmosfæren ganget med spektrometerets egen følsomhed — CCD'en er mest følsom omkring
+     550–600 nm og nærmest døv ved 950 nm. Det lyder som et problem, men det er nøglen til
+     resten af siden: <b>så snart man dividerer to spektre med hinanden, forkorter
+     instrumentet væk.</b> Derfor bygger afsnit 02 til 05 på forhold, ikke på absolutte
+     niveauer.</p>
+
+  <div class="callout warn">
+    <h4>Sådan skal tallene læses</h4>
+    <p>Spektrene deler ikke radiometrisk skala — hvert af dem er optaget med sin egen
+       integrationstid, og softwaren skalerer dem hver for sig. <b>Absolut reflektans kan
+       derfor ikke aflæses</b>, og alle reflektanskurver herunder er normeret.</p>
+    <p>Til gengæld er alt det der bygger på <i>forhold</i> upåvirket, fordi en konstant
+       faktor forkorter væk: NDVI, båndforhold, linjedybder og Rayleigh-eksponenten står
+       som de er. Kontrolregning med mørkefratræk flytter NDVI med 0,003 og
+       Rayleigh-eksponenten fra −4,22 til −4,20.</p>
+  </div>
+</section>
+
+<!-- ============================ SOL ============================ -->
+<section id="sol">
+  <h2><span class="num">01</span>Solen — to atmosfærer på én kurve</h2>
+  <p class="lede">Kurven bærer aftryk fra både Solens overflade og Jordens luft.
+     De to slags streger kan skelnes.</p>
+
+  <div class="readout" id="ro-sol"></div>
+  <figure>
+    <div id="ch-sol"></div>
+    <figcaption><b>Direkte sollys, 380–950 nm.</b>
+      <span class="tag sol">blå</span> Fraunhofer-linjer — absorption i Solens egen atmosfære.
+      <span class="tag atm">rød</span> telluriske bånd — absorption i Jordens atmosfære.
+      Farvebåndet under kurven viser hvor på det synlige spektrum vi er.</figcaption>
+  </figure>
+
+  <h3>Fraunhofer-linjerne: grundstoffer 150 millioner km væk</h3>
+  <p>Dybderne herunder er målt mod et lokalt kontinuum lagt gennem de nærmeste
+     kontinuumspunkter på hver side af linjen. Det er nødvendigt: et globalt fit
+     overdriver dybden på kurvens stejle flanker.</p>
+
+  <table>
+    <thead><tr><th>λ (nm)</th><th class="n">Dybde</th><th class="n">EW</th><th>Identifikation</th><th>Ophav</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td>393</td><td class="n">47 %</td><td class="n">1,61 nm</td><td>Ca II K</td><td><span class="tag sol">Solen</span></td></tr>
+      <tr><td>396</td><td class="n">39 %</td><td class="n">↑ samlet</td><td>Ca II H</td><td><span class="tag sol">Solen</span></td></tr>
+      <tr><td>383</td><td class="n">33 %</td><td class="n">—</td><td>Fe I 382,0 + Mg I 383,2/383,8</td><td><span class="tag sol">Solen</span></td></tr>
+      <tr><td>430</td><td class="n">27 %</td><td class="n">0,78 nm</td><td>G-båndet (CH) + Fe I 430,8</td><td><span class="tag sol">Solen</span></td></tr>
+      <tr><td>486</td><td class="n">14 %</td><td class="n">0,45 nm</td><td>H-beta</td><td><span class="tag sol">Solen</span></td></tr>
+      <tr><td>517</td><td class="n">13 %</td><td class="n">0,55 nm</td><td>Mg I b-triplet 516,7/517,3/518,4</td><td><span class="tag sol">Solen</span></td></tr>
+      <tr><td>438</td><td class="n">13 %</td><td class="n">—</td><td>Fe I</td><td><span class="tag sol">Solen</span></td></tr>
+      <tr><td>410</td><td class="n">12 %</td><td class="n">—</td><td>H-delta</td><td><span class="tag sol">Solen</span></td></tr>
+      <tr><td>589</td><td class="n">8 %</td><td class="n">0,17 nm</td><td>Na I D₁+D₂ 589,0/589,6</td><td><span class="tag sol">Solen</span></td></tr>
+      <tr class="hi"><td>656</td><td class="n">14 %</td><td class="n">0,44 nm</td><td>H-alfa</td><td><span class="tag sol">Solen</span></td></tr>
+      <tr class="hi"><td>761</td><td class="n">62 %</td><td class="n">4,50 nm</td><td>O₂ A-båndet</td><td><span class="tag atm">Jorden</span></td></tr>
+      <tr><td>936</td><td class="n">35 %</td><td class="n">4,67 nm</td><td>H₂O 940-båndet</td><td><span class="tag atm">Jorden</span></td></tr>
+      <tr><td>687</td><td class="n">23 %</td><td class="n">1,36 nm</td><td>O₂ B-båndet</td><td><span class="tag atm">Jorden</span></td></tr>
+      <tr><td>720</td><td class="n">19 %</td><td class="n">2,05 nm</td><td>H₂O</td><td><span class="tag atm">Jorden</span></td></tr>
+      <tr><td>823</td><td class="n">8 %</td><td class="n">1,03 nm</td><td>H₂O</td><td><span class="tag atm">Jorden</span></td></tr>
+    </tbody>
+  </table>
+
+  <p>Hα, Hβ, Na D og Mg b er hver kun 2–3 datapunkter brede. De er altså
+     <b>instrument-begrænsede</b>: spektrometerets spaltebredde (~1,5–2 nm) er
+     bredere end linjerne selv. De sande linjer er langt smallere og langt dybere,
+     så de aflæste dybder er udvandede — ikke fysiske. Ca II H og K er brede nok til at
+     være delvist opløst, og derfor står de så voldsomt igennem.</p>
+
+  <p>To ting kunne <i>ikke</i> findes: Ca I ved 422,7 nm (kun 1 % — under støjen) og
+     Hγ ved 434 nm (6 %, halvt begravet i den tætte skov af Fe I-linjer). Det er reelle
+     grænser for instrumentet, ikke fejl i målingen.</p>
+
+  <h3>Hvor meget luft gik lyset igennem?</h3>
+  <p>O₂ A-båndet ved 761 nm fjerner 62 % af lyset i et bånd på få nanometer. Ilt er
+     jævnt fordelt i atmosfæren, så båndets styrke er et direkte mål for luftmassen.
+     Og Sermilik ligger på 65,7° N — solen kommer aldrig ret højt:</p>
+
+  <table>
+    <thead><tr><th>Dato</th><th class="n">Solhøjde ved middag</th><th class="n">Luftmasse m</th></tr></thead>
+    <tbody>
+      <tr><td>21. juni (max)</td><td class="n">47,8°</td><td class="n">1,35</td></tr>
+      <tr><td>15. juli</td><td class="n">45,8°</td><td class="n">1,39</td></tr>
+      <tr class="hi"><td>4. august</td><td class="n">41,5°</td><td class="n">1,51</td></tr>
+      <tr><td>1. september</td><td class="n">32,5°</td><td class="n">1,86</td></tr>
+    </tbody>
+  </table>
+
+  <p>Selv på årets allerbedste dag når solen kun 47,8°. Luftmassen er <b>altid mindst
+     1,35</b>, og er målingen ikke taget lige omkring middag, hurtigt 2–3. Samme dag står
+     solen 51° over Danmark, altså luftmasse 1,28. Lyset ved Sermilik skal gennem
+     omkring <b>18 % mere atmosfære</b> end hjemme — og det er hele forklaringen på
+     hvorfor den blå ende af kurven er så kraftigt dæmpet.</p>
+
+  <div class="readout" id="ro-planck"></div>
+  <figure>
+    <div id="ch-planck"></div>
+    <figcaption><b>Målt spektrum mod et sort legeme ved 5772 K</b> (Solens effektive
+      temperatur), normeret ved 530 nm og vist i logaritmisk skala. Det røde areal er alt
+      det som atmosfæren og detektoren tilsammen fjerner.</figcaption>
+  </figure>
+
+  <div class="callout">
+    <h4>Hvorfor man ikke kan aflæse Solens temperatur af denne kurve</h4>
+    <p>Et Planck-fit til kontinuumet giver <b>5490 K</b> hvis man kun bruger 450–650 nm —
+       fristende tæt på Solens 5772 K. Men udvider man intervallet, eksploderer fittet:
+       500–700 nm giver 12000 K, 450–900 nm giver 9930 K. Den ustabilitet er ikke fysik,
+       den er beviset for at kurven ikke er kalibreret.</p>
+    <p>De 5490 K er et lykketræf, hvor detektorens fald mod blå og atmosfærens dæmpning i
+       blå tilfældigvis trækker i hver sin retning. Til gengæld er det en fremragende
+       samtale at have med en klasse: <i>hvad er rådata egentlig, og hvornår er et pænt tal
+       et rigtigt tal?</i></p>
+  </div>
+</section>
+
+<!-- ============================ HIMMEL ============================ -->
+<section id="himmel">
+  <h2><span class="num">02</span>Himlen — λ⁻⁴ målt, ikke påstået</h2>
+  <p class="lede">Det her afsnit er det mest indirekte i hele analysen, så det tages
+     langsomt: hvad de to målinger er, hvorfor man dividerer dem, og hvad tallet
+     der kommer ud, betyder.</p>
+
+  <h3>Først: hvad er de to målinger overhovedet?</h3>
+  <p>De blev lavet med samme spektrometer, få minutter fra hinanden. Forskellen er
+     udelukkende <b>hvilken vej fiberen pegede</b>:</p>
+
+  <figure>
+    <svg viewBox="0 0 900 380" role="img"
+         aria-label="Diagram: sollys når spektrometeret enten som direkte stråle eller via spredning i atmosfæren">
+      <defs>
+        <linearGradient id="atm" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#bcd8f5" stop-opacity=".55"/>
+          <stop offset="100%" stop-color="#e8f2fc" stop-opacity=".25"/>
+        </linearGradient>
+        <marker id="ay" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6"
+                markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#d9a441"/></marker>
+        <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6"
+                markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3b7dd8"/></marker>
+      </defs>
+
+      <rect x="0" y="52" width="900" height="266" fill="url(#atm)"/>
+      <text x="18" y="76" font-size="12.5" fill="#5d6577" font-style="italic">atmosfæren</text>
+      <line x1="0" y1="318" x2="900" y2="318" stroke="#8a8f9c" stroke-width="2"/>
+      <rect x="0" y="318" width="900" height="62" fill="#f0ece6"/>
+
+      <!-- Sol -->
+      <circle cx="105" cy="92" r="27" fill="#f2c14e" stroke="#d9a441" stroke-width="2"/>
+      <g stroke="#e8b93c" stroke-width="2.5" stroke-linecap="round">
+        <line x1="105" y1="48" x2="105" y2="34"/><line x1="105" y1="150" x2="105" y2="136"/>
+        <line x1="61" y1="92" x2="47" y2="92"/><line x1="163" y1="92" x2="149" y2="92"/>
+        <line x1="74" y1="61" x2="64" y2="51"/><line x1="146" y1="123" x2="136" y2="113"/>
+        <line x1="136" y1="61" x2="146" y2="51"/><line x1="64" y1="133" x2="74" y2="123"/>
+      </g>
+      <text x="105" y="176" font-size="13" font-weight="650" fill="#8a6d1e" text-anchor="middle">Solen</text>
+
+      <!-- Direkte straale -->
+      <line x1="132" y1="118" x2="298" y2="300" stroke="#d9a441" stroke-width="3.5"
+            marker-end="url(#ay)"/>
+      <rect x="278" y="300" width="46" height="17" rx="3" fill="#2a2f3a"/>
+      <text x="301" y="341" font-size="13" font-weight="650" fill="#2a2f3a" text-anchor="middle">Sol-måling</text>
+      <text x="301" y="359" font-size="11.5" fill="#5d6577" text-anchor="middle">fiberen peger mod Solen</text>
+      <text x="196" y="196" font-size="12" font-weight="600" fill="#8a6d1e"
+            text-anchor="middle" transform="rotate(47 196 196)">direkte stråle</text>
+
+      <!-- Straale ind mod molekyle -->
+      <line x1="140" y1="88" x2="576" y2="132" stroke="#d9a441" stroke-width="3.5"
+            marker-end="url(#ay)"/>
+      <text x="370" y="98" font-size="12" font-weight="600" fill="#8a6d1e" text-anchor="middle">samme sollys</text>
+
+      <!-- Molekyle -->
+      <circle cx="600" cy="136" r="11" fill="#fff" stroke="#3b7dd8" stroke-width="2.5"/>
+      <circle cx="600" cy="136" r="4" fill="#3b7dd8"/>
+      <text x="600" y="112" font-size="12.5" font-weight="650" fill="#1c5fb8" text-anchor="middle">luftmolekyle</text>
+
+      <!-- Spredt i alle retninger, svagt -->
+      <g stroke="#3b7dd8" stroke-width="1.6" opacity=".3" stroke-linecap="round">
+        <line x1="609" y1="128" x2="668" y2="88"/><line x1="612" y1="140" x2="678" y2="152"/>
+        <line x1="590" y1="127" x2="546" y2="92"/><line x1="590" y1="146" x2="548" y2="182"/>
+        <line x1="604" y1="148" x2="628" y2="206"/>
+      </g>
+      <!-- Den ene vi maaler -->
+      <line x1="606" y1="147" x2="694" y2="298" stroke="#3b7dd8" stroke-width="3.5"
+            marker-end="url(#ab)"/>
+      <rect x="676" y="300" width="46" height="17" rx="3" fill="#2a2f3a"/>
+      <text x="699" y="341" font-size="13" font-weight="650" fill="#2a2f3a" text-anchor="middle">Himmel-måling</text>
+      <text x="699" y="359" font-size="11.5" fill="#5d6577" text-anchor="middle">fiberen peger væk fra Solen</text>
+      <text x="592" y="232" font-size="12" font-weight="600" fill="#1c5fb8"
+            text-anchor="middle" transform="rotate(60 592 232)">spredt lys</text>
+
+      <text x="790" y="176" font-size="12.5" fill="#5d6577" text-anchor="middle">molekylet spreder</text>
+      <text x="790" y="194" font-size="12.5" fill="#5d6577" text-anchor="middle">i alle retninger —</text>
+      <text x="790" y="212" font-size="12.5" font-weight="650" fill="#1c5fb8" text-anchor="middle">blåt langt kraftigere</text>
+      <text x="790" y="230" font-size="12.5" font-weight="650" fill="#1c5fb8" text-anchor="middle">end rødt</text>
+    </svg>
+    <figcaption><b>De to målegeometrier.</b> Begge måler lys der startede i Solen.
+      Forskellen er at himmel-lyset har været omkring et luftmolekyle på vejen — og
+      netop dét omvej-trin er det eneste vi vil isolere.</figcaption>
+  </figure>
+
+  <h3>Hvorfor man dividerer</h3>
+  <p>Problemet er, at ingen af de to målinger er "ren fysik". Begge er forurenet af
+     ting vi ikke er interesserede i. Skriver man op hvad der faktisk sidder i hvert
+     spektrum, ser det sådan her ud:</p>
+
+  <div class="eq">Sol-måling:      M<sub>sol</sub>(λ)  =  S(λ) · T(λ) ·        R(λ)
+Himmel-måling:   M<sub>him</sub>(λ)  =  S(λ) · T(λ) · <span class="hl">P(λ)</span> · R(λ)
+
+<span class="cmt">S(λ) = Solens eget spektrum      T(λ) = atmosfærens gennemsigtighed
+R(λ) = spektrometerets følsomhed  P(λ) = sandsynligheden for at blive spredt</span></div>
+
+  <p>Læg mærke til at de to linjer er <i>næsten</i> identiske. Himmel-målingen har
+     præcis ét led mere: <b>P(λ)</b> — chancen for at en lysstråle af netop den
+     bølgelængde bliver kastet ned i vores retning i stedet for at fortsætte lige ud.
+     Det er det led vi vil have fat i. Så vi dividerer:</p>
+
+  <div class="eq">M<sub>him</sub>(λ)     <span class="gone">S(λ)</span> · <span class="gone">T(λ)</span> · <span class="keep">P(λ)</span> · <span class="gone">R(λ)</span>
+────────  =  ───────────────────────  =  <span class="keep">P(λ)</span>
+M<sub>sol</sub>(λ)     <span class="gone">S(λ)</span> · <span class="gone">T(λ)</span> ·        <span class="gone">R(λ)</span></div>
+
+  <p>Alt det overstregede forkorter væk, fordi det står ens i tæller og nævner.
+     <b>Det er hele pointen.</b> Vi slipper af med tre ting på én gang:</p>
+
+  <ul>
+    <li><b>Solens eget spektrum</b> forsvinder. Vi behøver ikke vide hvordan Solen
+      stråler — vi måler kun hvad atmosfæren <i>gør</i> ved lyset.</li>
+    <li><b>Spektrometerets følsomhed</b> forsvinder. Det er den store gevinst.
+      Præcis den ukalibrerede detektorrespons, der ødelagde temperaturfittet i
+      afsnit 01, er nu væk uden at vi har kalibreret noget som helst.</li>
+    <li><b>Atmosfærens dæmpning</b> forkorter i store træk også væk, fordi begge
+      stråler har rejst gennem samme luft.</li>
+  </ul>
+
+  <p>Tilbage står ét enkelt tal for hver bølgelængde: <b>hvor let bliver netop denne
+     farve spredt?</b> Det er en ren egenskab ved luften. Ingen kalibrering, intet
+     referenceinstrument, ingen tabelopslag — bare to målinger delt med hinanden.</p>
+
+  <h3>Hvorfor grafen er logaritmisk på begge akser</h3>
+  <p>Vi forventer at spredningen følger en <i>potenslov</i>: P(λ) = k · λ<sup>n</sup>,
+     hvor n er det tal vi jagter. Tager man logaritmen på begge sider:</p>
+
+  <div class="eq">P(λ)  =  k · λ<sup>n</sup>          <span class="cmt">← krum kurve, svær at aflæse</span>
+
+log P  =  log k  +  <span class="keep">n</span> · log λ    <span class="cmt">← ret linje med hældning n</span></div>
+
+  <p>Det er derfor begge akser er logaritmiske i figuren herunder. En potenslov, som
+     ellers er en krum kurve man ikke kan se hældningen af, bliver til <b>en ret
+     linje hvis hældning direkte <i>er</i> eksponenten</b>. Man behøver ikke fitte
+     noget for at se det — man kan lægge en lineal på grafen og aflæse fysikken.</p>
+
+  <div class="readout" id="ro-ray"></div>
+  <figure>
+    <div id="ch-ray"></div>
+    <figcaption><b>Himmel delt med sol, dobbeltlogaritmisk.</b> En ren potenslov bliver
+      en ret linje her. Den stiplede linje er Rayleighs λ⁻⁴. Målingen følger den tæt i
+      det blå og flader ud mod rød.</figcaption>
+  </figure>
+
+  <div class="grid g3">
+    <div class="stat"><div class="k">400–500 nm</div><div class="v">λ<sup>−4,22</sup></div>
+      <div class="d">RMS-afvigelse 0,023 — næsten perfekt Rayleigh</div></div>
+    <div class="stat"><div class="k">420–680 nm</div><div class="v">λ<sup>−3,22</sup></div>
+      <div class="d">hele det synlige område under ét</div></div>
+    <div class="stat"><div class="k">500–700 nm</div><div class="v">λ<sup>−2,68</sup></div>
+      <div class="d">fladere — aerosoler overtager i det røde</div></div>
+  </div>
+
+  <h3>Hvad −4 betyder, og hvorfor det er lige præcis 4</h3>
+  <p>Et luftmolekyle er omkring tusind gange mindre end en lysbølges bølgelængde. Når
+     lysbølgens elektriske felt passerer, rykker det molekylets elektroner frem og
+     tilbage i takt med bølgen. Molekylet bliver til en lillebitte antenne, der svinger
+     med lysets egen frekvens — og en svingende ladning udsender selv lys, i alle
+     retninger. <b>Det er spredning:</b> lyset absorberes ikke, det bliver sendt videre
+     et andet sted hen.</p>
+
+  <p>Og her kommer eksponenten fra: en svingende antennes udstrålede effekt vokser med
+     <b>frekvensen i fjerde potens</b>. Høj frekvens betyder kort bølgelængde, så
+     omskrevet til bølgelængde bliver det λ⁻⁴. Det er ikke et tal man har målt sig frem
+     til og rundet af — det falder ud af elektromagnetismen.</p>
+
+  <p>Konsekvensen er stor. Sammenligner man violet ved 400 nm med rødt ved 700 nm:</p>
+
+  <div class="eq">(700 / 400)<sup>4</sup>  =  1,75<sup>4</sup>  ≈  <span class="keep">9,4</span>
+
+<span class="cmt">Violet lys spredes altså ~9 gange kraftigere end rødt.</span></div>
+
+  <p>Derfor er himlen blå: det blå lys bliver kastet rundt i atmosfæren og når os
+     fra alle retninger, mens det røde i højere grad fortsætter uforstyrret. Og derfor
+     er Solen selv gullig — det blå er netop det der er blevet <i>fjernet</i> fra den
+     direkte stråle. De to iagttagelser er den samme fysik set fra hver sin side.
+     Ved solnedgang, hvor lyset skal igennem mange gange mere luft, er selv det grønne
+     spredt væk, og der er kun det røde tilbage.</p>
+
+  <h3>Hvad grafen faktisk viser — og hvor den afviger</h3>
+  <p>Målingen følger λ⁻⁴ meget tæt i den blå ende: eksponenten er <b>−4,22</b> over
+     400–500 nm med en afvigelse på blot 0,023. Men mod rød flader kurven ud til
+     <b>−2,68</b>. Den afvigelse er ikke en måleusikkerhed — den er et selvstændigt
+     resultat.</p>
+
+  <p>Luften indeholder nemlig ikke kun molekyler. Der er også <b>aerosoler</b>:
+     støvkorn, havsaltkrystaller, små vanddråber. De er <i>ikke</i> meget mindre end
+     bølgelængden — de er sammenlignelige med den. Så gælder antenne-argumentet ikke
+     længere, og spredningen bliver næsten uafhængig af farven, altså λ⁰.</p>
+
+  <ul>
+    <li>I det <b>blå</b> er molekylernes λ⁻⁴ så kraftig at den fuldstændig dominerer
+      → vi måler −4,22.</li>
+    <li>I det <b>røde</b> er molekyle-spredningen faldet med en faktor 9, mens
+      aerosolerne bidrager lige meget som før. Deres flade bidrag kommer til at fylde
+      relativt mere → kurven flader ud til −2,68.</li>
+  </ul>
+
+  <p><b>Forskellen mellem de to eksponenter er altså partikel-signalet</b> — og det kan
+     regnes om til et tal for luftkvaliteten. Det gøres nedenfor.</p>
+
+  <h3>Men er den blå himmel nu også sollys?</h3>
+  <p>Hele argumentet ovenfor hviler på en antagelse: at himmellyset er sollys der har
+     taget en omvej. Den antagelse skal efterprøves, ikke forudsættes. Og det kan
+     gøres skarpt, fordi de to muligheder giver <i>modsatte</i> forudsigelser:</p>
+
+  <ul>
+    <li><b>Hvis himlen selv lyste</b> — glødede, fluorescerede, hvad som helst — ville
+      dens spektrum være dens eget. Solens absorptionslinjer havde ingen grund til at
+      være der.</li>
+    <li><b>Hvis himlen er spredt sollys</b>, skal Solens Fraunhofer-linjer stå med,
+      og i <i>samme relative dybde</i>. Et molekyle der spreder lys, ved jo ikke om
+      der tilfældigvis mangler lys ved 589 nm — det kaster bare videre hvad det får.
+      Hullerne følger med uændrede.</li>
+  </ul>
+
+  <p>Det er en rigtig test: de to hypoteser kan ikke begge overleve. Her er tallene:</p>
+
+  <table>
+    <thead><tr><th>Linje</th><th class="n">Dybde i Solen</th><th class="n">Dybde i himlen</th><th class="n">Forskel</th></tr></thead>
+    <tbody>
+      <tr><td>Ca II K (393 nm)</td><td class="n">50,1 %</td><td class="n">48,4 %</td><td class="n">1,7 pp</td></tr>
+      <tr><td>Hβ (486 nm)</td><td class="n">19,3 %</td><td class="n">17,7 %</td><td class="n">1,6 pp</td></tr>
+      <tr class="hi"><td>Mg b (517 nm)</td><td class="n">12,7 %</td><td class="n">12,6 %</td><td class="n">0,1 pp</td></tr>
+      <tr><td>Na D (589 nm)</td><td class="n">8,8 %</td><td class="n">10,7 %</td><td class="n">1,9 pp</td></tr>
+      <tr><td>Hα (656 nm)</td><td class="n">14,4 %</td><td class="n">13,2 %</td><td class="n">1,2 pp</td></tr>
+    </tbody>
+  </table>
+
+  <p>Linjerne står der, og de står lige så dybt. Mg b afviger med 0,1 procentpoint —
+     det er inden for aflæsningsusikkerheden. <b>Den blå himmel er sollys.</b> Ikke som
+     postulat i en lærebog, men som noget der er efterprøvet på egne data, med en test
+     der kunne være faldet ud til den anden side.</p>
+
+  <p>Figuren herunder viser det direkte. De to spektre er hver især normeret til deres
+     eget niveau ved 560 nm, så de kan lægges oven på hinanden. Deres <i>hældning</i> er
+     vidt forskellig — himlen er langt stærkere i blå, hvilket netop er λ⁻⁴ — men de
+     små hak sidder på nøjagtig samme bølgelængder og er lige dybe.</p>
+
+  <div class="readout" id="ro-frau"></div>
+  <figure>
+    <div id="ch-frau"></div>
+    <figcaption><b>Sol og himmel, hver normeret til sit eget niveau ved 560 nm.</b>
+      Kurverne har vidt forskellig hældning — det er Rayleigh — men <i>hakkene sidder
+      præcis oven i hinanden</i>. Det er Solens fingeraftryk, båret med af det spredte lys.</figcaption>
+  </figure>
+
+  <h3>Hvor ren er luften over Sermilik?</h3>
+  <p>Eksponenten er ikke bare et tal om lysets fysik — den er et <b>mål for luftkvaliteten</b>.
+     Ren luft består af molekyler og giver λ⁻⁴. Jo flere partikler der er i luften, jo
+     fladere bliver kurven. Deler man himlen op i sine to bidrag, kan de skilles ad:</p>
+
+  <div class="eq">P(λ)  =  <span class="keep">a·λ⁻⁴</span>  +  <span class="hl">c</span>
+
+<span class="cmt">a·λ⁻⁴ : molekyler (Rayleigh)
+c     : partikler — støv, havsalt, dråber (næsten farveuafhængig)</span></div>
+
+  <p>Målt gennem klar luft er <b>84 % af himmellyset molekylespredning</b> ved 550 nm.
+     Det er højt. Over en storby ville partikelandelen være mange gange større.
+     En måling gennem tyndt skyslør samme dag gav til sammenligning kun 44 % — dråberne
+     tredoblede partikelbidraget:</p>
+
+  <div class="grid g3">
+    <div class="stat"><div class="k">Klar luft</div><div class="v">84 %</div>
+      <div class="d">molekylespredning ved 550 nm · λ<sup>−4,22</sup></div></div>
+    <div class="stat"><div class="k">Gennem tyndt skyslør</div><div class="v">44 %</div>
+      <div class="d">molekylespredning ved 550 nm · λ<sup>−1,92</sup></div></div>
+    <div class="stat"><div class="k">Følsomhed</div><div class="v">3×</div>
+      <div class="d">så meget flyttede et tyndt slør partikelbidraget</div></div>
+  </div>
+
+  <div class="readout" id="ro-sky2"></div>
+  <figure>
+    <div id="ch-sky2"></div>
+    <figcaption><b>Himmel delt med sol, klar luft mod tyndt skyslør</b>, hver normeret
+      ved 500 nm. Den klare himmel følger λ⁻⁴ tæt. Sløret gør kurven markant fladere,
+      fordi skydråber er store nok til at sprede alle farver næsten lige meget.</figcaption>
+  </figure>
+
+  <p>Det er præcis samme princip som satellitter bruger til at måle aerosoler og
+     luftforurening. Her er det gjort med to spektre og en division.</p>
+</section>
+
+<!-- ============================ PLANTER ============================ -->
+<section id="planter">
+  <h2><span class="num">03</span>Planterne — klorofyl og red edge</h2>
+  <p class="lede">Reflektans er målespektret delt med solspektret. Igen forsvinder
+     instrumentet, og planten står tilbage.</p>
+
+  <p>Kurverne herunder er normeret så NIR-plateauet (790–880 nm) er 1,0. Det er
+     nødvendigt fordi den absolutte skala er tabt, og det er uden konsekvenser for alt det
+     interessante: formen, kanternes placering og båndforholdene er uberørte.
+     De telluriske bånd er interpoleret væk, fordi de sidder i både tæller og nævner og
+     kun bidrager med støj i divisionen.</p>
+
+  <div class="readout" id="ro-refl"></div>
+  <figure>
+    <div class="controls" id="ctl-refl"></div>
+    <div id="ch-refl"></div>
+    <figcaption><b>Normeret reflektans for de tre overflader.</b> Bemærk de tre træk hos
+      den sunde plante: den flade bund i blå, den lille pukkel i grøn, det dybe fald i rød
+      — og så <i>klippen</i>, den næsten lodrette stigning omkring 700–730 nm.</figcaption>
+  </figure>
+
+  <div class="grid g3">
+    <div class="stat"><div class="k">Grøn plante · NDVI</div><div class="v">+0,87</div>
+      <div class="d">NIR/rød = 13,9. Tæt, sund, klorofylrig vegetation</div></div>
+    <div class="stat"><div class="k">Grøn plante 2 · NDVI</div><div class="v">+0,63</div>
+      <div class="d">NIR/rød = 4,4. Væsentligt svagere vegetationssignal</div></div>
+    <div class="stat"><div class="k">Klippe · NDVI</div><div class="v">+0,23</div>
+      <div class="d">NIR/rød = 1,6. Lavt — men ikke nul. Se afsnit 4</div></div>
+  </div>
+
+  <h3>Klorofylsignaturen</h3>
+  <p>Den sunde plante viser lærebogsformen fuldstændigt rent:</p>
+  <ul>
+    <li><b>Flad, meget lav bund fra 400 til 500 nm</b> (R ≈ 0,05 normeret). Klorofyl a og b
+      absorberer begge kraftigt i blå — Soret-båndet — og karotenoiderne dækker resten op
+      til omkring 500 nm. Absorptionen er så mættet at der ikke er en enkelt tydelig
+      minimumsbølgelængde, bare en bred bund. Det er den korrekte aflæsning, ikke en
+      manglende måling.</li>
+    <li><b>Grøn pukkel med top ved 553 nm</b> (R = 0,10). Dobbelt så høj som bunden.
+      Det er den eneste grund til at planter ser grønne ud: ikke fordi de udsender grønt,
+      men fordi de er dårligst til at absorbere netop dér.</li>
+    <li><b>Skarpt minimum ved 671 nm</b> (R = 0,07) — klorofyl a's røde absorptionsbånd.
+      Målt mod et lokalt kontinuum er dykket <b>53 % dybt</b>.</li>
+    <li><b>Red edge:</b> stejleste hældning ved <b>717 nm</b>, halvhøjdepunkt ved 729 nm.
+      Reflektansen stiger <b>14,5 gange</b> fra 670 til NIR-plateauet.</li>
+  </ul>
+
+  <p>Red edge er ikke pigment overhovedet — det er <i>struktur</i>. Ved 700 nm holder
+     klorofylet op med at absorbere, og lyset møder i stedet bladets indre: cellevægge,
+     luftrum, vand. De spreder næsten alt NIR tilbage. Springet fra 7 % til 100 % over
+     bare 60 nm er den skarpeste kant i hele naturens reflektansverden — og præcis derfor
+     bygger NDVI og al satellitbaseret vegetationsovervågning på den.</p>
+
+  <div class="callout">
+    <h4>Grøn plante 2 er ikke en anden plante — den er en blanding</h4>
+    <p>Plante 2 har ikke bare svagere signal, den har en <i>anden form</i>: ingen tydelig
+       grøn pukkel (maksimum forskudt til 620 nm), rødminimum flyttet til 642 nm, og
+       grøn/rød-forholdet under 1. Det ligner ikke en syg plante. Det ligner en plante
+       blandet med noget andet. Det efterprøves i afsnit 5.</p>
+  </div>
+</section>
+
+<!-- ============================ KLIPPE ============================ -->
+<section id="klippe">
+  <h2><span class="num">04</span>Klippen og jorden — jern, og noget levende</h2>
+  <p class="lede">En jævnt stigende kurve uden skarpe kanter. Næsten.</p>
+
+  <p>Klippens reflektans stiger nærmest monotont fra blå mod nær-infrarød:
+     R(450)/R(650) = <b>0,415</b>, altså mere end dobbelt så meget lys tilbage i rødt som
+     i blåt. Hældningen er jævn gennem hele det synlige område (+1,85 pr. 1000 nm fra 450
+     til 650 nm) uden nogen skarp kant.</p>
+
+  <p>Det er den klassiske signatur for <b>trevalent jern, Fe³⁺</b>. Ladningsoverførsels-
+overgange i oxideret jern absorberer kraftigt i UV og blå og aftager gennem grøn
+     mod rød. Det er den samme fysik der gør rust rød, Mars rød og forvitrede
+     klippeoverflader rødbrune. Grundfjeldet omkring Ammassalik er arkæisk gnejs, og en
+     forvitret, jernoxid-farvet overflade passer præcist på formen.</p>
+
+  <h3>Men NDVI er ikke nul</h3>
+  <p>Bar klippe burde ligge omkring 0,05–0,10. Målingen giver <b>+0,23</b>. Det er for højt
+     til at være tilfældigt, så jeg gik efter en forklaring, og der er tre spor der peger
+     samme vej:</p>
+
+  <table>
+    <thead><tr><th>Indikator</th><th class="n">Klippen</th><th class="n">Sund plante</th><th>Tolkning</th></tr></thead>
+    <tbody>
+      <tr><td>NDVI</td><td class="n">+0,23</td><td class="n">+0,87</td><td>for højt til bar sten</td></tr>
+      <tr class="hi"><td>Klorofyldyk ved 670–675 nm</td><td class="n">6 %</td><td class="n">53 %</td><td>svagt, men reelt</td></tr>
+      <tr><td>Red edge-kontrast</td><td class="n">1,6×</td><td class="n">14,5×</td><td>en antydning af kant</td></tr>
+    </tbody>
+  </table>
+
+  <p>Et klorofyldyk på 6 % er i sig selv i underkanten af hvad man tør konkludere på fra
+     ét bånd. Men det står præcis hvor det skal (670–675 nm), og det følges af både forhøjet
+     NDVI og en svag red edge. Tre uafhængige indikatorer der alle peger samme vej, er en
+     anden sag end én.</p>
+
+  <p><b>Den mest sandsynlige tolkning: klippen er ikke bar.</b> Den bærer et tyndt,
+     usammenhængende dække af <b>lav eller mos</b> — hvilket er nærmest uundgåeligt på
+     grønlandsk grundfjeld. Skorpelav er så tætsiddende at overfladen ser sten-grå ud for
+     øjet, men spektrometeret ser klorofylet.</p>
+
+  <div class="callout">
+    <h4>Hvad det betyder for satellitbilleder</h4>
+    <p>Det her er i lille skala præcis den fejlkilde der plager NDVI-kortlægning af arktiske
+       områder. En Sentinel-2-pixel er 10 × 10 m. Er en tiendedel af den dækket af lav,
+       flytter NDVI sig målbart — og en tidsserie kan komme til at vise "grønnere Arktis"
+       hvor der i virkeligheden bare er lav på sten. Dét er en pointe man kan tage direkte
+       fra denne ene måling ud på en klippe ved Sermilik og hen i en diskussion af
+       fjernmålingens troværdighed.</p>
+  </div>
+
+  <h3>Bar jord til sammenligning</h3>
+  <p>En måling af bar, rødlig jord samme sted afgør spørgsmålet. Jorden er utvivlsomt
+     uden vegetation — og den giver <b>NDVI = −0,03</b>. Altså nul, som bar overflade skal.
+     Klippens +0,23 kan derfor ikke forklares med "sten giver også lidt udslag".</p>
+
+  <div class="readout" id="ro-jord"></div>
+  <figure>
+    <div id="ch-jord"></div>
+    <figcaption><b>Tre overflader, alle normeret til NIR-plateauet.</b> Jorden stiger
+      jævnt og har intet spring ved 700 nm. Klippen ligner den, men med en anelse kant.
+      Planten har den fulde red edge.</figcaption>
+  </figure>
+
+  <p>Jorden har samtidig en endnu kraftigere jernsignatur end klippen:
+     R(450)/R(650) = <b>0,26</b> mod klippens 0,42 — den reflekterer næsten fire gange
+     så meget rødt som blåt. Reflektansen topper ved 750 nm og falder derefter, hvilket
+     sandsynligvis er Fe³⁺-krystalfeltbåndet omkring 850–900 nm. Det er samme bånd
+     der bruges til at kortlægge jernholdige mineraler fra satellit.</p>
+</section>
+
+<!-- ============================ BLANDING ============================ -->
+<section id="blanding">
+  <h2><span class="num">05</span>Blandingen — mixed pixel, målt i felten</h2>
+  <p class="lede">Hypotesen fra afsnit 3 kan efterprøves med almindelig lineær algebra.</p>
+
+  <p>Hvis Grøn plante 2 er en blanding af vegetation og bar klippe i spektrometerets
+     synsfelt, må dens spektrum kunne skrives som en vægtet sum af de to andre. Det er en
+     lineær mindste-kvadraters løsning med to ubekendte, regnet på 420–880 nm med de
+     telluriske bånd holdt udenfor:</p>
+
+  <div class="callout">
+    <h4>Resultat</h4>
+    <p style="font-family:ui-monospace,Menlo,monospace;font-size:1rem">
+      plante2 ≈ <b>0,366</b> × plante + <b>0,321</b> × klippe &nbsp;&nbsp; (R² = <b>0,987</b>)</p>
+    <p>Vegetationsandel ≈ <b>53 %</b>. Modellen forklarer 98,7 % af variationen i et spektrum
+       med 460 frihedsgrader ud fra to tal.</p>
+  </div>
+
+  <div class="readout" id="ro-mix"></div>
+  <figure>
+    <div id="ch-mix"></div>
+    <figcaption><b>Målt mod modelleret.</b> Den sorte kurve er den faktiske måling af
+      Grøn plante 2. Den stiplede er blandingsmodellen af de to andre spektre. De ligger
+      stort set oven i hinanden.</figcaption>
+  </figure>
+
+  <p>Kontrolregningen er lige så vigtig: forsøger man den anden vej — at bygge den
+     <i>sunde</i> plante af plante 2 og klippe — kræver det en <b>negativ</b> klippevægt
+     (−0,795). Negative andele er fysisk meningsløse, og det fortæller at den sunde plante
+     er den reneste endmember i datasættet. Blandingen går kun én vej.</p>
+
+  <p>Det svarer nøjagtigt til den NDVI der blev målt: +0,87 for ren vegetation, +0,23 for
+     klippe, og +0,63 for en cirka fifty-fifty blanding — pænt imellem, en anelse trukket
+     mod vegetationen fordi den er lysere i NIR og derfor fylder mere i signalet.
+     <b>Det er mixed pixel-problemet, demonstreret med et spektrometer til under 3000 kr.</b></p>
+</section>
+
+<!-- ============================ SNE ============================ -->
+<section id="sne">
+  <h2><span class="num">06</span>Sneen — albedo og urenheder</h2>
+  <p class="lede">Målt på gletsjeren 7. august kl. 18:28–18:58 lokal tid: indstråling,
+     ren sne, beskidt sne og jordholdig sne. Alle fire med samme instrument, samme
+     indstillinger, inden for en halv time.</p>
+
+  <p>Albedo — hvor stor en del af sollyset en overflade kaster tilbage — er den
+     enkeltvariabel der styrer mest af indlandsisens afsmeltning. Og den er ikke en
+     konstant: den afhænger af hvad der ligger <i>på</i> sneen. De tre overflader
+     herunder lå inden for få meter af hinanden.</p>
+
+  <div class="readout" id="ro-sne"></div>
+  <figure>
+    <div id="ch-sne"></div>
+    <figcaption><b>De tre sneoverflader, målt mod indstrålingen.</b> Ren sne kaster det
+      meste tilbage. De to beskidte ligger nede omkring en femtedel. Kurverne er forhold,
+      ikke absolut albedo — se forbeholdet nederst.</figcaption>
+  </figure>
+
+  <h3>Urenhedernes fingeraftryk</h3>
+  <p>Deler man beskidt sne med ren sne, forsvinder både indstrålingen og instrumentet ud
+     af regnestykket — de to blev målt med samme geometri få minutter fra hinanden. Det
+     der står tilbage, er urenhedernes rene virkning:</p>
+
+  <div class="readout" id="ro-sne2"></div>
+  <figure>
+    <div id="ch-sne2"></div>
+    <figcaption><b>Beskidt sne delt med ren sne.</b> Begge kurver <i>stiger</i> mod det
+      nær-infrarøde. Det er ikke en tilfældighed — det er selve kendetegnet ved
+      lysabsorberende urenheder.</figcaption>
+  </figure>
+
+  <p>Fysikken bag formen er skarpt opdelt:</p>
+  <ul>
+    <li><b>I det synlige</b> absorberer sod, støv og jord kraftigt. Det er her sneen
+      bliver mørkere, og det er her næsten hele albedo-tabet sker.</li>
+    <li><b>I det nær-infrarøde</b> absorberer isen selv, og det er <i>kornstørrelsen</i>
+      der bestemmer niveauet. Urenheder betyder næsten ingenting her.</li>
+  </ul>
+
+  <p>Derfor stiger forholdet mod NIR. Og derfor er det bemærkelsesværdigt at de to
+     beskidte prøver <b>nærmer sig hinanden i NIR</b> (0,27 og 0,24) mens de er vidt
+     forskellige i det synlige (0,18 og 0,12): de har omtrent <b>samme kornstruktur</b>,
+     men den ene bærer cirka dobbelt så meget lysabsorberende materiale som den anden.
+     Det er en aflæsning man ikke kan lave med det blotte øje.</p>
+
+  <table>
+    <thead><tr><th>Overflade</th><th class="n">Synligt 400–700</th>
+      <th class="n">NIR 760–880</th><th class="n">Energivægtet</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td>Ren sne</td><td class="n">1,00</td><td class="n">1,00</td><td class="n">1,00</td></tr>
+      <tr><td>Beskidt sne</td><td class="n">0,184</td><td class="n">0,266</td><td class="n">0,189</td></tr>
+      <tr><td>Jord/beskidt sne</td><td class="n">0,124</td><td class="n">0,241</td><td class="n">0,132</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Hvad det koster i energi</h3>
+  <p>De beskidte flader beholder altså kun <b>19 %</b> og <b>13 %</b> af den rene snes
+     albedo. Sætter man ren sne til en albedo på 0,80 — en rimelig værdi for ren, men
+     ikke helt frisk sne — bliver regnestykket:</p>
+
+  <div class="grid g3">
+    <div class="stat"><div class="k">Ren sne</div><div class="v">20 %</div>
+      <div class="d">af indstrålingen absorberes · albedo ≈ 0,80</div></div>
+    <div class="stat"><div class="k">Beskidt sne</div><div class="v">85 %</div>
+      <div class="d">af indstrålingen absorberes · albedo ≈ 0,15</div></div>
+    <div class="stat"><div class="k">Jord/beskidt sne</div><div class="v">89 %</div>
+      <div class="d">af indstrålingen absorberes · albedo ≈ 0,11</div></div>
+  </div>
+
+  <p>Ved 500 W/m² — et typisk klarvejrs-middel over en sommerdag — svarer det til
+     <b>324 og 347 W/m² ekstra absorberet energi</b>. Går det hele til smeltning, er det
+     omkring <b>42–45 mm vandækvivalent ekstra afsmeltning på en enkelt soldag</b>
+     sammenlignet med den rene sne få meter derfra.</p>
+
+  <div class="callout">
+    <h4>Det er albedo-feedbacken, målt direkte</h4>
+    <p>Mørkere sne absorberer mere energi og smelter hurtigere. Når sneen smelter,
+       bliver urenhederne tilbage og koncentreres på overfladen. Så bliver den endnu
+       mørkere, og det hele accelererer. Målingerne her fanger to trin på den
+       skala inden for få meters afstand — og forskellen mellem dem er større end
+       forskellen mellem sne og bar jord i det synlige.</p>
+    <p>Det er samme mekanisme der driver mørkezonen på Grønlands indlandsis, hvor
+       støv, sod og snealger sænker albedoen over store områder. Her er den målt med
+       et instrument til under 3000 kr.</p>
+  </div>
+
+  <div class="callout warn">
+    <h4>Sådan skal tallene læses</h4>
+    <p>Alle fire spektre er optaget med <b>samme integrationstid</b>, så de deler
+       radiometrisk skala, og forholdene mellem dem er reelle. Tallene i tabellen —
+       relativ albedo mod ren sne — er derfor solide: ren og beskidt sne blev målt med
+       samme geometri fire minutter fra hinanden.</p>
+    <p><b>Det absolutte niveau er ikke målt.</b> Forholdet ren sne / indstråling
+       overstiger 1 omkring 700 nm, hvilket ikke kan passe for en albedo. Forklaringen
+       er målegeometrien: indstrålings-målingen opsamler hele himlens blå lys, mens
+       sneen er belyst mest af den direkte, røde lavtstående sol. Til absolut albedo
+       kræves et hvidt referencepanel eller en cosinus-korrigeret sensor. Albedoen 0,80
+       for ren sne ovenfor er derfor en <i>antagelse</i>, ikke en måling — de relative
+       tal står uden den.</p>
+  </div>
+</section>
+
+<!-- ============================ FELTFORSØG ============================ -->
+<section id="feltforsoeg">
+  <h2><span class="num">07</span>Feltforsøget — albedo målt med pinde</h2>
+  <p class="lede">3.–9. august blev der afsat felter på gletsjeren med forskellig
+     albedo, og smeltningen aflæst på ablationspinde. På seks døgn smeltede isen
+     mellem 20 og 40 cm — alt efter hvor mørk overfladen var.</p>
+
+  <figure>
+    <img src="foto/felt-moerkt.jpg" alt="Felt på gletsjeren dækket med mørkt sediment, markeret med bambuspinde og grønne flag">
+    <figcaption><b>Et af felterne.</b> Mørkt sediment spredt ud på isen, med pinde
+      gennem feltet til at måle hvor meget overfladen sænker sig. I baggrunden ses
+      rækken af øvrige felter markeret med grønne flag.</figcaption>
+  </figure>
+
+  <h3>Sådan måles albedoen</h3>
+  <p>Albedoen bestemmes med et <b>trykt referencekort</b> der lægges på isen og
+     fotograferes sammen med overfladen. Kortet har to felter med kendt albedo:</p>
+
+  <figure>
+    <img src="foto/referencekort.jpg" alt="Referencekort med et gråt og et hvidt felt, mærket med pixelværdi og albedo, liggende på isen ved siden af en tommestok">
+    <figcaption><b>Referencekortet.</b> Gråt felt: pixelværdi 86, albedo 34 %.
+      Hvidt felt: pixelværdi 166, albedo 65 %. Begge følger
+      <code>albedo = pixelværdi / 255</code>.</figcaption>
+  </figure>
+
+  <p>Billedet lægges ind i <a href="https://geo.sg.dk/albedo">albedo-appen</a>, hvor man
+     markerer referencekortet og de områder der skal måles. Appen sammenligner
+     gråværdierne og regner om:</p>
+
+  <div class="eq">albedo(område)  =  gråværdi(område) / gråværdi(reference)  ×  albedo(reference)</div>
+
+  <p>Fordi både kortet og isen er i samme billede, under samme lys og med samme
+     kameraindstilling, forkorter belysningen og eksponeringen væk. <b>Det er
+     nøjagtig samme princip som divisionen i afsnit 02 til 06</b> — bare med et kamera
+     i stedet for et spektrometer.</p>
+
+  <h3>De målte albedoer</h3>
+  <table>
+    <thead><tr><th>Overflade</th><th class="n">Albedo</th><th>Hvad det er</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td>Hvidt felt</td><td class="n">57,5 %</td>
+        <td>Lys, kornet is — det lyseste på gletsjeren</td></tr>
+      <tr><td>Beskidt is</td><td class="n">26,0 %</td><td>Almindelig overflade med støv og sediment</td></tr>
+      <tr><td>Gletsjerens nederste del</td><td class="n">26,5 %</td><td>Gennemsnit over hele ablationszonen</td></tr>
+      <tr class="hi"><td>Vandløb</td><td class="n">10,7 %</td><td>Smeltevandskanal — det mørkeste</td></tr>
+    </tbody>
+  </table>
+
+  <figure>
+    <img src="foto/felt-lyst.jpg" alt="Lyst felt af kornet is omgivet af mørkere snavset is, med referencekort og tommestok">
+    <figcaption><b>Resultatet er synligt uden tal.</b> Det lyse felt står tydeligt
+      <i>højere</i> end den mørkere is omkring det. Forskellen i højde <i>er</i>
+      forskellen i smeltning.</figcaption>
+  </figure>
+
+  <h3>Regnestykket — og et krydstjek der holder</h3>
+  <p>Smelter isen kun på grund af den absorberede solstråling, kan smeltedybden
+     forudsiges direkte:</p>
+
+  <div class="eq">d  =  Q · (1 − α) · t  /  (ρ<sub>is</sub> · L<sub>f</sub>)
+
+<span class="cmt">Q = indstråling (W/m²)     α = albedo        t = 6 døgn
+ρ = 900 kg/m³ (is)         L = 334 kJ/kg (smeltevarme)</span></div>
+
+  <p>Vender man ligningen om, kan <b>hvert felt selv fortælle hvor meget sol der har
+     ramt det</b>. Og de to yderpunkter er uafhængige af hinanden:</p>
+
+  <div class="grid g3">
+    <div class="stat"><div class="k">Fra det hvide felt</div><div class="v">273</div>
+      <div class="d">W/m² · albedo 57,5 %, smeltet 20 cm</div></div>
+    <div class="stat"><div class="k">Fra vandløbet</div><div class="v">260</div>
+      <div class="d">W/m² · albedo 10,7 %, smeltet 40 cm</div></div>
+    <div class="stat"><div class="k">Afvigelse</div><div class="v">5 %</div>
+      <div class="d">To uafhængige målinger, samme svar</div></div>
+  </div>
+
+  <p>To felter med vidt forskellig albedo og vidt forskellig smeltning peger på
+     <b>samme indstråling inden for 5 %</b>. Det er ikke en tilfældighed — det er
+     beviset for at <b>smeltningen her er styret af den absorberede solstråling og
+     stort set intet andet</b>.</p>
+
+  <p>Og tallet lader sig efterprøve helt uafhængigt: solen leverer 381 W/m² i døgnmiddel
+     over atmosfæren på denne breddegrad i august. De 266 W/m² svarer til en atmosfærisk
+     transmission på <b>0,70</b> — præcis hvad man forventer for en uge med klart vejr i
+     Arktis.</p>
+
+  <div class="readout" id="ro-melt"></div>
+  <figure>
+    <div id="ch-melt"></div>
+    <figcaption><b>Albedo mod smeltning.</b> Den rette linje er modellen med
+      Q = 266 W/m². Punkterne er de målte felter. Bemærk hvor lidt der skal til:
+      hver 10 procentpoint lavere albedo koster godt 4½ cm ekstra is på seks dage.</figcaption>
+  </figure>
+
+  <div class="callout">
+    <h4>Hvad det siger om hele gletsjeren</h4>
+    <p>Ablationszonens gennemsnitlige albedo blev målt til <b>26,5 %</b>. Med samme
+       regnestykke smelter den <b>34 cm is på seks døgn</b> — knap 6 cm i døgnet.
+       Havde overfladen haft det hvide felts albedo, ville det have været 19,5 cm.</p>
+    <p><b>Forskellen på 14 cm over seks dage er albedoens pris.</b> Ganget op over
+       en hel smeltesæson og hele ablationszonen er det den mekanisme der afgør, hvor
+       meget af Grønlands overfladesmeltning der løber i havet hvert år.</p>
+  </div>
+
+  <div class="callout warn">
+    <h4>En uoverensstemmelse i metoden</h4>
+    <p>Det trykte referencekort angiver det hvide felt til <b>albedo 65 %</b>
+       (pixelværdi 166, altså 166/255). Appen regner derimod med <b>70 %</b> for
+       referencekortet. Alle målte albedoer bliver dermed cirka <b>7,7 % for høje</b>
+       — en overflade der burde give 30 %, kommer ud som 32,3 %.</p>
+    <p>Tallene på denne side er som de kom ud af appen. Rettes referencen til 65 %,
+       falder de målte albedoer tilsvarende, og den udledte indstråling stiger en smule.
+       Konklusionerne om <i>forholdet</i> mellem felterne ændrer sig ikke.</p>
+    <p>Til gengæld er de 7 % en del af forklaringen på afvigelsen mod satellitten i
+       afsnit 08 — og de peger på en generel forbedring: <b>brug begge referencefelter
+       til en to-punkts-kalibrering</b> i stedet for kun det hvide. To kendte albedoer
+       og to målte gråværdier fastlægger sammenhængen empirisk, uanset hvad kameraets
+       eksponering og tonekurve har gjort undervejs.</p>
+  </div>
+</section>
+
+<!-- ============================ SATELLIT ============================ -->
+<section id="satellit">
+  <h2><span class="num">08</span>Fra spektrum til satellit</h2>
+  <p class="lede">Otte af Sentinel-2's ti optiske bånd ligger inden for instrumentets
+     rækkevidde. Nedenfor holdes feltmålingerne op mod
+     <a href="../kort/">Sermilik Validation-GIS</a> — og de stemmer inden for 15 %,
+     når man måler på det rigtige sted.</p>
+
+  <p>En satellit måler ikke spektre. Den måler nogle få brede bånd, og af dem beregnes
+     de indeks som klimaovervågning bygger på. Sentinel-2 har ti optiske bånd; et
+     spektrometer som dette har 571 punkter. Folder man de målte spektre med satellittens
+     faktiske båndbredder, får man <b>præcis de tal Sentinel-2 ville rapportere</b> for
+     netop den overflade — og så kan de sammenlignes med, hvad satellitten faktisk sagde.</p>
+
+  <figure>
+    <img src="foto/satellit-feltpunkt.jpg" alt="Sentinel-2 i ægte farver og som albedokort over feltområdet, med målepunktet markeret">
+    <figcaption><b>Feltområdet set fra Sentinel-2, 7. august 2026.</b> Øverst ægte farver,
+      nederst samme udsnit som albedokort. Krydset er målepunktet nær isranden — og
+      albedokortet viser med det samme hvor mørkt netop det sted er sammenlignet med
+      gletsjeren længere inde.</figcaption>
+  </figure>
+
+  <div class="readout" id="ro-s2"></div>
+  <figure>
+    <div id="ch-s2"></div>
+    <figcaption><b>Sentinel-2's bånd lagt oven på de målte reflektansspektre.</b>
+      De grå felter er båndenes bredde. Læg mærke til hvor de tre red edge-bånd
+      (B05, B06, B07) sidder — netop hen over den kant hvor vegetationens reflektans
+      springer.</figcaption>
+  </figure>
+
+  <h3>Hvad satellitten ville rapportere</h3>
+  <table>
+    <thead><tr><th>Overflade</th><th class="n">B02 blå</th><th class="n">B03 grøn</th>
+      <th class="n">B04 rød</th><th class="n">B08 NIR</th>
+      <th class="n">NDVI</th><th class="n">NDWI</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td>Grøn plante</td><td class="n">0,053</td><td class="n">0,097</td>
+        <td class="n">0,075</td><td class="n">1,030</td><td class="n">+0,865</td><td class="n">−0,828</td></tr>
+      <tr><td>Grøn plante 2 (blandet)</td><td class="n">0,113</td><td class="n">0,179</td>
+        <td class="n">0,237</td><td class="n">1,025</td><td class="n">+0,624</td><td class="n">−0,703</td></tr>
+      <tr><td>Klippe</td><td class="n">0,286</td><td class="n">0,451</td>
+        <td class="n">0,653</td><td class="n">1,029</td><td class="n">+0,224</td><td class="n">−0,390</td></tr>
+      <tr><td>Bar jord</td><td class="n">0,365</td><td class="n">0,636</td>
+        <td class="n">1,045</td><td class="n">1,002</td><td class="n">−0,021</td><td class="n">−0,223</td></tr>
+    </tbody>
+  </table>
+
+  <p>NDVI beregnet gennem satellittens brede bånd giver <b>+0,865</b> for den sunde
+     plante mod +0,866 fra hele spektret. Båndene mister altså næsten ingenting for
+     vegetation — kanten er så kraftig at den slår igennem uanset opløsning. Det er
+     forklaringen på, at NDVI overhovedet virker fra 786 km's højde.</p>
+
+  <h3>Hvilke af GIS'ens lag kan valideres — og hvilke kan ikke</h3>
+  <table>
+    <thead><tr><th>Lag i Validation-GIS</th><th>Bånd</th><th class="n">Kan måles her?</th>
+      <th>Hvad det bruges til</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td>NDWI — smeltesøer</td><td>B03, B08</td><td class="n">Ja, begge</td>
+        <td>Smeltesøer på indlandsisen, afstrømning</td></tr>
+      <tr><td>NDVI — vegetation</td><td>B04, B08</td><td class="n">Ja, begge</td>
+        <td>Arktisk grønning, vegetationsskift</td></tr>
+      <tr class="hi"><td>Albedo (Liang 2001)</td><td>B02, B04, B08, <b>B11, B12</b></td>
+        <td class="n">3 af 5 · 85 % af vægten</td><td>Energibalance, afsmeltning</td></tr>
+      <tr><td>NDSI — sne og is</td><td>B03, <b>B11</b></td><td class="n">Nej — B11 mangler</td>
+        <td>Snedække, snegrænse</td></tr>
+      <tr><td>Landsat LST</td><td>B10 termisk</td><td class="n">Nej — termisk</td>
+        <td>Overfladetemperatur</td></tr>
+    </tbody>
+  </table>
+
+  <p>Grænsen er skarp og værd at kende: Red Tide stopper ved <b>950 nm</b>, og
+     Sentinel-2's to SWIR-bånd ligger ved 1610 og 2190 nm. Det er ikke en mangel ved
+     metoden, men en konkret systemgrænse som eleverne selv kan konstatere ved at kigge
+     på bølgelængdeaksen.</p>
+
+  <p>Hvor meget den grænse koster, kan gøres op præcist. <b>Albedo-formlen</b> vægter de
+     fem bånd som 0,356·B02 + 0,130·B04 + 0,373·B08 + 0,085·B11 + 0,072·B12. De tre
+     bånd instrumentet kan nå, bærer 0,859 af de samlede 1,016 — altså
+     <b>85 % af vægten</b> — så snemålingerne i
+     afsnit 06 dækker langt det meste af det der afgør albedoen, og kun de sidste 15 %
+     ligger uden for rækkevidde.</p>
+
+  <p><b>NDSI</b> derimod falder helt væk, og det er lærerigt hvorfor. Indekset er
+     (B03 − B11)/(B03 + B11), altså grøn minus SWIR. Sne er meget lys i grøn — men det er
+     skyer også. Det er først i SWIR at de to skilles ad: sne absorberer kraftigt ved
+     1610 nm, skyer gør ikke. <b>Hele pointen med NDSI ligger dermed i det ene bånd
+     instrumentet ikke har.</b> Man kan måle at sneen er lys, men ikke skelne den fra en
+     sky — og det er præcis den skelnen satellitten er bygget til.</p>
+
+  <div class="callout">
+    <h4>Hvorfor det betyder noget for klimaovervågning</h4>
+    <p><b>Albedo</b> er den enkeltvariabel der styrer mest af indlandsisens afsmeltning:
+       mørkere overflade → mere absorberet energi → mere smeltning → endnu mørkere
+       overflade. Den beregnes fra rummet ud fra fem bånd og en empirisk formel — og den
+       formel er i sin tid kalibreret mod feltspektre af nøjagtig samme slags som disse.</p>
+    <p><b>Grønning af Arktis</b> aflæses af NDVI-tidsserier over årtier. Men målingerne
+       her viser at en klippe med lav giver <b>+0,23</b> og en halvt bevokset flade
+       <b>+0,63</b>. En Sentinel-2-pixel er 10 × 10 m og indeholder næsten altid flere
+       overflader. <b>En stigning i NDVI kan derfor betyde mere vegetation — eller bare
+       en anden blanding.</b> Uden jordmålinger kan de to ikke skilles ad.</p>
+  </div>
+
+  <h3>Jord mod satellit: den første rigtige sammenligning</h3>
+  <p>Feltmålingerne blev holdt op mod Sentinel-2 fra <b>7. august 2026</b> — en scene med
+     kun <b>0,11 % skydække</b>, taget kl. 14:14 UTC, altså næsten præcis ved lokal middag
+     hvor solen stod højest (41,5°). Bedre betingelser findes ikke.</p>
+
+  <figure>
+    <img src="foto/satellit-spektre.jpg" alt="Sentinel-2-spektre for gletsjeris sammenlignet med bibliotekspektre for sne og jord, samt albedo på tre steder">
+    <figcaption><b>Til venstre:</b> de målte Sentinel-2-spektre sammenlignet med
+      bibliotekspektre for sne og jord. Både is og sne kollapser til næsten nul ved
+      1610 nm, mens jord tværtimod topper der — det er den kontrast NDSI udnytter.
+      <b>Til højre:</b> albedoen tre steder på gletsjeren, holdt op mod jordmålingen.</figcaption>
+  </figure>
+
+  <table>
+    <thead><tr><th>Sted</th><th class="n">Albedo</th><th>Overflade</th></tr></thead>
+    <tbody>
+      <tr><td>Nær isranden</td><td class="n">0,077</td><td>Mørk, sedimentfyldt is med smeltevandskanaler</td></tr>
+      <tr><td>Midt på gletsjeren</td><td class="n">0,163</td><td>Bar, snavset is</td></tr>
+      <tr class="hi"><td><b>Højere oppe — hvor der blev målt</b></td><td class="n"><b>0,231</b></td><td>Renere bar is</td></tr>
+      <tr class="hi"><td><b>Målt på jorden med referencekort</b></td><td class="n"><b>0,265</b></td><td>Samme flade</td></tr>
+    </tbody>
+  </table>
+
+  <p><b>Satellit 0,231 mod jordmåling 0,265 — 15 % fra hinanden.</b> For to metoder der
+     ikke har noget med hinanden at gøre — den ene et kamera og et stykke papir på isen,
+     den anden et spektrometer i 786 km højde — er det en god overensstemmelse.</p>
+
+  <p>Og der er god plads til de sidste 15 %: appens reference står på 70 % hvor kortet
+     siger 65 % (godt 7 %), og en hældning på blot 3–5° væk fra solen giver 6–11 %,
+     fordi Sentinel-2's atmosfærekorrektion regner med en vandret flade.
+     <b>Der er ikke noget uforklaret tilbage.</b></p>
+
+  <h3>Men først gik det galt — og dét er den vigtigste lektion</h3>
+  <p>Den første sammenligning blev lavet nær isranden og gav satellit 0,077 mod
+     jordmåling 0,265. Faktor tre. Forklaringen var hverken et defekt instrument eller
+     en dårlig metode:</p>
+
+  <figure>
+    <img src="foto/satellit-transekt.jpg" alt="Satellitbillede i ægte farver og som albedokort, med et transekt fra isranden op ad gletsjeren og den tilhørende albedoprofil">
+    <figcaption><b>Albedoen tredobles på under to kilometer.</b> Krydset er feltpunktet
+      nær randen; den stiplede linje er transektet op ad gletsjeren. Randzonen er mørk af
+      sediment og smeltevand, mens den åbne gletsjer ligger på 0,20–0,30 — netop dér hvor
+      jordmålingen ligger.</figcaption>
+  </figure>
+
+  <p>Randzonen er et af de mest heterogene steder man kan vælge: mørke sedimentbånd,
+     smeltevandskanaler og bar is inden for få meter. En Sentinel-2-pixel på 20 × 20 m
+     gennemsnitter det hele, mens et referencekort på jorden måler den flade det tilfældigvis
+     ligger på.</p>
+
+  <div class="callout">
+    <h4>Lektionen: hvor man måler, afgør hvad man måler</h4>
+    <p>Det er samme fænomen som blandingen i afsnit 05 — bare på is i stedet for vegetation,
+       og med en faktor tre i stedet for en faktor to. <b>Validering handler mindre om
+       præcision i instrumentet end om at vælge en flade der er stor og ensartet nok til
+       at satellitten ser det samme som mennesket.</b></p>
+    <p>Praktisk betyder det: mål midt på en ensartet flade, mindst 40 × 40 m, og hold dig
+       væk fra render, kanter og overgange. Det er ikke en detalje — det er forskellen
+       mellem faktor tre og 15 %.</p>
+  </div>
+
+  <div class="callout warn">
+    <h4>Et værktøj der skal efterses</h4>
+    <p>Slår man punktet op med pixel-info-værktøjet i Validation-GIS'en, får man
+       albedo 0,616, NDSI 0,106 og NDVI 0,003. Henter man de samme tal direkte fra
+       Copernicus for samme punkt og samme scene, får man <b>0,132, +0,851 og −0,260</b>.</p>
+    <p>Alle tre afviger, og fortegnet på to af dem er vendt. Værktøjet blev desuden bedt
+       om 2026-08-07 med ±0 dages tolerance, men leverede en scene fra <b>23. juli</b> med
+       70 % skydække — mens der fandtes en næsten skyfri scene fra selve datoen.
+       Tallene herover er hentet uden om værktøjet, direkte fra kilden.</p>
+  </div>
+
+  <h3>Hvad der vil stramme sammenligningen yderligere</h3>
+  <p>To ting mangler for at lukke de sidste 15 %. Et <b>hvidt referencepanel</b>, så
+     jordreflektansen bliver absolut frem for kalibreret mod et trykt kort — det fjerner
+     de 7 % fra referencen. Og <b>hældningen læst af ArcticDEM</b>, så den topografiske
+     korrektion kan regnes med i stedet for skønnes.</p>
+
+  <p>Begge ville flytte tallene få procent. <b>Ingen af dem ændrer konklusionen:</b>
+     kamera og satellit måler det samme, når de får lov at se på den samme flade.</p>
+</section>
+
+<!-- ============================ ANVENDELSE ============================ -->
+<section id="undervisning">
+  <h2><span class="num">09</span>Hvad det kan bruges til</h2>
+  <p class="lede">Ét instrument, én formiddag, fem overflader — og tal der rækker fra
+     atomernes energiniveauer til satellitfjernmåling.</p>
+
+  <p>Det stærke ved datasættet er koblingen: eleverne peger et instrument på noget de kan
+     se — solen, himlen, en plante, en sten — og får resultater ud der ikke kunne fås på
+     nogen anden måde end ved at måle. Rejsen fra elevens <i>verden</i> til
+     naturvidenskabens <i>Verden</i> går gennem én fil.</p>
+
+  <h3>Fem spørgsmål, hver med et måleresultat som svar</h3>
+  <table>
+    <thead><tr><th>Spørgsmål</th><th>Hvad data svarer</th><th>Fører videre til</th></tr></thead>
+    <tbody>
+      <tr><td><b>Hvad er en streg i et spektrum?</b></td>
+        <td>Ca II K står 47 % dybt — calcium i en stjerne 150 mio. km væk</td>
+        <td>Atomernes energiniveauer, kvantespring, stjerners sammensætning</td></tr>
+      <tr class="hi"><td><b>Hvorfor er himlen blå?</b></td>
+        <td>λ<sup>−4,22</sup>, målt — ikke påstået</td>
+        <td>Elektromagnetisme, dipolstråling, hvorfor solnedgange er røde</td></tr>
+      <tr><td><b>Hvor ren er luften?</b></td>
+        <td>84 % molekylespredning i klar luft, 44 % gennem slør</td>
+        <td>Aerosoler, luftforurening, satellitovervågning af atmosfæren</td></tr>
+      <tr><td><b>Hvorfor er planter grønne?</b></td>
+        <td>Reflektans 0,05 i blå og rød, 0,10 i grøn, 1,0 i NIR</td>
+        <td>Fotosyntese, klorofyl, bladets indre struktur</td></tr>
+      <tr class="hi"><td><b>Hvad afgør hvor hurtigt indlandsisen smelter?</b></td>
+        <td>Beskidt sne beholder 19 % af den rene snes albedo</td>
+        <td>Albedo-feedback og energibalance — den halvdel der sker på overfladen</td></tr>
+      <tr><td><b>Kan man stole på et satellitbillede?</b></td>
+        <td>Plante 2 er 53 % vegetation + 47 % klippe, R² = 0,99</td>
+        <td>Mixed pixels, NDVI-tidsserier, "greening of the Arctic"</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Fire forløb der kan bygges direkte på tallene</h3>
+
+  <div class="grid g3">
+    <div class="stat"><div class="k">Fysik B/A</div><div class="v">λ⁻⁴</div>
+      <div class="d">Fra Fraunhofer-linjer til atommodeller, og fra spredning til
+        elektromagnetisk stråling. Eleverne fitter selv eksponenten i et regneark.</div></div>
+    <div class="stat"><div class="k">Naturgeografi</div><div class="v">NDVI</div>
+      <div class="d">Fjernmåling fra bunden: hvad et indeks er, hvorfor red edge findes,
+        og hvad en mixed pixel gør ved en tidsserie.</div></div>
+    <div class="stat"><div class="k">Biologi</div><div class="v">Klorofyl</div>
+      <div class="d">Absorptionsspektret målt på en levende plante, koblet til
+        fotosyntesens aktionsspektrum.</div></div>
+    <div class="stat"><div class="k">Klima · tværfagligt</div><div class="v">Albedo</div>
+      <div class="d">Feedback-mekanismen målt direkte på sne. Se forløbet herunder.</div></div>
+  </div>
+
+  <h3>Det tværfaglige: satellitten i lommeformat</h3>
+  <p>Sentinel-2 måler i 13 bånd. Dette spektrometer måler i 571. Alle de indeks
+     satellitten leverer — NDVI, vegetationsdække, jernindhold — kan regnes ud af
+     tallene her, og eleverne kan se præcis hvilke bølgelængder de bygger på og hvorfor
+     netop dem. <b>Klippen med NDVI +0,23 mod den bare jords −0,03</b> er hele
+     diskussionen om troværdighed i arktisk fjernmåling, målt på to sten.</p>
+
+  <h3>Klimaforløbet: hvor bliver Grønlands is af?</h3>
+  <p>Indlandsisen taber masse på to måder, og de vejer omtrent lige tungt. Cirka
+     <b>halvdelen</b> af det årlige tab kommer fra <b>overfladen</b> — sne og is der
+     smelter, hvor solindstrålingen leverer energien. Den anden halvdel kommer fra
+     <b>dynamikken</b>: isen flyder hurtigere ud mod kysten, kalver som isbjerge og
+     smelter i mødet med havet.</p>
+
+  <p>Det er en pointe værd at gøre eksplicit for eleverne, fordi den deler emnet i to
+     helt forskellige fysiske historier — og fordi kun den ene kan måles med et
+     spektrometer.</p>
+
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+    <div class="stat"><div class="k">Cirka halvdelen · overfladen</div>
+      <div class="v" style="font-size:1.3rem">Albedo styrer</div>
+      <div class="d">Hvor meget sollys sneen kaster tilbage, afgør hvor meget energi
+        der er til smeltning. <b>Det er dét målingerne på denne side handler om.</b></div></div>
+    <div class="stat"><div class="k">Cirka halvdelen · dynamikken</div>
+      <div class="v" style="font-size:1.3rem">Havet og flydningen</div>
+      <div class="d">Udløbsgletsjere accelererer, kalver isbjerge og smelter nedefra
+        hvor varmt havvand når frem til gletsjerfronten.</div></div>
+  </div>
+
+  <h4 style="margin:1.6rem 0 .4rem;font-size:1rem;color:var(--navy)">Halvdel 1: overfladen — det I selv kan måle</h4>
+  <ol class="steps">
+    <li><b>Hvad er albedo, og hvorfor betyder den noget?</b> Ren sne kaster omkring
+      80 % af sollyset tilbage. De beskidte flader få meter derfra beholder kun 19 % og
+      13 % af det. Regnet om absorberer de <b>85–89 % af indstrålingen mod den rene snes
+      20 %</b>.</li>
+    <li><b>Hvad koster det i smeltning?</b> Ved 500 W/m² svarer det til 324–347 W/m²
+      ekstra absorberet energi, altså <b>42–45 mm vandækvivalent ekstra afsmeltning på
+      en enkelt soldag</b>. Eleverne regner det selv med smeltevarmen 334 kJ/kg — det er
+      en opgave i energiregnskab, ikke i udenadslære.</li>
+    <li><b>Hvorfor forstærker det sig selv?</b> Når sneen smelter, bliver urenhederne
+      liggende tilbage og koncentreres på overfladen. Albedoen falder yderligere,
+      der absorberes mere, og det går hurtigere. <b>Det er en positiv feedback</b> — og
+      de to beskidte prøver er reelt to trin på den skala.</li>
+    <li><b>Hvorfor er den svær at modellere?</b> Fordi urenhederne ikke er jævnt
+      fordelt, ikke er konstante over tid, og delvis er <i>biologiske</i> — snealger
+      vokser når det bliver varmere og gør isen mørkere. En model med fast albedo
+      rammer systematisk for lavt.</li>
+  </ol>
+
+  <h4 style="margin:1.8rem 0 .4rem;font-size:1rem;color:var(--navy)">Halvdel 2: dynamikken — og den foregår lige uden for døren</h4>
+  <p>Den anden halvdel kan et spektrometer ikke sige noget om. Til gengæld ligger
+     Sermilik feltstation ved et af verdens bedst undersøgte eksempler på den:
+     <b>Helheim Gletsjer</b> løber ud i Sermilik Fjord få snesevis af kilometer mod
+     nordvest og er en af Grønlands mest aktive udløbsgletsjere.</p>
+
+  <p>Mekanismen er en anden end på overfladen. Varmt, salt atlanterhavsvand ligger som
+     et lag i dybden i fjorden og når helt ind til gletsjerfronten, hvor det smelter isen
+     <i>nedefra</i>. Det svækker fronten, gletsjeren accelererer, og der leveres mere is
+     til havet pr. år. Det er den del modellerne især har haft svært ved, fordi den
+     kræver at man kobler iskappe, fjorddybde og oceanets varmetransport sammen.</p>
+
+  <p><b>Didaktisk er det stærkt netop fordi de to halvdele mødes samme sted.</b>
+     Eleverne kan måle albedoen på sneen med eget udstyr, og de kan se isbjergene fra
+     Helheim drive forbi i fjorden. Den ene halvdel af regnskabet kan de selv sætte tal
+     på; den anden må de hente fra <a href="../kort/">Validation-GIS'en</a> og fra
+     forskningens data. At kunne skelne mellem "det jeg selv har målt" og "det jeg må
+     stole på andre har målt" er i sig selv en naturvidenskabelig kompetence.</p>
+
+  <div class="callout">
+    <h4>Koblingen til mørkezonen</h4>
+    <p>På indlandsisens vestrand findes et bælte hvor isen er markant mørkere end
+       omgivelserne — <b>mørkezonen</b>. Årsagen er den samme som her: støv, sod og
+       snealger sænker albedoen. Zonen er vokset over de seneste årtier og er en aktiv
+       del af forskningen i iskappens overflade-massebalance.</p>
+    <p>Målingerne på siden er den samme fysik i lille skala. Eleverne kan gå fra deres
+       egen måling af to snepletter til at forstå hvorfor et bælte på tværs af Grønland
+       smelter hurtigere end resten — og hvorfor det stadig kun er den halve historie.</p>
+  </div>
+
+  <div class="callout">
+    <h4>Måleprotokol, hvis I selv skal ud</h4>
+    <ol class="steps" style="margin:.6rem 0 0">
+      <li><b>Mål aldrig direkte mod Solen.</b> Brug et hvidt referencepanel i fuldt
+        sollys — PTFE, hvid skumplade eller et mat hvidt karton. Så ligger alle mål i
+        samme lysstyrkeområde, og reflektansen bliver ægte:
+        <code>R_mål = (mål / reference) × R_reference</code></li>
+      <li><b>Samme integrationstid til hele serien</b> — ellers kan spektrene ikke
+        sammenlignes indbyrdes. Sigt efter 50–70 % af fuldskala på det lyseste mål.</li>
+      <li><b>Tag et mørkespektrum</b> med fiberen dækket til, ved samme integrationstid.
+        Det betyder lidt i midten af spektret, men op mod 20 % i enderne og på mørke mål.</li>
+    </ol>
+  </div>
+
+  <div class="callout">
+    <h4>Videre målinger der giver nye resultater</h4>
+    <p><b>Sne og is</b> — høj og flad reflektans i det synlige, markant fald efter 1000 nm.
+      <b>Vand</b> — næsten sort i NIR, hvilket er hele grundlaget for at kortlægge
+      smeltesøer på indlandsisen. <b>Samme plante hen over sæsonen</b> — red edge flytter
+      sig målbart mod kortere bølgelængder når klorofylet nedbrydes om efteråret, og det
+      er en tidsserie eleverne selv kan producere.</p>
+  </div>
+</section>
+
+</main>
+
+<footer><div class="wrap">
+  <p><b>Data:</b> fem måleserier, 571 punkter pr. spektrum, 380–950 nm,
+     Ocean Optics Red Tide USB-650, Sermilik feltstation, Østgrønland, august 2026.<br>
+     <b>Analyse og figurer:</b> genereret af <code>spektrum/build.py</code>.
+     Alle beregninger er reproducerbare fra rådata.</p>
+  <p style="opacity:.7">Sans Science · undervisning med SANS</p>
+</div></footer>
+
+<script>
+const DATA = __DATA__;
+</script>
+<script>
+/* ---------------------------------------------------------------
+   Minimal SVG-plotbibliotek. Ingen eksterne afhængigheder.
+   --------------------------------------------------------------- */
+const NS = "http://www.w3.org/2000/svg";
+const el = (n, a = {}) => { const e = document.createElementNS(NS, n);
+  for (const k in a) e.setAttribute(k, a[k]); return e; };
+
+function wl2rgb(w){
+  let r,g,b,f;
+  if (w < 380 || w > 750) return "#6d6f77";
+  if (w < 440){ r = -(w-440)/60; g = 0; b = 1; }
+  else if (w < 490){ r = 0; g = (w-440)/50; b = 1; }
+  else if (w < 510){ r = 0; g = 1; b = -(w-510)/20; }
+  else if (w < 580){ r = (w-510)/70; g = 1; b = 0; }
+  else if (w < 645){ r = 1; g = -(w-645)/65; b = 0; }
+  else { r = 1; g = 0; b = 0; }
+  if (w < 420) f = 0.35 + 0.65*(w-380)/40;
+  else if (w > 700) f = 0.35 + 0.65*(750-w)/50;
+  else f = 1;
+  const c = v => Math.round(255 * Math.pow(Math.min(1, Math.max(0, v*f)), 0.85));
+  return `rgb(${c(r)},${c(g)},${c(b)})`;
+}
+
+function Chart(host, cfg){
+  const W = 900, H = cfg.height || 380;
+  const M = Object.assign({t:22, r:20, b:46, l:58}, cfg.margin||{});
+  const svg = el("svg", {viewBox:`0 0 ${W} ${H}`, role:"img"});
+  host.innerHTML = ""; host.appendChild(svg);
+
+  const xs = cfg.xlim, ys = cfg.ylim, ylog = !!cfg.ylog, xlog = !!cfg.xlog;
+  const px = v => M.l + (xlog ? (Math.log(v)-Math.log(xs[0]))/(Math.log(xs[1])-Math.log(xs[0]))
+                               : (v-xs[0])/(xs[1]-xs[0])) * (W-M.l-M.r);
+  const py = v => {
+    const t = ylog ? (Math.log(Math.max(v,1e-12))-Math.log(ys[0]))/(Math.log(ys[1])-Math.log(ys[0]))
+                   : (v-ys[0])/(ys[1]-ys[0]);
+    return H-M.b - t*(H-M.t-M.b);
+  };
+
+  const defs = el("defs"); svg.appendChild(defs);
+
+  /* spektral gradient under kurven */
+  if (cfg.spectralFill){
+    const gid = "grad"+Math.random().toString(36).slice(2,8);
+    const lg = el("linearGradient", {id:gid, x1:"0", x2:"1", y1:"0", y2:"0"});
+    for (let w = xs[0]; w <= xs[1]; w += 5){
+      lg.appendChild(el("stop", {offset:((w-xs[0])/(xs[1]-xs[0])*100)+"%",
+        "stop-color":wl2rgb(w), "stop-opacity":"0.72"}));
+    }
+    defs.appendChild(lg); cfg.spectralFill.gid = gid;
+  }
+
+  /* baggrundsbånd */
+  (cfg.bands||[]).forEach(b => {
+    svg.appendChild(el("rect", {x:px(b.x0), y:M.t, width:Math.max(0,px(b.x1)-px(b.x0)),
+      height:H-M.t-M.b, fill:b.color||"#000", opacity:b.opacity!=null?b.opacity:0.05}));
+    if (b.label) { const t = el("text", {x:(px(b.x0)+px(b.x1))/2, y:M.t+14,
+        "text-anchor":"middle", "font-size":"11", fill:"#8a8f9c"}); t.textContent = b.label;
+      svg.appendChild(t); }
+  });
+
+  /* gitter + akser */
+  const ticks = (lim, log, want) => {
+    if (log){
+      const out = [];
+      for (let e = Math.floor(Math.log10(lim[0])); e <= Math.ceil(Math.log10(lim[1])); e++)
+        for (const m of [1,2,5]){ const v = m*Math.pow(10,e);
+          if (v >= lim[0] && v <= lim[1]) out.push(v); }
+      return out;
+    }
+    const raw = (lim[1]-lim[0])/want, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const step = [1,2,2.5,5,10].map(s=>s*mag).find(s => raw/s <= 1.4) || 10*mag;
+    const out = []; for (let v = Math.ceil(lim[0]/step)*step; v <= lim[1]+1e-9; v += step)
+      out.push(+v.toFixed(10));
+    return out;
+  };
+  const fmt = v => Math.abs(v) >= 1000 ? v.toFixed(0)
+    : Math.abs(v) >= 1 ? String(+v.toFixed(2))
+    : (v === 0 ? "0" : (Math.abs(v) < 0.01 ? v.toExponential(0).replace("e-","e−") : String(+v.toFixed(3))));
+
+  ticks(ys, ylog, 5).forEach(v => {
+    svg.appendChild(el("line", {x1:M.l, x2:W-M.r, y1:py(v), y2:py(v),
+      stroke:"#e6eaf0", "stroke-width":1}));
+    const t = el("text", {x:M.l-8, y:py(v)+4, "text-anchor":"end", "font-size":"11.5", fill:"#8a8f9c"});
+    t.textContent = cfg.yfmt ? cfg.yfmt(v) : fmt(v); svg.appendChild(t);
+  });
+  (cfg.xticks || ticks(xs, xlog, 8)).forEach(v => {
+    svg.appendChild(el("line", {x1:px(v), x2:px(v), y1:M.t, y2:H-M.b,
+      stroke:"#e6eaf0", "stroke-width":1}));
+    const t = el("text", {x:px(v), y:H-M.b+19, "text-anchor":"middle", "font-size":"11.5", fill:"#8a8f9c"});
+    t.textContent = fmt(v); svg.appendChild(t);
+  });
+  svg.appendChild(el("line", {x1:M.l, x2:W-M.r, y1:H-M.b, y2:H-M.b, stroke:"#b9c0cc"}));
+  svg.appendChild(el("line", {x1:M.l, x2:M.l, y1:M.t, y2:H-M.b, stroke:"#b9c0cc"}));
+
+  if (cfg.xlabel){ const t = el("text", {x:(M.l+W-M.r)/2, y:H-8, "text-anchor":"middle",
+    "font-size":"12", fill:"#5d6577"}); t.textContent = cfg.xlabel; svg.appendChild(t); }
+  if (cfg.ylabel){
+    const cy = (M.t + (H-M.b)) / 2;
+    const t = el("text", {x:14, y:cy, "text-anchor":"middle", "font-size":"12",
+      fill:"#5d6577", transform:`rotate(-90 14 ${cy})`});
+    t.textContent = cfg.ylabel; svg.appendChild(t); }
+
+  const gPlot = el("g"); svg.appendChild(gPlot);
+  const path = pts => pts.map((p,i) => (i?"L":"M")+px(p[0]).toFixed(2)+" "+py(p[1]).toFixed(2)).join("");
+
+  const drawn = [];
+  (cfg.series||[]).forEach(s => {
+    const pts = s.data.filter(p => p[1] != null && isFinite(p[1])
+      && p[0] >= xs[0]-1e-9 && p[0] <= xs[1]+1e-9 && (!ylog || p[1] > 0));
+    if (s.fillTo != null){
+      const a = el("path", {d: path(pts)+`L${px(pts[pts.length-1][0])} ${py(s.fillTo)}L${px(pts[0][0])} ${py(s.fillTo)}Z`,
+        fill: s.fill || "#ccc", opacity: s.fillOpacity != null ? s.fillOpacity : 0.12, stroke:"none"});
+      gPlot.appendChild(a);
+    }
+    if (cfg.spectralFill && s.spectral){
+      const a = el("path", {d: path(pts)+`L${px(pts[pts.length-1][0])} ${py(ys[0])}L${px(pts[0][0])} ${py(ys[0])}Z`,
+        fill:`url(#${cfg.spectralFill.gid})`, stroke:"none"});
+      gPlot.appendChild(a);
+    }
+    const p = el("path", {d:path(pts), fill:"none", stroke:s.color, "stroke-width":s.width||1.6,
+      "stroke-linejoin":"round", "stroke-linecap":"round"});
+    if (s.dash) p.setAttribute("stroke-dasharray", s.dash);
+    if (s.hidden) p.setAttribute("opacity","0");
+    gPlot.appendChild(p);
+    drawn.push({s, p, pts});
+  });
+
+  /* annotationer med henvisningsstreg */
+  (cfg.annotations||[]).forEach(a => {
+    const x = px(a.x), y0 = py(a.y);
+    const xl = px(a.lx != null ? a.lx : a.x), y1 = py(a.ly);
+    const up = a.ly > a.y;
+    gPlot.appendChild(el("line", {x1:x, y1:y0 + (up ? -3 : 3), x2:xl, y2:y1 + (up ? 4 : -4),
+      stroke:a.color||"#888", "stroke-width":0.9, opacity:0.55}));
+    const t = el("text", {x:xl, y:y1 + (up ? 0 : 11), "text-anchor":a.anchor||"middle",
+      "font-size":a.size||"11.5", fill:a.color||"#333", "font-weight":"600"});
+    t.textContent = a.text; gPlot.appendChild(t);
+  });
+
+  /* legende */
+  if (cfg.legend !== false){
+    const lg = el("g"); let lx = M.l + 6, ly = M.t + 12;
+    (cfg.series||[]).filter(s => s.name).forEach(s => {
+      const w = s.name.length * 6.1 + 26;
+      if (cfg.legendPos === "tr"){ }
+      lg.appendChild(el("line", {x1:lx, x2:lx+16, y1:ly-4, y2:ly-4, stroke:s.color,
+        "stroke-width":s.width||2, "stroke-dasharray":s.dash||"none"}));
+      const t = el("text", {x:lx+21, y:ly, "font-size":"11.5", fill:"#3a4152"});
+      t.textContent = s.name; lg.appendChild(t);
+      lx += w;
+    });
+    if (cfg.legendPos === "b") lg.setAttribute("transform", `translate(0 ${H-M.b-M.t-6})`);
+    svg.appendChild(lg);
+  }
+
+  /* hover-aflæsning */
+  if (cfg.readout){
+    const ro = document.querySelector(cfg.readout);
+    const cross = el("line", {y1:M.t, y2:H-M.b, stroke:"#0A0F3C", "stroke-width":1,
+      opacity:0, "stroke-dasharray":"3 3"});
+    svg.appendChild(cross);
+    const hit = el("rect", {x:M.l, y:M.t, width:W-M.l-M.r, height:H-M.t-M.b,
+      fill:"transparent", style:"cursor:crosshair"});
+    svg.appendChild(hit);
+    const move = ev => {
+      const r = svg.getBoundingClientRect();
+      const cx = (ev.clientX - r.left) / r.width * W;
+      let v = xlog
+        ? Math.exp(Math.log(xs[0]) + (cx-M.l)/(W-M.l-M.r)*(Math.log(xs[1])-Math.log(xs[0])))
+        : xs[0] + (cx-M.l)/(W-M.l-M.r)*(xs[1]-xs[0]);
+      v = Math.round(v);
+      cross.setAttribute("x1", px(v)); cross.setAttribute("x2", px(v));
+      cross.setAttribute("opacity", 0.45);
+      const parts = drawn.filter(d => !d.s.hidden && d.s.name).map(d => {
+        const p = d.pts.reduce((a,b) => Math.abs(b[0]-v) < Math.abs(a[0]-v) ? b : a, d.pts[0]);
+        return `<b style="color:${d.s.color}">${d.s.name}</b> ${cfg.rofmt ? cfg.rofmt(p[1]) : p[1].toPrecision(3)}`;
+      });
+      ro.innerHTML = `<b>${v} nm</b> &nbsp; ` + parts.join(" &nbsp;·&nbsp; ");
+    };
+    hit.addEventListener("mousemove", move);
+    hit.addEventListener("touchmove", e => { move(e.touches[0]); e.preventDefault(); }, {passive:false});
+    hit.addEventListener("mouseleave", () => { cross.setAttribute("opacity",0); ro.innerHTML=""; });
+  }
+
+  return {svg, setVisible(name, on){
+    drawn.forEach(d => { if (d.s.name === name){ d.s.hidden = !on;
+      d.p.setAttribute("opacity", on ? 1 : 0); } });
+  }};
+}
+
+/* ---------------------------------------------------------------
+   Databehandling — samme metode som i Python-analysen
+   --------------------------------------------------------------- */
+const WL = DATA.wl, SOL = DATA.sol;
+const zip = y => WL.map((w,i) => [w, y[i]]);
+const TELL = [[686,697],[715,738],[752,775],[808,838],[890,950]];
+
+function reflectance(y){ return y.map((v,i) => v / SOL[i]); }
+
+function cleanTelluric(r){
+  const ok = WL.map(w => w >= 400 && w <= 890 && !TELL.some(([a,b]) => w >= a && w <= b));
+  const xs = [], ys = [];
+  WL.forEach((w,i) => { if (ok[i]){ xs.push(w); ys.push(r[i]); } });
+  const interp = WL.map(w => {
+    if (w <= xs[0]) return ys[0];
+    if (w >= xs[xs.length-1]) return ys[ys.length-1];
+    let j = 1; while (xs[j] < w) j++;
+    const t = (w - xs[j-1]) / (xs[j] - xs[j-1]);
+    return ys[j-1] + t * (ys[j] - ys[j-1]);
+  });
+  return interp.map((_,i) => {            // 9-punkts glidende middel
+    let s = 0, n = 0;
+    for (let k = i-4; k <= i+4; k++){ const j = Math.min(WL.length-1, Math.max(0,k));
+      s += interp[j]; n++; }
+    return s/n;
+  });
+}
+
+function normNIR(c){
+  const v = []; WL.forEach((w,i) => { if (w >= 790 && w <= 880) v.push(c[i]); });
+  v.sort((a,b)=>a-b);
+  const med = v[Math.floor(v.length/2)];
+  return c.map(x => x/med);
+}
+
+const REFL = {};
+["himmel","plante","plante2","klippe"].forEach(k => {
+  REFL[k] = normNIR(cleanTelluric(reflectance(DATA[k])));
+});
+const RAY = cleanTelluric(reflectance(DATA.himmel));
+
+/* ---------------------------------------------------------------
+   Figurer
+   --------------------------------------------------------------- */
+const COL = {sol:"#c88a1e", himmel:"#3b7dd8", plante:"#2e9451",
+             plante2:"#c98a2b", klippe:"#8a7a6d"};
+const NAMES = {sol:"Sol", himmel:"Blå himmel", plante:"Grøn plante",
+               plante2:"Grøn plante 2", klippe:"Klippe"};
+
+/* --- 00: rå spektre --- */
+const rawChart = Chart(document.getElementById("ch-raw"), {
+  height: 360, xlim:[380,950], ylim:[0,0.85],
+  xlabel:"Bølgelængde (nm)", ylabel:"Rå detektorsignal",
+  readout:"#ro-raw", rofmt: v => v.toFixed(4),
+  bands:[{x0:750,x1:950,color:"#000",opacity:0.035,label:"nær-infrarødt"}],
+  series: ["sol","himmel","klippe","plante","plante2"].map(k =>
+    ({name:NAMES[k], color:COL[k], data:zip(DATA[k]), width:1.5}))
+});
+const ctlRaw = document.getElementById("ctl-raw");
+["sol","himmel","klippe","plante","plante2"].forEach(k => {
+  const b = document.createElement("button");
+  b.className = "on";
+  b.innerHTML = `<span class="swatch" style="background:${COL[k]}"></span>${NAMES[k]}`;
+  b.onclick = () => { b.classList.toggle("on");
+    rawChart.setVisible(NAMES[k], b.classList.contains("on")); };
+  ctlRaw.appendChild(b);
+});
+
+/* --- 01: solspektret med linjer --- */
+const MARKS = [
+  [393,"Ca II K",0.30,"#10243f"], [397,"Ca II H",0.42,"#10243f"],
+  [410,"Hδ",0.24,"#10243f"], [430,"G-bånd",0.36,"#10243f"],
+  [438,"Fe I",0.48,"#10243f"], [486,"Hβ",0.60,"#10243f"],
+  [517,"Mg b",0.90,"#10243f"], [527,"Fe I",0.97,"#10243f"],
+  [589,"Na D",0.68,"#10243f"], [656,"Hα",0.50,"#10243f"],
+  [687,"O₂ B",0.36,"#8c1c1c"], [720,"H₂O",0.26,"#8c1c1c"],
+  [761,"O₂ A",0.17,"#8c1c1c"], [823,"H₂O",0.13,"#8c1c1c"],
+  [936,"H₂O",0.09,"#8c1c1c"]
+];
+Chart(document.getElementById("ch-sol"), {
+  height: 420, xlim:[380,950], ylim:[0,1.12],
+  xlabel:"Bølgelængde (nm)", ylabel:"Rå detektorsignal",
+  readout:"#ro-sol", rofmt: v => v.toFixed(4), legend:false,
+  spectralFill:{},
+  bands:[{x0:750,x1:950,color:"#000",opacity:0.03}],
+  series:[{name:"Sol", color:"#2a2f3a", width:1.2, data:zip(SOL), spectral:true}],
+  annotations: MARKS.map(([w,t,ly,c]) =>
+    ({x:w, y:SOL[w-380], ly:ly, text:t, color:c}))
+});
+
+/* --- 01b: Planck --- */
+const h=6.626e-34, cc=2.998e8, kB=1.381e-23;
+const planck = (l,T) => { const L = l*1e-9;
+  return 2*h*cc*cc / Math.pow(L,5) / (Math.exp(h*cc/(L*kB*T))-1); };
+const pScale = SOL[530-380] / planck(530,5772);
+Chart(document.getElementById("ch-planck"), {
+  height: 360, xlim:[380,950], ylim:[3e-3,3], ylog:true,
+  xlabel:"Bølgelængde (nm)", ylabel:"Relativ intensitet (log)",
+  readout:"#ro-planck", rofmt: v => v.toFixed(4),
+  yfmt: v => { const e = Math.log10(v); return Math.abs(e-Math.round(e)) < 1e-9
+    ? (Math.round(e)===0 ? "1" : "10"+(Math.round(e)<0?"⁻":"")+"¹²³".charAt(Math.abs(Math.round(e))-1)) : ""; },
+  series:[
+    {name:"Sort legeme 5772 K", color:"#c8102e", width:2,
+     data:WL.map(w => [w, pScale*planck(w,5772)]), fillTo:3e-3, fill:"#c8102e", fillOpacity:0.07},
+    {name:"Målt spektrum", color:"#2a2f3a", width:1.4, data:zip(SOL)}
+  ],
+  annotations:[
+    {x:415, y:SOL[415-380], lx:505, ly:0.0125, text:"blå dæmpet: Rayleigh + ozon", color:"#1c3f6e"},
+    {x:880, y:SOL[880-380], lx:800, ly:0.9, text:"NIR mangler: bånd + detektor", color:"#8c1c1c"}
+  ]
+});
+
+/* --- 02: Rayleigh log-log --- */
+const rayRef = WL.filter(w => w>=400 && w<=750)
+  .map(w => [w, RAY[400-380] * Math.pow(w/400, -4)]);
+Chart(document.getElementById("ch-ray"), {
+  height: 360, xlim:[400,750], ylim:[0.08,0.9], xlog:true, ylog:true,
+  xticks:[400,450,500,550,600,650,700,750],
+  xlabel:"Bølgelængde (nm) — logaritmisk", ylabel:"Himmel / Sol (log)",
+  readout:"#ro-ray", rofmt: v => v.toFixed(4),
+  yfmt: v => [0.1,0.2,0.5].includes(+v.toFixed(3)) ? String(v) : "",
+  series:[
+    {name:"Rayleigh λ⁻⁴ (reference)", color:"#b0b6c2", width:1.8, dash:"6 4", data:rayRef},
+    {name:"Målt himmel/sol", color:"#3b7dd8", width:2, data:zip(RAY)}
+  ]
+});
+
+/* --- 02b: Fraunhofer i himlen --- */
+const nAt = (y, w) => y.map(v => v / y[w-380]);
+const solN = nAt(SOL, 560), skyN = nAt(DATA.himmel, 560);
+Chart(document.getElementById("ch-frau"), {
+  height: 340, xlim:[380,700], ylim:[0,1.6],
+  xlabel:"Bølgelængde (nm)", ylabel:"Normeret ved 560 nm",
+  readout:"#ro-frau", rofmt: v => v.toFixed(3),
+  series:[
+    {name:"Sol", color:"#c88a1e", width:1.5, data:zip(solN)},
+    {name:"Blå himmel", color:"#3b7dd8", width:1.5, data:zip(skyN)}
+  ],
+  annotations:[
+    {x:393, y:solN[13], ly:1.35, text:"Ca II K", color:"#10243f"},
+    {x:486, y:solN[106], ly:1.15, text:"Hβ", color:"#10243f"},
+    {x:517, y:solN[137], ly:1.42, text:"Mg b", color:"#10243f"},
+    {x:589, y:solN[209], ly:1.05, text:"Na D", color:"#10243f"},
+    {x:656, y:solN[276], ly:0.72, text:"Hα", color:"#10243f"}
+  ]
+});
+
+/* --- 03: reflektans --- */
+const reflChart = Chart(document.getElementById("ch-refl"), {
+  height: 380, xlim:[400,900], ylim:[0,1.35],
+  xlabel:"Bølgelængde (nm)", ylabel:"Normeret reflektans (NIR-plateau = 1)",
+  readout:"#ro-refl", rofmt: v => v.toFixed(3),
+  bands:[{x0:700,x1:740,color:"#2e9451",opacity:0.07,label:"red edge"}],
+  series:[
+    {name:"Grøn plante", color:COL.plante, width:2, data:zip(REFL.plante)},
+    {name:"Grøn plante 2", color:COL.plante2, width:2, data:zip(REFL.plante2)},
+    {name:"Klippe", color:COL.klippe, width:2, data:zip(REFL.klippe)}
+  ],
+  annotations:[
+    {x:553, y:REFL.plante[173], ly:0.32, text:"grøn top 553", color:"#1f6b39"},
+    {x:671, y:REFL.plante[291], ly:0.30, text:"klorofyl a  671", color:"#1f6b39"},
+    {x:717, y:REFL.plante[337], ly:0.72, text:"stejlest 717", color:"#1f6b39"}
+  ]
+});
+const ctlRefl = document.getElementById("ctl-refl");
+["plante","plante2","klippe"].forEach(k => {
+  const b = document.createElement("button"); b.className = "on";
+  b.innerHTML = `<span class="swatch" style="background:${COL[k]}"></span>${NAMES[k]}`;
+  b.onclick = () => { b.classList.toggle("on");
+    reflChart.setVisible(NAMES[k], b.classList.contains("on")); };
+  ctlRefl.appendChild(b);
+});
+
+/* --- 02b: klar himmel mod skyslør --- */
+(function(){
+  const rClear = cleanTelluric(reflectance(DATA.himmel));
+  const rHaze  = cleanTelluric(DATA.himmel3.map((v,i) => v / DATA.sol3[i]));
+  const at = (a,w) => a[w-380];
+  const nc = rClear.map(v => v/at(rClear,500));
+  const nh = rHaze.map(v => v/at(rHaze,500));
+  const ref = WL.filter(w => w>=400 && w<=750).map(w => [w, Math.pow(w/500,-4)]);
+  Chart(document.getElementById("ch-sky2"), {
+    height: 340, xlim:[400,750], ylim:[0.15,4.5], xlog:true, ylog:true,
+    xticks:[400,450,500,550,600,650,700,750],
+    xlabel:"Bølgelængde (nm) — logaritmisk", ylabel:"Himmel/sol, normeret ved 500 nm",
+    readout:"#ro-sky2", rofmt: v => v.toFixed(3),
+    yfmt: v => [0.2,0.5,1,2,4].includes(+v.toFixed(2)) ? String(v) : "",
+    series:[
+      {name:"Rayleigh λ⁻⁴", color:"#b0b6c2", width:1.8, dash:"6 4", data:ref},
+      {name:"Klar luft (λ⁻⁴ʼ²²)", color:"#2f6fc4", width:2, data:zip(nc)},
+      {name:"Tyndt skyslør (λ⁻¹ʼ⁹²)", color:"#c98a2b", width:2, data:zip(nh)}
+    ]
+  });
+})();
+
+/* --- 04b: bar jord mod klippe --- */
+(function(){
+  const rJord = normNIR(cleanTelluric(
+    DATA.jord100.map((v,i) => (v - DATA.moerke100[i]) / DATA.sol3[i])));
+  Chart(document.getElementById("ch-jord"), {
+    height: 340, xlim:[400,900], ylim:[0,1.35],
+    xlabel:"Bølgelængde (nm)", ylabel:"Normeret reflektans (NIR-plateau = 1)",
+    readout:"#ro-jord", rofmt: v => v.toFixed(3),
+    bands:[{x0:700,x1:740,color:"#2e9451",opacity:0.06}],
+    series:[
+      {name:"Bar jord · −0,03", color:"#a8552e", width:2, data:zip(rJord)},
+      {name:"Klippe · +0,23", color:COL.klippe, width:2, data:zip(REFL.klippe)},
+      {name:"Grøn plante · +0,87", color:COL.plante, width:1.5, dash:"4 3",
+       data:zip(REFL.plante)}
+    ],
+    annotations:[
+      {x:720, y:1.28, ly:1.28, text:"red edge-zone", color:"#4a7a58", size:"10.5"}
+    ]
+  });
+})();
+
+/* --- 06: sne og albedo --- */
+(function(){
+  const R = y => cleanTelluric(y.map((v,i) => v / DATA.ink[i]));
+  const ren = R(DATA.sne_ren), besk = R(DATA.sne_beskidt), jord = R(DATA.sne_jord);
+  Chart(document.getElementById("ch-sne"), {
+    height: 360, xlim:[400,880], ylim:[0,1.35],
+    xlabel:"Bølgelængde (nm)", ylabel:"Forhold til indstråling",
+    readout:"#ro-sne", rofmt: v => v.toFixed(3),
+    series:[
+      {name:"Ren sne", color:"#2a7fd4", width:2.2, data:zip(ren)},
+      {name:"Beskidt sne", color:"#c98a2b", width:2.2, data:zip(besk)},
+      {name:"Jord/beskidt sne", color:"#8c4a2b", width:2.2, data:zip(jord)}
+    ]
+  });
+
+  const rB = cleanTelluric(DATA.sne_beskidt.map((v,i) => v / DATA.sne_ren[i]));
+  const rJ = cleanTelluric(DATA.sne_jord.map((v,i) => v / DATA.sne_ren[i]));
+  Chart(document.getElementById("ch-sne2"), {
+    height: 360, xlim:[400,880], ylim:[0,0.42],
+    xlabel:"Bølgelængde (nm)", ylabel:"Relativ albedo (ren sne = 1)",
+    readout:"#ro-sne2", rofmt: v => v.toFixed(3),
+    bands:[{x0:400,x1:700,color:"#3b7dd8",opacity:0.07},
+           {x0:760,x1:880,color:"#c8102e",opacity:0.07}],
+    series:[
+      {name:"Beskidt sne / ren sne", color:"#c98a2b", width:2.4, data:zip(rB)},
+      {name:"Jord/beskidt / ren sne", color:"#8c4a2b", width:2.4, data:zip(rJ)}
+    ],
+    annotations:[
+      {x:860, y:rB[480], lx:690, ly:0.37, text:"stiger mod NIR", color:"#7a4a1a"},
+      {x:550, y:0.035, ly:0.035, text:"synligt — urenheder absorberer",
+       color:"#2a4a6b", size:"10.5"},
+      {x:820, y:0.035, ly:0.035, text:"NIR — kornstørrelse",
+       color:"#7a2a2a", size:"10.5"}
+    ]
+  });
+})();
+
+/* --- 07: albedo mod smeltning --- */
+(function(){
+  const Q = 266, T = 6*86400, RHO = 900, LF = 334000;
+  const model = a => 100 * Q*(1-a)*T/(RHO*LF);          // cm is
+  const line = [];
+  for (let a = 0; a <= 0.70; a += 0.01) line.push([100*a, model(a)]);
+  const MAAL = [[57.48, 20, "Hvidt felt"], [10.7, 40, "Vandløb"]];
+  const AFL  = [[26.0, model(0.26), "Beskidt is"], [26.5, model(0.265), "Gletsjer-middel"]];
+  const dot = (p,c) => { const d=[]; for (let k=0;k<=360;k+=24)
+      d.push([p[0]+0.85*Math.cos(k*Math.PI/180), p[1]+0.85*Math.sin(k*Math.PI/180)]); return d; };
+  Chart(document.getElementById("ch-melt"), {
+    height: 380, xlim:[0,70], ylim:[10,48],
+    xlabel:"Albedo (%)", ylabel:"Smeltet is på 6 døgn (cm)",
+    readout:"#ro-melt", rofmt: v => v.toFixed(1),
+    series:[
+      {name:"Model: Q = 266 W/m²", color:"#8a8f9c", width:2, dash:"6 4", data:line},
+      ...MAAL.map(p => ({color:"#c8102e", width:2.6, data:dot(p)})),
+      ...AFL.map(p  => ({color:"#2f6fc4", width:2.2, data:dot(p)}))
+    ],
+    annotations:[
+      {x:57.5, y:20, lx:52, ly:14.6, text:"Hvidt felt · målt 20 cm", color:"#8c1c1c"},
+      {x:10.7, y:40, lx:22, ly:45.0, text:"Vandløb · målt 40 cm", color:"#8c1c1c"},
+      {x:26.2, y:34, lx:40, ly:38.5, text:"Beskidt is og gletsjer-middel", color:"#1c5fb8"}
+    ]
+  });
+})();
+
+/* --- 08: Sentinel-2-bånd over reflektansen --- */
+(function(){
+  const S2 = [["B02",492.4,66],["B03",559.8,36],["B04",664.6,31],["B05",704.1,15],
+              ["B06",740.5,15],["B07",782.8,20],["B08",832.8,106],["B8A",864.7,21]];
+  const rJord = normNIR(cleanTelluric(
+    DATA.jord100.map((v,i) => (v - DATA.moerke100[i]) / DATA.sol3[i])));
+  Chart(document.getElementById("ch-s2"), {
+    height: 380, xlim:[400,900], ylim:[0,1.45],
+    xlabel:"Bølgelængde (nm)", ylabel:"Normeret reflektans",
+    readout:"#ro-s2", rofmt: v => v.toFixed(3),
+    bands: S2.map(([n,c,w]) => ({x0:c-w/2, x1:c+w/2, color:"#3a4152", opacity:0.10})),
+    series:[
+      {name:"Grøn plante", color:COL.plante, width:2, data:zip(REFL.plante)},
+      {name:"Grøn plante 2", color:COL.plante2, width:1.7, data:zip(REFL.plante2)},
+      {name:"Klippe", color:COL.klippe, width:1.7, data:zip(REFL.klippe)},
+      {name:"Bar jord", color:"#a8552e", width:1.7, data:zip(rJord)}
+    ],
+    annotations: S2.map(([n,c,w]) =>
+      ({x:c, y:1.22, ly:1.22, text:n, color:"#3a4152", size:"10"}))
+  });
+})();
+
+/* --- 05: unmixing --- */
+const MIX = WL.map((w,i) => 0.366*DATA.plante[i] + 0.321*DATA.klippe[i]);
+Chart(document.getElementById("ch-mix"), {
+  height: 340, xlim:[400,900], ylim:[0,0.15],
+  xlabel:"Bølgelængde (nm)", ylabel:"Rå detektorsignal",
+  readout:"#ro-mix", rofmt: v => v.toFixed(4),
+  series:[
+    {name:"Grøn plante 2 (målt)", color:"#2a2f3a", width:1.8, data:zip(DATA.plante2)},
+    {name:"0,366·plante + 0,321·klippe", color:"#c8102e", width:1.8, dash:"5 3", data:zip(MIX)}
+  ]
+});
+</script>
+</body>
+</html>
