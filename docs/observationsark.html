@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Observationsark — albedo-forløbet, modul 1</title>
+<style>
+  :root{ --navy:#0A0F3C; --line:#9aa3b2; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef1f5;color:#12172b;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;font-size:10.5pt;line-height:1.4}
+  .ark{background:#fff;width:210mm;min-height:297mm;margin:1rem auto;padding:12mm 13mm;box-shadow:0 2px 14px rgba(10,15,60,.14)}
+  h1{font-size:15pt;margin:0 0 1mm;color:var(--navy)}
+  h2{font-size:11.5pt;margin:6mm 0 2mm;color:var(--navy)}
+  p{margin:1.5mm 0}
+  .sml{font-size:9pt;color:#444}
+  .felter{display:flex;flex-wrap:wrap;gap:2mm 8mm;margin:3mm 0 1mm;font-size:10pt}
+  .felter span{white-space:nowrap}
+  .streg{display:inline-block;border-bottom:0.3mm solid #333;min-width:22mm;height:4mm;vertical-align:bottom}
+  .streg.kort{min-width:12mm}
+  table{border-collapse:collapse;width:100%;margin:2mm 0}
+  th,td{border:0.3mm solid var(--line);padding:1.4mm 1.8mm;text-align:left;vertical-align:top;font-size:9.5pt}
+  th{background:#eef1f6;font-size:8.5pt;text-transform:uppercase;letter-spacing:.04em;color:#333}
+  td.tid{white-space:nowrap;color:#555;font-size:9pt}
+  tr.rk td{height:13.5mm}
+  tr.tal td{height:9mm}
+  .regel{border-left:1.2mm solid var(--navy);background:#f3f6fb;padding:3mm 4mm;margin:5mm 0 0;font-size:10.5pt}
+  .spm li{margin:0 0 7mm}
+  .knap{display:block;margin:1rem auto 0;width:210mm;text-align:right}
+  .knap button{background:var(--navy);color:#fff;border:none;padding:.6rem 1.2rem;font:inherit;font-weight:600;cursor:pointer}
+  @media print{
+    @page{size:A4;margin:0}
+    body{background:#fff}
+    .ark{margin:0;box-shadow:none;page-break-after:always}
+    .ark:last-of-type{page-break-after:auto}
+    .knap{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="knap"><button onclick="window.print()">Print (2 sider)</button></div>
+
+<!-- ═══ SIDE 1 — HVOR GÅR GRUPPERNE I STÅ? ═══ -->
+<div class="ark">
+  <h1>Observationsark — albedo-forløbet, modul 1</h1>
+  <p class="sml">Sæt dig bagerst. Sæt en streg, hver gang en gruppe rækker hånden op eller går i stå — og skriv med få ord,
+    hvad de spurgte om. Notér også, hvornår hver fase faktisk begyndte.</p>
+
+  <div class="felter">
+    <span>Klasse <span class="streg"></span></span>
+    <span>Dato <span class="streg"></span></span>
+    <span>Antal grupper <span class="streg kort"></span></span>
+    <span>Vejr: ☐ sol ☐ jævnt overskyet ☐ vådt</span>
+    <span>Satellitbilledets dato (står i opslaget) <span class="streg"></span></span>
+  </div>
+
+  <table>
+    <thead><tr><th style="width:42%">Hvor i forløbet</th><th style="width:9%">Plan</th><th style="width:10%">Faktisk start</th><th style="width:12%">Streger</th><th>Hvad spurgte de om?</th></tr></thead>
+    <tbody>
+      <tr class="rk"><td>Casen, videoen og «Hvad er albedo?»</td><td class="tid">0–10</td><td></td><td></td><td></td></tr>
+      <tr class="rk"><td>«Gæt først» — gættet i måleskemaet</td><td class="tid"></td><td></td><td></td><td></td></tr>
+      <tr class="rk"><td>Ude: finde to flader på 40 × 40 meter</td><td class="tid">10–35</td><td></td><td></td><td></td></tr>
+      <tr class="rk"><td>Foto med referencekortet (skygge, lodret, genskin)</td><td class="tid"></td><td></td><td></td><td></td></tr>
+      <tr class="rk"><td>Åbne appen på mobilen (QR-koden)</td><td class="tid"></td><td></td><td></td><td></td></tr>
+      <tr class="rk"><td>Appen: sort felt → hvidt felt → flade</td><td class="tid"></td><td></td><td></td><td></td></tr>
+      <tr class="rk"><td>Navn på målingen og «Mine målinger»</td><td class="tid"></td><td></td><td></td><td></td></tr>
+      <tr class="rk"><td>Tallene ind i måleskemaet</td><td class="tid">35–50</td><td></td><td></td><td></td></tr>
+      <tr class="rk"><td>Satellitkortet: finde skolen med søgefeltet</td><td class="tid">50–65</td><td></td><td></td><td></td></tr>
+      <tr class="rk"><td>Klik på fladen — «ensartet» eller «blandet»</td><td class="tid"></td><td></td><td></td><td></td></tr>
+      <tr class="rk"><td>Opgave 2c: enige eller uenige med satellitten?</td><td class="tid"></td><td></td><td></td><td></td></tr>
+      <tr class="rk"><td>Folden «Åbn, når I har jeres egne tal» og opsamlingen</td><td class="tid">65–75</td><td></td><td></td><td></td></tr>
+      <tr class="rk"><td>Andet</td><td class="tid"></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+
+  <div class="regel"><b>Reglen bagefter:</b> ret kun det, mindst <b>tre grupper</b> gik i stå over. Resten er smag.</div>
+</div>
+
+<!-- ═══ SIDE 2 — KLASSENS TAL OG TRE SPØRGSMÅL ═══ -->
+<div class="ark">
+  <h2 style="margin-top:0">Klassens tal</h2>
+  <p class="sml">Skriv gruppernes middeltal på tavlen under opsamlingen — og over på arket her. Det er samtidig kontrollen af
+    tabellen «Typiske værdier» i elevarket: asfalt 0,08–0,12 på telefonen mod 0,10–0,15 fra satellitten; græs 0,03–0,08 mod 0,16–0,25.</p>
+
+  <table>
+    <thead><tr><th style="width:9%">Gruppe</th><th>Asfalt<br>telefon</th><th>Asfalt<br>satellit</th><th>Græs<br>telefon</th><th>Græs<br>satellit</th><th style="width:24%">Ensartet eller blandet?<br>(asfalt / græs)</th></tr></thead>
+    <tbody>
+      <tr class="tal"><td>1</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr class="tal"><td>2</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr class="tal"><td>3</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr class="tal"><td>4</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr class="tal"><td>5</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr class="tal"><td>6</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr class="tal"><td>7</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr class="tal"><td>8</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr class="tal"><td>9</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr class="tal"><td>10</td><td></td><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+  <p class="sml">Målte nogen tør og våd asfalt (opgave 1b)? Tør <span class="streg kort"></span> våd <span class="streg kort"></span></p>
+
+  <h2>Tre spørgsmål lige efter timen</h2>
+  <ol class="spm">
+    <li><b>Blev de overraskede over græsset?</b> Hvor mange grupper sagde det højt? <span class="streg kort"></span>
+      &nbsp; Åbnede nogen folden, før de havde egne tal? <span class="streg kort"></span></li>
+    <li><b>Hvor mange grupper nåede opgave 2c</b> (enige eller uenige med satellitten)? <span class="streg kort"></span>
+      &nbsp; Hvor mange nåede del 3? <span class="streg kort"></span></li>
+    <li><b>Hvad tog længst tid — og var det tiden værd?</b></li>
+  </ol>
+</div>
+
+</body>
+</html>
