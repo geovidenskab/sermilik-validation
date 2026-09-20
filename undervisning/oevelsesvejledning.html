@@ -61,6 +61,9 @@ tr.hi td{background:#fff9ee}
 .opg{border-left:3px solid var(--varm);background:#fff6ed;padding:.9rem 1.1rem;margin:1.2rem 0}
 .opg h4{margin:0 0 .4rem;font-size:var(--fs-md);color:var(--navy)}
 .opg p{margin:.4rem 0;font-size:var(--fs-sm);max-width:none}
+.opg ul{margin:.3rem 0 .4rem;padding-left:1.2rem;font-size:var(--fs-sm)}
+.opg li{margin:.2rem 0}
+th small{display:block;text-transform:none;letter-spacing:0;font-weight:400}
 .info{border-left:3px solid var(--teal);background:#f1fbfb;padding:.9rem 1.1rem;margin:1.2rem 0}
 .info h4{margin:0 0 .4rem;font-size:var(--fs-md);color:var(--navy)}
 .info p{margin:.4rem 0;font-size:var(--fs-sm);max-width:none}
@@ -150,23 +153,37 @@ tr.hi td{background:#fff9ee}
 <div class="skala-tekst"><span>mørkt — absorberer næsten alt</span><span>lyst — kaster næsten alt tilbage</span></div>
 
 <table>
-  <thead><tr><th>Overflade</th><th class="n">Albedo</th><th class="n">Absorberer</th></tr></thead>
+  <thead><tr><th>Overflade</th><th class="n">Telefonen ser<br><small>synligt lys</small></th><th class="n">Satellitten regner<br><small>hele solspektret</small></th><th>Hvorfor forskellen?</th></tr></thead>
   <tbody>
-    <tr><td>Vand</td><td class="n">0,05–0,10</td><td class="n">~93 %</td></tr>
-    <tr class="hi"><td>Asfalt</td><td class="n">0,10–0,15</td><td class="n">~87 %</td></tr>
-    <tr><td>Græs</td><td class="n">0,20–0,25</td><td class="n">~78 %</td></tr>
-    <tr><td>Lyse fliser, beton</td><td class="n">0,30–0,40</td><td class="n">~65 %</td></tr>
-    <tr><td>Hvid mur</td><td class="n">0,60–0,80</td><td class="n">~30 %</td></tr>
-    <tr class="hi"><td>Frisk sne</td><td class="n">0,75–0,85</td><td class="n">~20 %</td></tr>
+    <tr><td>Vand</td><td class="n">0,05–0,10</td><td class="n">0,05–0,10</td><td>Mørkt overalt</td></tr>
+    <tr><td>Asfalt</td><td class="n">0,08–0,12</td><td class="n">0,10–0,15</td><td>Næsten ens i alle farver</td></tr>
+    <tr class="hi"><td>Græs</td><td class="n">0,03–0,08</td><td class="n">0,16–0,25</td><td>Planter kaster infrarødt lys tilbage, som I ikke kan se</td></tr>
+    <tr><td>Lyse fliser, beton</td><td class="n">0,25–0,35</td><td class="n">0,30–0,40</td><td>Lidt lysere i infrarødt</td></tr>
+    <tr><td>Hvid mur</td><td class="n">0,60–0,80</td><td class="n">0,60–0,80</td><td>Lys overalt</td></tr>
+    <tr class="hi"><td>Frisk sne</td><td class="n">0,90–0,95</td><td class="n">0,75–0,85</td><td>Sne er <i>mørkere</i> i infrarødt</td></tr>
   </tbody>
 </table>
+
+<p><b>Læg mærke til græsset.</b> For jeres telefon er en græsplæne lige så mørk som
+  asfalt — måske mørkere. For satellitten er den flere gange så lys. Ingen af dem tager fejl.
+  Planter opsuger det synlige lys til fotosyntese, men kaster næsten halvdelen af det
+  infrarøde tilbage, og det infrarøde er en stor del af Solens energi. Sne og is gør det
+  modsatte: blændende hvide for øjet, men mørkere i infrarødt.</p>
 
 <div class="opg">
   <h4>Opgave 1 · Spørgsmål at tage med ind</h4>
   <p><b>a)</b> Hvilken overflade i skolegården bliver varmest på en solskinsdag?
     Passer det med jeres målinger?</p>
-  <p><b>b)</b> Asfalt absorberer omkring 87 % af sollyset, græs omkring 78 %.
-    Hvad betyder det for temperaturen i en by med meget asfalt og lidt græs?</p>
+  <p><b>b)</b> I målte sikkert græsset som lige så mørkt som asfalten — eller mørkere.
+    Alligevel er en græsplæne køligere at gå på en sommerdag. Satellitten giver græs en
+    albedo omkring 0,20 og asfalt omkring 0,12.</p>
+  <ul>
+    <li>Regn ud hvor stor en del af sollyset hver flade absorberer, med satellittens tal.</li>
+    <li>Hvorfor kan jeres telefon ikke se forskellen?</li>
+    <li>Græs har ét trick mere end albedo, som asfalt ikke har. Hvilket?
+      <i>(Hint: hvad bruger planten vandet til?)</i></li>
+    <li>Hvad betyder det samlet for temperaturen i en by med meget asfalt og lidt græs?</li>
+  </ul>
   <p><b>c)</b> Mål det samme sted igen når der ligger sne. Hvor meget flytter
     albedoen sig — og hvad sker der med den absorberede energi?</p>
 </div>
@@ -191,11 +208,15 @@ tr.hi td{background:#fff9ee}
   infrarøde 20 × 20.</p>
 
 <div class="opg">
-  <h4>Opgave 2 · Find jeres egen skole</h4>
-  <p><b>1)</b> Slå skolens position op i satellitkortet og aflæs albedoen for feltet.</p>
-  <p><b>2)</b> Sammenlign med det I målte på jorden. Er de ens?</p>
-  <p><b>3)</b> Hvis de er forskellige — <i>hvorfor?</i> Kig på hvad der ligger inden for
-    de ti meter satellitten dækker.</p>
+  <h4>Opgave 2 · Find jeres egen skole — mål tre steder</h4>
+  <p><b>1) En stor, ensartet asfaltflade</b> — mindst 40 × 40 meter: en parkeringsplads
+    eller en boldbane med belægning. Stå midt på den.</p>
+  <p><b>2) En stor, ensartet græsflade</b> — mindst 40 × 40 meter: en fodboldbane.</p>
+  <p><b>3) Et blandet hjørne</b> — hvor asfalt, græs og tag mødes inden for få meter.</p>
+  <p>Slå alle tre steder op i satellitkortet med ⓘ-værktøjet. Notér både <b>albedo</b>
+    og <b>NDVI</b>. Træk derefter en firkant på cirka 100 meter om stedet, og notér
+    <b>min og max</b>.</p>
+  <p><b>Hvor er I enige med satellitten — og hvor er I ikke?</b></p>
 </div>
 
 <div class="info">
@@ -205,16 +226,30 @@ tr.hi td{background:#fff9ee}
   <p class="formel">albedo = 0,356·B02 + 0,130·B04 + 0,373·B08 + 0,085·B11 + 0,072·B12 − 0,0018</p>
   <p>B02 er blåt lys, B04 rødt, B08 nær-infrarødt og B11/B12 kortbølge-infrarødt.
     Vægtene afspejler hvor meget af solens energi der ligger i hvert område af spektret.
-    Bemærk at jeres referencekort kun ser det synlige lys, mens satellitten også tæller
-    det infrarøde med — det er en af grundene til at de to metoder kan afvige nogle procent.</p>
+    Jeres referencekort ser kun det synlige lys; satellitten tæller det infrarøde med.
+    For asfalt og beton betyder det lidt. For græs er det en faktor tre eller mere, fordi
+    planter er lyse i infrarødt. For sne og is går det den anden vej — de er mørkere i
+    infrarødt, end de ser ud. På gletsjeren gav kortet 0,265 og satellitten 0,231:
+    retningen passer. På <a href="../spektrum/#planter">spektrum-siden</a> kan I se
+    springet i planternes spektrum ved 700 nm, som forskerne selv målte det.</p>
 </div>
 
 <h3>Det I sandsynligvis opdager</h3>
-<p>Jeres asfalt målte måske 0,12. Satellitten siger måske 0,25 for feltet. Ingen af jer
-  tager fejl — <b>I måler bare ikke det samme.</b> Satellitten lægger alt sammen inden
-  for sine ti meter: asfalten, græsplænen ved siden af, det lyse tag, cykelskuret.
-  Det hedder en <b>blandet pixel</b>, og det er et af de største problemer i al
-  satellitovervågning.</p>
+<p><b>På den store asfaltflade</b> er I nogenlunde enige med satellitten. Asfalt ser ens
+  ud i alle farver, og fladen er stor nok til, at satellitten kun ser asfalt. Det er den
+  rene sammenligning — og den viser, at metoden virker.</p>
+<p><b>På græsset</b> er I helt uenige: I måler måske 0,06, satellitten siger 0,18. Fladen
+  er ensartet, så det er ikke en blandet pixel. Se på NDVI: den er høj, og det betyder,
+  at fladen kaster meget infrarødt tilbage — lys, jeres telefon slet ikke ser. Uenigheden
+  er <b>spektral</b>: I måler i hver jeres del af solspektret.</p>
+<p><b>I det blandede hjørne</b> er I også uenige, men af en anden grund. Her viser
+  firkantens min og max, at satellittens felter svinger meget: den lægger asfalt, græs
+  og tag sammen. Det hedder en <b>blandet pixel</b>, og det er et af de største
+  problemer i al satellitovervågning.</p>
+<p>To grunde til at være uenig — og I kan skelne dem: <b>høj NDVI og ensartet flade
+  betyder spektral forskel; stor spredning i firkanten betyder blandet pixel.</b> På
+  gletsjeren ramte forskerne den anden: første sammenligning lå en faktor tre forkert,
+  fordi de målte i randzonen, hvor mørkt sediment og lys is ligger inden for få meter.</p>
 
 <!-- ══════════ DEL 3 ══════════ -->
 <h2>Del 3 · Regn på afsmeltningen</h2>
