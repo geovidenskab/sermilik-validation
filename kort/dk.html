@@ -18,18 +18,27 @@
   <button id="toggle-panel">☰ Kortlag</button>
 
   <aside id="panel">
-    <p class="intro">
-      Du har målt albedo på jorden. Her måler satellitten det samme sted fra 786 km oppe.
-      Find stedet på luftfotoet, vælg en dag hvor Sentinel-2 fløj over, tænd albedokortet
-      — og se, om I er enige.
-    </p>
+    <p class="intro"><b>Sådan finder I satellittens albedo:</b></p>
+    <ol class="intro-trin">
+      <li>Find jeres sted på luftfotoet.</li>
+      <li>Tryk på <b>ⓘ</b> i værktøjslinjen — og tryk så på stedet.</li>
+      <li>Sammenlign satellittens albedo med jeres egen måling.</li>
+    </ol>
+    <p class="intro">Vil I se hele området på én gang? Tænd albedokortet herunder.</p>
     <p class="intro" style="margin-top:0.2rem;">
       <a href="../undervisning/">← Undervisningsforløbet</a> ·
       <a href="../undervisning/oevelsesvejledning.html">Øvelsesvejledningen</a> ·
       <a href="./">Grønlandskortet</a>
     </p>
 
-    <h2>Satellitbilledet</h2>
+    <h2>Albedokortet</h2>
+    <p style="font-size:0.78rem; color:#555; margin: 0 0 0.4rem;">
+      Beregnet ud fra satellittens råbånd med samme formel, som forskerne bruger på indlandsisen.
+      Farverne her er skaleret til danske overflader — vand og asfalt i bunden, sne i toppen.
+    </p>
+    <div class="layer-group" id="glacial-layers"></div>
+
+    <h2>Vælg dato</h2>
 
     <div id="sh-config" class="connected">
       <div class="sh-mangler">
@@ -103,14 +112,9 @@
       </div>
     </div>
 
-    <div class="layer-group" id="spectral-layers" style="margin-top: 0.7rem;"></div>
+    <h2>Andre satellitbilleder</h2>
 
-    <h2>Albedokortet</h2>
-    <p style="font-size:0.78rem; color:#555; margin: 0 0 0.4rem;">
-      Beregnet ud fra satellittens råbånd med samme formel, som forskerne bruger på indlandsisen.
-      Farverne her er skaleret til danske overflader — vand og asfalt i bunden, sne i toppen.
-    </p>
-    <div class="layer-group" id="glacial-layers"></div>
+    <div class="layer-group" id="spectral-layers" style="margin-top: 0.7rem;"></div>
 
     <h2>Baggrundskort</h2>
     <div class="layer-group" id="basemaps-dk"></div>

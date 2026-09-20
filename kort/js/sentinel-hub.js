@@ -258,12 +258,29 @@ function scheduleSceneInfo() {
 map.on('moveend', scheduleSceneInfo);
 map.on('layeradd layerremove', scheduleSceneInfo);
 
+const erDKProfil = profil.id === 'dk';
+
 // ─── Layer-definitioner ────────────────────────────────────────────────────────
+// Navnene er på dansk, så en elev kan vælge lag uden at kende båndnumrene.
+// Beskrivelserne (tooltips) er forskellige på de to kort: Grønland handler om is
+// og moræner, Danmark om skolegårde og marker.
 const spectralLayerDefs = [
-  { id: 'TRUE_COLOR', name: 'True Color (B4-B3-B2)', desc: 'Native Sentinel-2 RGB med kendt dato. Lavere skydække end EOX-mosaikken når man rammer en god dag.' },
-  { id: 'COLOR_INFRARED', name: 'Color Infrared (B8-B4-B3)', desc: 'Vegetation lyser rødt. Pioneer-planter på morænerne fra Lille Istid bliver tydelige.' },
-  { id: 'VEGETATION_INDEX', name: 'NDVI — vegetationsindeks', desc: 'Grønt = vegetation. Kvantificér prograderede områder siden Mittivakkats tilbagetrækning.' },
-  { id: 'MOISTURE_INDEX', name: 'Moisture Index (B8A-B11)', desc: 'Fugtighed i terrænet — finder smelteområder og våde overflader.' },
+  { id: 'TRUE_COLOR', name: 'Rigtige farver',
+    desc: erDKProfil
+      ? 'Sentinel-2 i rigtige farver (bånd B4-B3-B2) fra den dato, I har valgt. Hvert felt er 10 × 10 meter.'
+      : 'Native Sentinel-2 RGB (B4-B3-B2) med kendt dato. Lavere skydække end EOX-mosaikken når man rammer en god dag.' },
+  { id: 'COLOR_INFRARED', name: 'Infrarødt — planter lyser rødt',
+    desc: erDKProfil
+      ? 'Falske farver (B8-B4-B3): det infrarøde lys, som jeres telefon ikke kan se, vises som rødt. Græs og skov lyser op.'
+      : 'Color Infrared (B8-B4-B3). Vegetation lyser rødt. Pioneer-planter på morænerne fra Lille Istid bliver tydelige.' },
+  { id: 'VEGETATION_INDEX', name: 'Plantedække (NDVI)',
+    desc: erDKProfil
+      ? 'Grønt = mange planter. Det er det samme tal, I får, når I trykker på kortet med ⓘ.'
+      : 'Grønt = vegetation. Kvantificér prograderede områder siden Mittivakkats tilbagetrækning.' },
+  { id: 'MOISTURE_INDEX', name: 'Fugtighed',
+    desc: erDKProfil
+      ? 'Fugtighed i overfladen (B8A-B11): våde marker og enge træder frem.'
+      : 'Moisture Index (B8A-B11). Fugtighed i terrænet — finder smelteområder og våde overflader.' },
 ];
 
 const glacialLayerDefs = [
@@ -272,7 +289,7 @@ const glacialLayerDefs = [
     evalscript: NDSI_EVALSCRIPT,
   },
   profil.albedoSkala === 'dk'
-    ? { id: 'ALBEDO', name: 'Albedokort — hvor meget kastes tilbage?',
+    ? { id: 'ALBEDO', name: 'Vis albedokortet',
         desc: 'Liang-formel fra B2, B4, B8, B11, B12, med farveskala til danske overflader (0,00–0,45). Mørkeblå = vand og asfalt, grøn = græs, gul = tørre marker og sand, lys = beton og lyse tage, hvid = sne. Sammenlign feltet med din egen måling.',
         evalscript: ALBEDO_EVALSCRIPT_DK,
       }

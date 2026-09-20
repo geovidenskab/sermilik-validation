@@ -32,6 +32,7 @@ const ENSARTET_STD = 0.02;
 let active = false;
 let toolButton = null;
 let modalEl = null;
+let hintEl = null;        // hjælpetekst ved ⓘ på Danmarkskortet
 
 // Indtegning af rektangel
 let drawing = null;       // { startLatLng, currentRect (L.rectangle) }
@@ -60,6 +61,28 @@ export function initPixelInfo() {
     if (active) deactivate(); else activate();
   });
 
+  // På Danmarkskortet er ⓘ det eneste værktøj, eleverne SKAL bruge. Fremhæv det,
+  // og vis en hjælpetekst, indtil de har prøvet det første gang.
+  if (erDK) {
+    btn.classList.add('fremhaev');
+    hintEl = document.createElement('div');
+    hintEl.className = 'px-hint';
+    hintEl.textContent = 'Tryk her — og så på det sted, I vil måle';
+    // Værktøjslinjen klipper sit indhold (overflow: hidden), så hjælpeteksten
+    // lægges i kortets container og stilles ud for knappen.
+    const kortEl = document.getElementById('map');
+    kortEl.appendChild(hintEl);
+    const placer = () => {
+      if (!hintEl) return;
+      const k = kortEl.getBoundingClientRect();
+      const b = btn.getBoundingClientRect();
+      hintEl.style.left = `${b.right - k.left + 10}px`;
+      hintEl.style.top = `${b.top - k.top + (b.height - hintEl.offsetHeight) / 2}px`;
+    };
+    requestAnimationFrame(placer);
+    window.addEventListener('resize', placer);
+  }
+
   // Esc deaktiverer
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && active) deactivate();
@@ -72,6 +95,7 @@ export function initPixelInfo() {
 
 function activate() {
   active = true;
+  if (hintEl) hintEl.textContent = 'Tryk nu på det sted, I vil måle';
   toolButton?.classList.add('active');
   document.getElementById('map').classList.add('tool-active');
   map.dragging.disable();  // så vi kan tegne rektangel
@@ -121,6 +145,7 @@ function onMouseUp(e) {
   if (drawing.currentRect) { map.removeLayer(drawing.currentRect); }
   drawing = null;
   dragStartPos = null;
+  if (hintEl) { hintEl.remove(); hintEl = null; }
   openInfoModal(bboxLatLng, erKlik);
 }
 
