@@ -92,7 +92,9 @@ th small{display:block;text-transform:none;letter-spacing:0;font-weight:400}
   main{padding:.6rem 0}
   h2{margin-top:1.1rem;font-size:12pt}
   .opg,.info,.mat{break-inside:avoid}
-  .niveau.udvid{break-before:page}
+  /* sideskift virker ikke på inline-block — gør banneret til en blok ved print */
+  .niveau.udvid{display:block;width:max-content;break-before:page;margin-top:0}
+  h2,h3,h4{break-after:avoid}
   @page{size:A4;margin:14mm}
 }
 </style>

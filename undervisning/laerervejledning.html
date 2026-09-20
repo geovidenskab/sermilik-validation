@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lærervejledning — albedo fra skolegården til Grønland</title>
+<style>
+/* Samme designsystem som undervisningssiden: én skriftfamilie, fem
+   størrelser, retvinklede kanter. Kan printes som elevark. */
+:root{
+  --navy:#0A0F3C; --teal:#63DAD6; --ink:#161c2e; --muted:#5a6376;
+  --line:#e3e7ee; --bg:#fbfcfd; --varm:#c9761f;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --fs-xs:.82rem; --fs-sm:.94rem; --fs-md:1rem; --fs-lg:1.15rem;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:var(--fs-md);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+header{background:var(--navy);color:#fff;padding:1.6rem 1.5rem}
+header .wrap{max-width:820px;margin:0 auto}
+header h1{margin:0 0 .3rem;font-size:1.6rem;letter-spacing:-.015em}
+header p{margin:0;opacity:.85;font-size:var(--fs-sm)}
+header a{color:var(--teal);font-size:var(--fs-xs);text-decoration:none}
+
+main{max-width:820px;margin:0 auto;padding:1.6rem 1.5rem 4rem}
+h2{font-size:1.25rem;color:var(--navy);margin:2.2rem 0 .5rem;
+  padding-bottom:.35rem;border-bottom:2px solid var(--navy)}
+h2:first-of-type{margin-top:1rem}
+h3{font-size:var(--fs-lg);color:var(--navy);margin:1.5rem 0 .4rem}
+p{margin:.7rem 0;max-width:70ch}
+strong,b{font-weight:640}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.9em;background:#eef1f6;padding:.1em .35em}
+.formel{font-family:ui-monospace,Menlo,monospace;font-size:var(--fs-sm);
+  background:#eef1f6;padding:.7rem .85rem;overflow-x:auto}
+
+.mat{background:#fff;border:1px solid var(--line);padding:1rem 1.2rem;margin:1.2rem 0}
+.mat ul{margin:.4rem 0;padding-left:1.2rem}
+.mat li{margin:.25rem 0;font-size:var(--fs-sm)}
+
+ol.trin-liste{counter-reset:t;list-style:none;padding:0;margin:1.2rem 0}
+ol.trin-liste li{counter-increment:t;position:relative;padding:0 0 1rem 2.8rem;max-width:70ch}
+ol.trin-liste li::before{content:counter(t);position:absolute;left:0;top:.1rem;width:1.75rem;
+  height:1.75rem;background:var(--navy);color:#fff;font-size:var(--fs-xs);font-weight:650;
+  display:flex;align-items:center;justify-content:center}
+ol.trin-liste li b{color:var(--navy)}
+
+table{border-collapse:collapse;width:100%;font-size:var(--fs-sm);margin:1rem 0}
+th,td{text-align:left;padding:.5rem .7rem;border-bottom:1px solid var(--line)}
+th{font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+  font-weight:600;border-bottom:1.5px solid #ccd3dd}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.hi td{background:#fff9ee}
+
+.skala{display:flex;height:32px;margin:1rem 0 .3rem;border:1px solid var(--line)}
+.skala div{flex:1;display:flex;align-items:center;justify-content:center;
+  font-size:var(--fs-xs);font-weight:600;font-variant-numeric:tabular-nums}
+.skala-tekst{display:flex;justify-content:space-between;font-size:var(--fs-xs);
+  color:var(--muted);margin-bottom:1.2rem}
+
+table.skema td,table.skema th{border:1px solid var(--line);padding:.55rem .4rem;text-align:center;font-size:var(--fs-xs)}
+table.skema td:first-child,table.skema th:first-child{text-align:left}
+table.skema td{height:2.1rem}
+.tabel-rul{overflow-x:auto}
+.niveau{display:inline-block;background:var(--navy);color:#fff;font-size:var(--fs-xs);
+  letter-spacing:.1em;text-transform:uppercase;padding:.3rem .7rem;margin:1.6rem 0 0}
+.niveau.udvid{background:var(--varm);margin-top:2.6rem}
+.niveau-note{font-size:var(--fs-sm);color:var(--muted)}
+.opg{border-left:3px solid var(--varm);background:#fff6ed;padding:.9rem 1.1rem;margin:1.2rem 0}
+.opg h4{margin:0 0 .4rem;font-size:var(--fs-md);color:var(--navy)}
+.opg p{margin:.4rem 0;font-size:var(--fs-sm);max-width:none}
+.opg ul{margin:.3rem 0 .4rem;padding-left:1.2rem;font-size:var(--fs-sm)}
+.opg li{margin:.2rem 0}
+th small{display:block;text-transform:none;letter-spacing:0;font-weight:400}
+.info{border-left:3px solid var(--teal);background:#f1fbfb;padding:.9rem 1.1rem;margin:1.2rem 0}
+.info h4{margin:0 0 .4rem;font-size:var(--fs-md);color:var(--navy)}
+.info p{margin:.4rem 0;font-size:var(--fs-sm);max-width:none}
+
+.knapper{display:flex;flex-wrap:wrap;gap:.6rem;margin:1.2rem 0}
+.knapper a{background:var(--navy);color:#fff;text-decoration:none;padding:.6rem 1.1rem;
+  font-weight:600;font-size:var(--fs-sm)}
+.knapper a.sek{background:#fff;color:var(--navy);box-shadow:inset 0 0 0 1.5px var(--navy)}
+.knapper a:hover{opacity:.9}
+
+.fejl li{font-size:var(--fs-sm);margin:.45rem 0}
+
+@media print{
+  body{background:#fff;font-size:10.5pt}
+  header{background:#fff;color:#000;border-bottom:2px solid #000;padding:0 0 .4rem}
+  header a,.knapper{display:none}
+  header h1{font-size:15pt}
+  main{padding:.6rem 0}
+  h2{margin-top:1.1rem;font-size:12pt}
+  .opg,.info,.mat{break-inside:avoid}
+  /* sideskift virker ikke på inline-block — gør banneret til en blok ved print */
+  .niveau.udvid{display:block;width:max-content;break-before:page;margin-top:0}
+  h2,h3,h4{break-after:avoid}
+  @page{size:A4;margin:14mm}
+}
+figure.lille{margin:1.2rem 0;background:#fff;border:1px solid var(--line);padding:.7rem;max-width:360px}
+figure.lille img{display:block;width:100%;height:auto}
+figure.lille figcaption{font-size:var(--fs-xs);color:var(--muted);padding-top:.5rem;line-height:1.5}
+.to-kol{display:grid;grid-template-columns:minmax(0,360px) 1fr;gap:1.4rem;align-items:start}
+@media (max-width:700px){.to-kol{grid-template-columns:1fr}}
+td.n,th.n{white-space:nowrap}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <h1>Lærervejledning: mål albedo</h1>
+  <p>Tidsplan, faglige mål, niveaudeling og facit til forløbet om afsmeltning</p>
+  <p style="margin-top:.5rem"><a href="./">← Tilbage til forløbet</a></p>
+</div></header>
+
+<main>
+
+<div class="mat">
+  <b>Forløbet på ét blik</b>
+  <ul>
+    <li><b>Casen:</b> to felter på en grønlandsk gletsjer, 20 og 40 cm smeltning på seks døgn. Forskellen er albedo.</li>
+    <li><b>Trin 1:</b> eleverne måler albedo i skolegården med telefon, referencekort og app.</li>
+    <li><b>Trin 2:</b> de slår de samme steder op i satellitkortet — og opdager, at græsset snyder, og at satellitten ser mere end deres flade.</li>
+    <li><b>Trin 3:</b> de regner gletsjerens smeltning efter med en simpel energimodel.</li>
+  </ul>
+</div>
+
+<div class="knapper">
+  <a href="oevelsesvejledning.html">Øvelsesvejledning (elevark)</a>
+  <a href="referencekort.html">Referencekort til print</a>
+  <a class="sek" href="https://geo.sg.dk/albedo">Albedo-appen</a>
+  <a class="sek" href="../kort/dk.html">Satellitkortet</a>
+</div>
+
+<p class="niveau-note">Elevarket er delt i et <b>kerneforløb</b> (del 1–3) for alle og en
+  <b>udvidelse</b> til B- og A-niveau. Forløbet kan bruges i både naturgeografi og fysik.</p>
+
+<h2>Tidsplan</h2>
+
+<h3>Ét modul (75 min) — kerneforløbet</h3>
+<table>
+  <thead><tr><th class="n">Tid</th><th>Hvad</th><th>Hvor i materialet</th></tr></thead>
+  <tbody>
+    <tr><td class="n">0–10</td><td>Casen, «Hvad er albedo?» og «Gæt først»</td><td>Forløbssiden · elevark del 1</td></tr>
+    <tr><td class="n">10–35</td><td>Ude: asfalt og græs, tre målinger af hver</td><td>Del 1, trin 1–5</td></tr>
+    <tr><td class="n">35–50</td><td>Fotos ind i appen, tal i måleskemaet</td><td>Måleskema</td></tr>
+    <tr><td class="n">50–65</td><td>Satellitkortet: slå stederne op med ⓘ</td><td>Del 2, opgave 2</td></tr>
+    <tr><td class="n">65–75</td><td>Opsamling: græsset, den blandede pixel — og tilbage til Grønland</td><td>«Det I sandsynligvis opdager»</td></tr>
+  </tbody>
+</table>
+
+<h3>To moduler</h3>
+<p>Modul 1 som ovenfor. Modul 2: del 3 (regn på afsmeltningen), usikkerhed, udvidelsen og
+  eventuelt droneopgaven sidst på forløbssiden. Opgave 1c (tør og våd asfalt) passer godt
+  som start på modul 2 — den kræver kun en spand vand.</p>
+
+<h2>Før timen</h2>
+<ul class="fejl">
+  <li><b>Print referencekortet</b> — ét pr. gruppe, mat papir, 100 % skalering,
+    tonerbesparelse slået fra. Det sorte felt skal være helt sort.</li>
+  <li><b>Find to store flader</b> på mindst 40 × 40 meter: én med asfalt, én med græs.
+    Tjek dem i satellitkortet på forhånd: ⓘ skal kalde omgivelserne <i>ensartede</i>.</li>
+  <li><b>Tjek at der findes et skyfrit satellitbillede.</b> ⓘ viser datoen for det nyeste
+    skyfri billede i den valgte periode. Driller vejret, så vælg «Seneste sommer» — asfalt
+    ændrer sig ikke med årstiden, men det gør græs.</li>
+  <li><b>Vejret:</b> jævnt overskyet er bedst. Lav sol giver lange skygger, og våde flader
+    spejler lyset.</li>
+</ul>
+
+<h2>Faglige mål</h2>
+<p class="niveau-note">Forslag — ret formuleringerne til efter jeres læreplan og studieplan.</p>
+<table>
+  <thead><tr><th>Naturgeografi</th><th>Fysik</th></tr></thead>
+  <tbody>
+    <tr><td>Albedo og strålingsbalance; is-albedo-feedback og Grønlands massetab</td><td>Energi og effekt; smeltevarme; absorberet og reflekteret stråling</td></tr>
+    <tr><td>Satellitdata og remote sensing: pixel, bånd, blandet pixel</td><td>Det elektromagnetiske spektrum: synligt og infrarødt lys</td></tr>
+    <tr><td>Feltmåling, databehandling og kildekritik af egne data</td><td>Måleusikkerhed; modeller og deres begrænsninger</td></tr>
+  </tbody>
+</table>
+
+<h2>Niveaudeling</h2>
+<table>
+  <thead><tr><th class="n">Niveau</th><th>Hvad</th><th>Hvordan</th></tr></thead>
+  <tbody>
+    <tr><td class="n"><b>C</b></td><td>Kerneforløbet, del 1–3</td><td>Kvalitative forklaringer. Opgave 3 kan regnes i fællesskab på tavlen.</td></tr>
+    <tr><td class="n"><b>B</b></td><td>Kernen + udvidelse 1–3</td><td>Absorberet andel i tal, spektral forskel over for blandet pixel, usikkerhed som ± og et lille forsøg om spredning.</td></tr>
+    <tr><td class="n"><b>A</b></td><td>Alt + udvidelse 4</td><td>Energibalancen med vejrstationens data, modelkritik — og afsnittet «Hvor præcis er metoden?» nedenfor som diskussionsoplæg.</td></tr>
+  </tbody>
+</table>
+
+<h2>Facit og forventede svar</h2>
+
+<div class="opg">
+  <h4>Opgave 1</h4>
+  <p><b>a)</b> Den mørkeste tørre flade — typisk asfalt. Mange grupper måler dog græsset som
+    lige så mørkt eller mørkere. Det er pointen, ikke en fejl.</p>
+  <p><b>b)</b> To grunde: græs kaster meget infrarødt lys tilbage, som telefonen ikke ser, så
+    dets rigtige albedo er højere, end det ser ud. Og planter bruger energi på at fordampe
+    vand.</p>
+  <p><b>c)</b> Våd asfalt er tydeligt mørkere end tør — regn med et fald på omkring en
+    tredjedel. Vand på overfladen gør, at mere lys fanges i stedet for at blive spredt
+    tilbage. Samme mekanisme gør våd is mørkere end tør.</p>
+</div>
+
+<div class="opg">
+  <h4>Opgave 2</h4>
+  <p><b>Asfalt:</b> elever og satellit er typisk enige inden for ca. 0,05.
+    <b>Græs:</b> telefonen giver 0,03–0,08, satellitten 0,16–0,25. <b>Blandet hjørne:</b>
+    ⓘ kalder fladen blandet, og satellittens tal ligger mellem de flader, den ser.</p>
+</div>
+
+<div class="opg">
+  <h4>Opgave 3</h4>
+  <p>Energi pr. m²: <code>E = Q · (1 − albedo) · t</code> med t = 6 · 86 400 s = 518 400 s.
+    Smeltet masse: <code>m = E / 334 000 J/kg</code>. Tykkelse: <code>d = m / 900 kg/m³</code>.</p>
+  <p><b>a)</b> Albedo 0,58: 266 · 0,42 · 518 400 = 57,9 MJ/m² → 173 kg/m² → <b>19 cm</b>.
+    Albedo 0,11: 266 · 0,89 · 518 400 = 122,7 MJ/m² → 367 kg/m² → <b>41 cm</b>.</p>
+  <p><b>b)</b> Ja — målt 20 og 40 cm.</p>
+  <p><b>c)</b> Albedo 0,27 giver <b>33–34 cm</b>, cirka 74 % mere end det lyse felt.</p>
+</div>
+
+<div class="opg">
+  <h4>Udvidelse 1–3</h4>
+  <p><b>1)</b> Græs absorberer 80 %, asfalt 88 %. Telefonen ser kun synligt lys. Græssets
+    ekstra trick er fordampning. Samlet: byer med meget asfalt bliver varmere — varmeø-effekten.</p>
+  <p><b>2)</b> Forskerne på gletsjeren ramte den blandede pixel: de målte i randzonen.</p>
+  <p><b>3)</b> På ujævne flader giver det mest spredning at flytte kortet. Appens albedo
+    holder ved forskellig eksponering, indtil det hvide felt bliver overeksponeret — så
+    advarer appen, og tallene bliver for høje.</p>
+</div>
+
+<div class="opg">
+  <h4>Udvidelse 4 (A-niveau)</h4>
+  <p><b>a)</b> Med 308 W/m²: <b>22 cm</b> og <b>47 cm</b>.
+    <b>b)</b> Der mangler ca. <b>13 W/m²</b> (lyst felt) og <b>42 W/m²</b> (mørkt felt).</p>
+  <p><b>c)</b> Netto langbølget: 276 − 316 = −40 W/m². Varme fra luften: +20 til +30 W/m²
+    (et overslag med vind 2 m/s og 5 °C varmere luft giver ca. 27 W/m²). Sum: −10 til −20 W/m².</p>
+  <p><b>d)</b> Det passer fint for det lyse felt. For det mørke felt mangler der mere — en
+    albedo omkring 0,20 i stedet for 0,11 ville få regnestykket til at gå op. Det mørke
+    felts albedo er den mest usikre måling i hele forsøget (se nedenfor).</p>
+  <p><b>e)</b> De 266 W/m² er solindstrålingen <i>minus</i> nettotabet fra de led, modellen
+    udelader. At en så simpel model rammer, skyldes at de to største udeladte led har
+    modsat fortegn.</p>
+</div>
+
+<h2>Når det går galt</h2>
+<ul class="fejl">
+  <li><b>Appen advarer om overeksponering</b> — det hvide felt er brændt ud. Tag billedet
+    igen, gerne i skygge eller med lavere eksponering.</li>
+  <li><b>Albedo over 1 eller helt urimelige tal</b> — felterne er markeret i forkert
+    rækkefølge (sort først), eller der ligger skygge over kortet.</li>
+  <li><b>Blankt papir eller gråt sort felt</b> — print igen på mat papir uden tonerbesparelse.</li>
+  <li><b>ⓘ siger «Ingen måling her»</b> — ingen skyfri optagelse i perioden. Vælg en længere
+    periode eller hæv «Max sky %».</li>
+  <li><b>Våde flader og lav sol</b> — mål lodret ned og med solen i ryggen, så I undgår genskin.</li>
+</ul>
+
+<h2>Hvor præcis er metoden?</h2>
+<p>Metoden er god til at <i>sammenligne</i> flader. De absolutte tal skal tages med
+  forbehold — regn med ± 0,03–0,05 under gode forhold. Fire ting er værd at kende:</p>
+
+<h3>1 · Telefonen ser kun synligt lys</h3>
+<p>Satellittens albedo tæller det infrarøde med, og det er omkring halvdelen af solens
+  energi. For asfalt og beton betyder det lidt. For græs er forskellen en faktor tre
+  eller mere, og for sne og is går den den anden vej.</p>
+
+<h3>2 · Kameraet gemmer ikke lys lineært</h3>
+<div class="to-kol">
+  <figure class="lille">
+    <img src="foto/gammelt-referencekort.jpg" alt="Det første referencekort liggende på mørk gletsjeris: et gråt felt mærket albedo 34 % og et hvidt felt mærket albedo 65 %">
+    <figcaption>Det første referencekort, fotograferet på gletsjeren 8. august 2026.
+      Det grå felt er mærket 34 % — men er i virkeligheden omkring 10 %.</figcaption>
+  </figure>
+  <div>
+    <p>Det første kort blev lavet ud fra <code>albedo = pixelværdi / 255</code>. Det holder
+      ikke: billedfiler er gamma-kodede, så en pixelværdi på 86 svarer til omkring 9 % af
+      papirets lysstyrke, ikke 34 %. I fotoet her måler det grå felt gråværdi 79 og det
+      hvide 201. Tager man forholdet direkte, bliver det grå felt 26–29 %. Regner man
+      tonekurven med, bliver det omkring 10 % — og det er også, hvad øjet siger.</p>
+    <p>Det «hvide felt på 65 %» var desuden bart papir, og i flere feltfotos var det
+      overeksponeret. Derfor er kortet lavet om til ét sort felt (5 %) og bart hvidt papir
+      (75 %), og appen kalibrerer gennem <i>begge</i> felter, så kameraets tonekurve og
+      eksponering falder ud af regnestykket.</p>
+    <p>Tallene fra Grønland er målt med det gamle kort og den gamle app. At de lander
+      15 % fra satellitten, er til dels held — det er en god diskussion til A-niveau.</p>
+  </div>
+</div>
+
+<h3>3 · Lav sol og ru flader</h3>
+<p>Et foto lodret ned måler lyset i én retning. Albedo er lyset i <i>alle</i> retninger.
+  For ru flader i lav sol — is om morgenen, en pløjemark i november — ser fladen mørkere
+  ud ovenfra, end dens albedo er, fordi kameraet ser ned i skyggerne mellem ujævnhederne.</p>
+
+<h3>4 · Satellittens tal er også en model</h3>
+<p>Sentinel-2 måler reflektans i bånd, og albedoen beregnes med en empirisk formel
+  (Liang 2001) ud fra bånd på 10 og 20 meter. Atmosfærekorrektionen antager en vandret
+  flade. Det er et godt tal — men ikke et facit.</p>
+
+<div class="knapper">
+  <a class="sek" href="./">← Tilbage til forløbet</a>
+  <a class="sek" href="../spektrum/">Det faglige grundlag</a>
+</div>
+
+</main>
+</body>
+</html>
