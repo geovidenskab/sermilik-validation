@@ -92,11 +92,23 @@ th small{display:block;text-transform:none;letter-spacing:0;font-weight:400}
   main{padding:.6rem 0}
   h2{margin-top:1.1rem;font-size:12pt}
   .opg,.info,.mat{break-inside:avoid}
+  details.fold{display:none}   /* facit og baggrund printes ikke med på elevarket */
+  .qr-blok img{width:80px;height:80px}
   /* sideskift virker ikke på inline-block — gør banneret til en blok ved print */
   .niveau.udvid{display:block;width:max-content;break-before:page;margin-top:0}
   h2,h3,h4{break-after:avoid}
   @page{size:A4;margin:14mm}
 }
+.qr-blok{display:flex;gap:1rem;align-items:center;margin:.6rem 0 0}
+.qr-blok img{flex:none;width:96px;height:96px}
+.qr-blok p{margin:0;font-size:var(--fs-sm)}
+details.fold{margin:1.1rem 0;border:1px solid var(--navy);background:#fff}
+details.fold summary{cursor:pointer;padding:.7rem 1rem;font-weight:600;font-size:var(--fs-sm);color:var(--navy)}
+details.fold .fold-inner{padding:0 1.1rem .9rem}
+details.fold.stille{border-color:var(--line)}
+details.fold.stille summary{color:var(--ink);font-weight:500}
+.stige{margin:.5rem 0;padding-left:1.3rem;font-size:var(--fs-sm)}
+.stige li{margin:.25rem 0}
 </style>
 </head>
 <body>
@@ -112,16 +124,19 @@ th small{display:block;text-transform:none;letter-spacing:0;font-weight:400}
 <div class="mat">
   <b>Det skal I bruge</b>
   <ul>
-    <li>En telefon med kamera</li>
-    <li>Det printede referencekort (sort/hvid, mat papir, 100 % skalering)</li>
-    <li>Albedo-appen på geo.sg.dk/albedo</li>
+    <li>En telefon med kamera — og jeres bærbare, når I er inde igen</li>
+    <li>Referencekortet, printet på mat papir</li>
     <li>Ca. 20 minutter udenfor</li>
   </ul>
+  <div class="qr-blok">
+    <img src="foto/qr-albedo.svg" alt="QR-kode til albedo-appen" width="96" height="96">
+    <p><b>Albedo-appen åbner I på mobilen:</b> scan koden, eller skriv
+      <b>geo.sg.dk/albedo</b>. Koden står også på referencekortet.</p>
+  </div>
 </div>
 
 <div class="knapper">
   <a href="referencekort.html">Print referencekortet</a>
-  <a href="https://geo.sg.dk/albedo">Åbn albedo-appen</a>
   <a class="sek" href="../kort/dk.html">Åbn satellitkortet</a>
 </div>
 
@@ -130,65 +145,38 @@ th small{display:block;text-transform:none;letter-spacing:0;font-weight:400}
   <p><b>Albedo</b> er et tal mellem 0 og 1. Det fortæller, hvor stor en del af sollyset en
     overflade kaster tilbage. Frisk sne: omkring 0,85. Asfalt: omkring 0,10. Resten bliver
     til varme.</p>
-  <p>Albedo er <i>næsten</i> det samme som, hvor lys en overflade ser ud — men ikke helt.
-    Omkring halvdelen af solens energi er infrarødt lys, som vi ikke kan se, og albedo
-    tæller det med. Planter og sne snyder. <a href="./#albedo">Læs mere på forløbssiden.</a></p>
   <div class="skala">
-    <div style="background:#1a1a1a;color:#fff">0,10</div>
-    <div style="background:#3d3d3d;color:#fff">0,20</div>
-    <div style="background:#6b6b6b;color:#fff">0,35</div>
-    <div style="background:#9c9c9c;color:#222">0,50</div>
-    <div style="background:#cfcfcf;color:#222">0,65</div>
-    <div style="background:#f2f2f2;color:#222">0,85</div>
-  </div>
-  <div class="skala-tekst"><span>mørkt — absorberer næsten alt</span><span>lyst — kaster næsten alt tilbage</span></div>
+      <div style="background:#1a1a1a;color:#fff">0,10</div>
+      <div style="background:#3d3d3d;color:#fff">0,20</div>
+      <div style="background:#6b6b6b;color:#fff">0,35</div>
+      <div style="background:#9c9c9c;color:#222">0,50</div>
+      <div style="background:#cfcfcf;color:#222">0,65</div>
+      <div style="background:#f2f2f2;color:#222">0,85</div>
+    </div>
+    <div class="skala-tekst"><span>mørkt — absorberer næsten alt</span><span>lyst — kaster næsten alt tilbage</span></div>
 </div>
 
-<p class="niveau-note"><b>Sådan er arket bygget op:</b> Kerneforløbet (del 1–3) er for alle.
-  Udvidelsen bagest er til jer, der vil et spadestik dybere — B- og A-niveau.</p>
-
-<div class="niveau">Kerneforløbet · for alle</div>
-
 <!-- ══════════ DEL 1 ══════════ -->
-<h2>Del 1 · Mål albedo i skolegården</h2>
+<h2>Del 1 · Mål albedo udenfor</h2>
 
 <div class="opg">
   <h4>Før I går ud · Gæt først</h4>
-  <p>Rangér de overflader, I vil måle, fra mørkest til lysest — og gæt på et tal for hver.
-    Brug gråtoneskalaen ovenfor. Skriv jeres gæt i måleskemaet.</p>
-  <p>Gæt <b>to</b> tal for græsset: Hvad tror I, jeres telefon måler? Og hvad tror I,
-    satellitten siger?</p>
+  <p>I skal måle to flader: <b>asfalt</b> og <b>græs</b>. Hvilken er mørkest? Gæt på et tal
+    for hver — brug gråtoneskalaen ovenfor — og skriv gættet i måleskemaet.</p>
+  <p>Gæt også: tror I, satellitten får det samme som jer?</p>
 </div>
 
 <ol class="trin-liste">
-  <li><b>Print kortet</b> i sort/hvid på mat papir, 100 % skalering. Blankt papir
-    giver genskin og ødelægger målingen.</li>
-  <li><b>Vælg jeres overflader.</b> Asfalt, græs, lyse fliser, en mørk måtte, en hvid
-    væg — og sne, hvis det er vinter. Jo større spredning, jo tydeligere resultat.</li>
-  <li><b>Læg kortet på overfladen</b> og fotografér <b>lige ned</b> ovenfra, så både
-    kort og overflade er med i samme billede. Pas på din egen skygge.</li>
-  <li><b>Åbn appen</b>, læg billedet ind, og markér det sorte felt, så det hvide —
-    og derefter overfladen.</li>
-  <li><b>Notér albedoen</b> i måleskemaet. Mål hver overflade <b>tre gange</b>, og flyt
-    kortet lidt hver gang — så kan I se, hvor meget tallet svinger.</li>
+  <li><b>Find to store flader</b> — én med asfalt og én med græs, hver mindst
+    <b>40 × 40 meter</b>: en parkeringsplads og en boldbane. Stå midt på fladen.</li>
+  <li><b>Læg referencekortet på fladen</b>, og fotografér <b>lige ned</b> ovenfra, så både
+    kort og flade er med i samme billede. Pas på jeres egen skygge.</li>
+  <li><b>Åbn appen på mobilen</b>, læg billedet ind, og markér det sorte felt, så det
+    hvide — og derefter fladen. Vælg navnet <i>Asfalt</i> eller <i>Græs</i>.</li>
+  <li><b>Mål hver flade tre gange</b>, og flyt referencekortet lidt hver gang. Appen samler
+    tallene under «Mine målinger» og regner middeltallet ud.</li>
+  <li><b>Skriv tallene i måleskemaet</b>, når I er inde igen.</li>
 </ol>
-
-<div class="info">
-  <h4>Hvorfor skal der ligge et referencekort i billedet?</h4>
-  <p>Et kamera måler ikke lys i absolutte enheder. Det samme græs bliver lyst i solskin
-    og mørkt i skygge, og telefonen justerer selv undervejs. Men ligger der felter med
-    <i>kendt</i> albedo i samme billede, kan man sammenligne: kortets sorte felt
-    reflekterer ca. 5 % og det hvide papir ca. 75 % — så kan alt derimellem regnes ud
-    af forholdet.</p>
-  <p><b>Belysningen forsvinder ud af regnestykket.</b> Det er hele tricket, og det er
-    præcis samme princip som satellitter bruger.</p>
-</div>
-
-
-
-
-
-
 
 <h3>Måleskema</h3>
 <div class="tabel-rul"><table class="skema">
@@ -203,29 +191,34 @@ th small{display:block;text-transform:none;letter-spacing:0;font-weight:400}
 <p class="niveau-note">De to sidste kolonner udfylder I i del 2. Skriv usikkerheden med:
   svinger jeres tre målinger mellem 0,10 og 0,14, er resultatet <b>0,12 ± 0,02</b>.</p>
 
+<h3>Typiske fejl</h3>
+<ul class="fejl">
+  <li><b>Skygge hen over referencekortet</b> — stil jer, så skyggen falder væk fra det,
+    eller mål i jævnt overskyet vejr.</li>
+  <li><b>Skråt billede</b> — hold telefonen lodret ned, ellers bliver albedoen for høj.</li>
+  <li><b>Genskin i papiret</b> — undgå at solen spejler sig i referencekortet.</li>
+</ul>
+
+<details class="fold stille"><summary>Hvorfor skal der ligge et referencekort i billedet?</summary>
+<div class="fold-inner">
+  <p>Et kamera måler ikke lys i absolutte enheder. Det samme græs bliver lyst i solskin
+    og mørkt i skygge, og telefonen justerer selv undervejs. Men ligger der felter med
+    <i>kendt</i> albedo i samme billede, kan man sammenligne: kortets sorte felt
+    reflekterer ca. 5 % og det hvide papir ca. 75 % — så kan alt derimellem regnes ud
+    af forholdet.</p>
+  <p><b>Belysningen forsvinder ud af regnestykket.</b> Det er hele tricket, og det er
+    præcis samme princip som satellitter bruger.</p>
+</div></details>
+
 <div class="opg">
-  <h4>Opgave 1 · Spørgsmål at tage med ind</h4>
-  <p><b>a)</b> Hvilken overflade i skolegården bliver varmest på en solskinsdag?
-    Passer det med jeres målinger?</p>
-  <p><b>b)</b> I målte sikkert græsset som lige så mørkt som asfalten — eller mørkere.
-    Alligevel er en græsplæne køligere at gå på en sommerdag. Hvorfor?
-    <i>(Hint: læs «Albedo på 30 sekunder» igen — og tænk på, hvad planten bruger vandet til.)</i></p>
-  <p><b>c)</b> Mål den samme asfalt <b>tør og våd</b> — hæld en spand vand ud. Hvor meget
+  <h4>Opgave 1 · Tag med ind</h4>
+  <p><b>a)</b> Hvilken af jeres flader bliver varmest på en solskinsdag? Passer det med
+    jeres målinger?</p>
+  <p><b>b)</b> Mål den samme asfalt <b>tør og våd</b> — hæld en spand vand ud. Hvor meget
     flytter albedoen sig? På gletsjeren sker det samme: smeltevand gør isen mørkere, og
     mørkere is smelter hurtigere. <i>Ligger der sne, så mål den også. Eller læg et hvidt
     lagen på græsset: sne på ti sekunder.</i></p>
 </div>
-
-<h3>Typiske fejl</h3>
-<ul class="fejl">
-  <li><b>Skygge hen over kortet</b> — stil jer så jeres skygge falder væk fra kortet,
-    eller mål i jævnt overskyet vejr.</li>
-  <li><b>Skråt billede</b> — så ser kameraet mest de solvendte flader, og albedoen
-    bliver for høj. Hold telefonen lodret ned.</li>
-  <li><b>Genskin i papiret</b> — brug mat papir, og undgå at solen spejler sig.</li>
-  <li><b>Gråt eller stribet sort felt</b> — printerens tonerbesparelse er slået til.
-    Slå den fra og print igen.</li>
-</ul>
 
 <!-- ══════════ DEL 2 ══════════ -->
 <h2>Del 2 · Se det samme sted fra rummet</h2>
@@ -235,158 +228,77 @@ th small{display:block;text-transform:none;letter-spacing:0;font-weight:400}
 
 <div class="opg">
   <h4>Opgave 2 · Er I enige med satellitten?</h4>
-  <p><b>1) En stor, ensartet asfaltflade</b> — mindst 40 × 40 meter: en parkeringsplads
-    eller en boldbane med belægning. Stå midt på den, og mål med kort og telefon.</p>
-  <p><b>2) En stor, ensartet græsflade</b> — mindst 40 × 40 meter: en fodboldbane.</p>
-  <p>Slå begge steder op i satellitkortet: tryk på <b>ⓘ</b>, og tryk så på stedet.
-    Notér satellittens <b>albedo</b> — og om kortet kalder omgivelserne
-    <b>ensartede</b> eller <b>blandede</b>.</p>
-  <p><b>Hvor er I enige med satellitten — og hvor er I ikke?</b></p>
-  <p><i>Har I tid:</i> prøv også et hjørne, hvor asfalt, græs og tag mødes inden for få
-    meter. Hvad siger kortet dér?</p>
+  <p><b>a)</b> Åbn <a href="../kort/dk.html">satellitkortet</a> på den bærbare. Søg efter
+    skolen, og klik dér, hvor I stod på <b>asfalten</b>. Notér satellittens albedo — og om
+    satellitkortet kalder omgivelserne <b>ensartede</b> eller <b>blandede</b>.</p>
+  <p><b>b)</b> Gør det samme for <b>græsset</b>.</p>
+  <p><b>c) Hvor er I enige med satellitten — og hvor er I ikke?</b></p>
+  <p><i>Har I tid:</i> klik også i et hjørne, hvor asfalt, græs og tag mødes inden for få
+    meter. Hvad siger satellitkortet dér?</p>
 </div>
 
-<h3>Det I sandsynligvis opdager</h3>
-<p><b>På asfalten er I nogenlunde enige.</b> Asfalt ser ens ud i alt lys, og fladen er
-  stor nok til, at satellitten kun ser asfalt. Det viser, at metoden virker.</p>
-<p><b>På græsset er I helt uenige.</b> I måler måske 0,06, satellitten siger 0,18. Det
-  er ikke en fejl: planter kaster meget infrarødt lys tilbage, og det kan jeres telefon
-  ikke se. Satellitten kan.</p>
-<p><b>I det blandede hjørne</b> ser satellitten flere slags overflader på én gang —
-  asfalt, græs og tag lagt sammen. Det hedder en <b>blandet pixel</b>. Forskerne på
-  gletsjeren faldt i samme fælde: første sammenligning lå en faktor tre forkert, fordi de
-  målte, hvor mørkt sediment og lys is ligger inden for få meter.</p>
+<details class="fold"><summary>Åbn, når I har jeres egne tal</summary>
+<div class="fold-inner">
+  <h3>Det I sandsynligvis opdager</h3>
+  <p><b>På asfalten er I nogenlunde enige.</b> Asfalt ser ens ud i alt lys, og fladen er
+    stor nok til, at satellitten kun ser asfalt. Det viser, at metoden virker.</p>
+  <p><b>På græsset er I helt uenige.</b> I måler måske 0,06, satellitten siger 0,18. Det
+    er ikke en fejl: planter kaster meget infrarødt lys tilbage, og det kan jeres telefon
+    ikke se. Satellitten kan. Omkring halvdelen af solens energi er infrarødt lys — og
+    albedo tæller det med.</p>
+  <p><b>I det blandede hjørne</b> ser satellitten flere slags overflader på én gang —
+    asfalt, græs og tag lagt sammen. Det hedder en <b>blandet pixel</b>. Forskerne på
+    gletsjeren faldt i samme fælde: første sammenligning lå en faktor tre forkert, fordi de
+    målte, hvor mørkt sediment og lys is ligger inden for få meter.</p>
+  <p><b>d)</b> En græsplæne er køligere at gå på end asfalt en sommerdag — selv om jeres
+    telefon målte den som lige så mørk. Hvorfor? <i>(Hint: det usynlige lys — og hvad
+    planten bruger vandet til.)</i></p>
 
-<h3>Typiske værdier</h3>
-<p>Sådan plejer det at gå. Hvordan passer det med jeres gæt?</p>
-<table>
-  <thead><tr><th>Overflade</th><th class="n">Det ser telefonen<br><small>synligt lys</small></th><th class="n">Det siger satellitten<br><small>alt sollys</small></th></tr></thead>
-  <tbody>
-    <tr><td>Vand</td><td class="n">0,05–0,10</td><td class="n">0,05–0,10</td></tr>
-    <tr><td>Asfalt</td><td class="n">0,08–0,12</td><td class="n">0,10–0,15</td></tr>
-    <tr class="hi"><td>Græs</td><td class="n">0,03–0,08</td><td class="n">0,16–0,25</td></tr>
-    <tr><td>Lyse fliser, beton</td><td class="n">0,25–0,35</td><td class="n">0,30–0,40</td></tr>
-    <tr><td>Hvid mur</td><td class="n">0,60–0,80</td><td class="n">0,60–0,80</td></tr>
-    <tr class="hi"><td>Frisk sne</td><td class="n">0,90–0,95</td><td class="n">0,75–0,85</td></tr>
-  </tbody>
-</table>
-
-<p><b>Læg mærke til græsset.</b> For jeres telefon er en græsplæne lige så mørk som
-  asfalt — måske mørkere. For satellitten er den flere gange så lys. Ingen af dem tager fejl.
-  Planter opsuger det synlige lys til fotosyntese, men kaster næsten halvdelen af det
-  infrarøde tilbage, og det infrarøde er en stor del af Solens energi. Sne og is gør det
-  modsatte: blændende hvide for øjet, men mørkere i infrarødt.</p>
+  <h3>Typiske værdier</h3>
+  <table>
+    <thead><tr><th>Overflade</th><th class="n">Det ser telefonen<br><small>synligt lys</small></th><th class="n">Det siger satellitten<br><small>alt sollys</small></th></tr></thead>
+    <tbody>
+      <tr><td>Vand</td><td class="n">0,05–0,10</td><td class="n">0,05–0,10</td></tr>
+      <tr><td>Asfalt</td><td class="n">0,08–0,12</td><td class="n">0,10–0,15</td></tr>
+      <tr class="hi"><td>Græs</td><td class="n">0,03–0,08</td><td class="n">0,16–0,25</td></tr>
+      <tr><td>Lyse fliser, beton</td><td class="n">0,25–0,35</td><td class="n">0,30–0,40</td></tr>
+      <tr><td>Hvid mur</td><td class="n">0,60–0,80</td><td class="n">0,60–0,80</td></tr>
+      <tr class="hi"><td>Frisk sne</td><td class="n">0,90–0,95</td><td class="n">0,75–0,85</td></tr>
+    </tbody>
+  </table>
+</div></details>
 
 <!-- ══════════ DEL 3 ══════════ -->
-<h2>Del 3 · Regn på afsmeltningen</h2>
+<h2>Del 3 · Tilbage til gletsjeren</h2>
 
-<p>Energien der smelter isen, er den del af sollyset overfladen <i>ikke</i> kaster tilbage.
-  Absorberet effekt er <code>Q · (1 − albedo)</code>. Over seks døgn bliver det til en
-  energimængde, og deler man med smeltevarmen får man massen af smeltet is.</p>
-
-<table>
-  <thead><tr><th>Størrelse</th><th>Værdi</th></tr></thead>
-  <tbody>
-    <tr><td>Sollys på isen, døgnmiddel i august</td><td>ca. 266 W/m²</td></tr>
-    <tr><td>Smeltevarme for is</td><td>334 000 J/kg</td></tr>
-    <tr><td>Isens massefylde</td><td>900 kg/m³</td></tr>
-  </tbody>
-</table>
+<p>Energien, der smelter isen, er den del af sollyset, isen <i>ikke</i> kaster tilbage:
+  <code>1 − albedo</code>. Det lyse felt havde albedo 0,58 og smeltede 20 cm. Det mørke
+  felt havde albedo 0,11 og smeltede 40 cm.</p>
 
 <div class="opg">
   <h4>Opgave 3 · Eftergør forskernes resultat</h4>
-  <p><b>a)</b> Beregn hvor mange centimeter is der smelter på seks døgn ved albedo
-    <b>0,58</b> (det lyse felt) og ved albedo <b>0,11</b> (mørk is med meget sediment).</p>
-  <p><b>b)</b> Sammenlign med det målte: 20 cm og 40 cm. Passer det?</p>
-  <p><b>c)</b> Gletsjerens gennemsnitlige albedo blev målt til <b>0,27</b>. Hvor meget
-    smelter der så — og hvor meget mere er det end det lyse felt?</p>
-</div>
-
-
-<!-- ══════════ UDVIDELSE ══════════ -->
-<div class="niveau udvid">Udvidelse · B- og A-niveau</div>
-
-<div class="opg">
-  <h4>Udvidelse 1 · Regn på græs og asfalt</h4>
-  <p>Satellitten giver græs en albedo omkring 0,20 og asfalt omkring 0,12.</p>
-  <ul>
-    <li>Regn ud hvor stor en del af sollyset hver flade absorberer, med satellittens tal.</li>
-    <li>Hvorfor kan jeres telefon ikke se forskellen?</li>
-    <li>Græs har ét trick mere end albedo, som asfalt ikke har. Hvilket?
-      <i>(Hint: hvad bruger planten vandet til?)</i></li>
-    <li>Hvad betyder det samlet for temperaturen i en by med meget asfalt og lidt græs?</li>
-  </ul>
-</div>
-
-<div class="opg">
-  <h4>Udvidelse 2 · To grunde til at være uenig med satellitten</h4>
-  <p>Når I trykker på et sted i kortet, får I også <b>plantedække (NDVI)</b> — åbn
-    «Detaljer og tal til rapporten». Mål de tre steder fra opgave 2 igen, og notér
-    albedo, NDVI og om fladen er ensartet eller blandet.</p>
-  <p><b>På græsset</b> er fladen ensartet, så uenigheden er ikke en blandet pixel. NDVI er
-    høj, og det betyder, at fladen kaster meget infrarødt tilbage. Uenigheden er
-    <b>spektral</b>: I måler i hver jeres del af solspektret.</p>
-  <p><b>I det blandede hjørne</b> svinger albedoen meget inden for 100 meter. Uenigheden
-    skyldes en <b>blandet pixel</b>.</p>
-  <p>Reglen: <b>højt plantedække og ensartet flade betyder spektral forskel; blandet flade
-    betyder blandet pixel.</b> Hvilken af de to ramte forskerne på gletsjeren?</p>
-</div>
-
-<div class="opg">
-  <h4>Udvidelse 3 · Hvor sikker er jeres måling?</h4>
-  <p><b>a)</b> Hvad giver mest spredning: at flytte kortet til et nyt sted på samme flade,
-    at markere et andet udsnit i samme foto, eller at tage et nyt foto? Lav et lille forsøg,
-    der skiller de tre ad.</p>
-  <p><b>b)</b> Tag tre fotos af samme flade med forskellig lysstyrke (eksponering −1, 0 og +1).
-    Appens albedo bør være den samme, selv om billederne ikke er det — det er hele idéen
-    med referencekortet. Holder det? Hvornår går det galt?</p>
-  <p><b>c)</b> Hvor stor skal forskellen til satellitten være, før den er større end jeres
-    egen usikkerhed?</p>
-</div>
-
-<div class="opg">
-  <h4>Udvidelse 4 · Hvorfor passer den simple model? <span style="font-weight:400">(A-niveau)</span></h4>
-  <p>Modellen i opgave 3 regner kun med det sollys, isen absorberer, og bruger
-    <b>Q = 266 W/m²</b>. Men vejrstationen ved gletsjeren målte i de samme seks døgn
-    (3.–8. august 2026), i døgnmiddel:</p>
+  <p><b>a)</b> Uden lommeregner: hvor stor en del af sollyset beholder det lyse felt?
+    Og det mørke? Hvor mange gange mere beholder det mørke felt — og passer det med
+    40 cm mod 20 cm?</p>
+  <p><b>b)</b> Med lommeregner: beregn, hvor mange centimeter is der smelter på seks døgn
+    ved albedo <b>0,58</b> og ved albedo <b>0,11</b>. Passer det med det målte?</p>
+  <ol class="stige">
+    <li>Energi pr. m²: <code>sollys · (1 − albedo) · tid</code> — tiden er 6 døgn = 518 400 s</li>
+    <li>Smeltet is i kg pr. m²: <code>energi / smeltevarme</code></li>
+    <li>Tykkelse i meter: <code>kg pr. m² / massefylde</code></li>
+  </ol>
   <table>
+    <thead><tr><th>Størrelse</th><th>Værdi</th></tr></thead>
     <tbody>
-      <tr><td>Indstråling fra solen</td><td>308 W/m²</td></tr>
-      <tr><td>Langbølget stråling fra himlen</td><td>276 W/m²</td></tr>
-      <tr><td>Lufttemperatur</td><td>5,3 °C</td></tr>
-      <tr><td>Vind</td><td>2,1 m/s</td></tr>
+      <tr><td>Sollys på isen, døgnmiddel i august</td><td>ca. 266 W/m²</td></tr>
+      <tr><td>Smeltevarme for is</td><td>334 000 J/kg</td></tr>
+      <tr><td>Isens massefylde</td><td>900 kg/m³</td></tr>
     </tbody>
   </table>
-  <p><b>a)</b> Regn opgave 3a igen med de målte 308 W/m². Hvor meget <i>skulle</i> de to
-    felter være smeltet?</p>
-  <p><b>b)</b> Forskellen til de målte 20 og 40 cm er energi, som modellen mangler. Hvor
-    mange W/m² er det for hvert felt? <i>(1 cm smeltning på seks døgn svarer til 5,8 W/m².)</i></p>
-  <p><b>c)</b> Smeltende is er 0 °C og udsender 316 W/m² langbølget stråling
-    (Stefan-Boltzmann). Himlen sender 276 W/m² tilbage. Den lune luft afleverer omvendt
-    varme til isen — et overslag giver 20–30 W/m². Hvad bliver summen af de to?</p>
-  <p><b>d)</b> Passer summen med det, der manglede i b)? For hvilket felt passer det
-    bedst — og hvad kan forklare resten? <i>(Hint: hvor sikker er albedoen for det mørke felt?)</i></p>
-  <p><b>e)</b> De 266 W/m² er altså en <i>effektiv</i> værdi. Hvad er gemt i den?
-    I kan selv hente stationens tal i <a href="../kort/">Grønlandskortet</a>: tryk på
-    vejrstationen og vælg «Vis og plot data».</p>
-</div>
-
-<div class="info">
-  <h4>Sådan beregner satellitten albedo (Liang 2001)</h4>
-  <p>Satellitten måler reflektansen i hvert af sine bånd, og albedoen er et vægtet
-    gennemsnit af fem af dem:</p>
-  <p class="formel">albedo = 0,356·B02 + 0,130·B04 + 0,373·B08 + 0,085·B11 + 0,072·B12 − 0,0018</p>
-  <p>B02 er blåt lys, B04 rødt, B08 nær-infrarødt og B11/B12 kortbølge-infrarødt.
-    Vægtene afspejler hvor meget af solens energi der ligger i hvert område af spektret.
-    Jeres referencekort ser kun det synlige lys; satellitten tæller det infrarøde med.
-    For asfalt og beton betyder det lidt. For græs er det en faktor tre eller mere, fordi
-    planter er lyse i infrarødt. For sne og is går det den anden vej — de er mørkere i
-    infrarødt, end de ser ud. På gletsjeren gav kortet 0,265 og satellitten 0,231:
-    retningen passer. På <a href="../spektrum/#planter">spektrum-siden</a> kan I se
-    springet i planternes spektrum ved 700 nm, som forskerne selv målte det.</p>
 </div>
 
 <div class="knapper">
+  <a href="udvidelse.html">Videre til udvidelsen · B- og A-niveau</a>
   <a class="sek" href="./">← Tilbage til forløbet</a>
 </div>
 

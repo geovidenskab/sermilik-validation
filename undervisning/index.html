@@ -89,6 +89,16 @@ figcaption b{color:var(--ink)}
 
 
 /* ---------- bokse og kort ---------- */
+.qr-blok{display:flex;gap:1.1rem;align-items:center;border:1px solid var(--line);background:var(--card);
+  padding:.9rem 1.1rem;margin:1.2rem 0;max-width:34rem}
+.qr-blok img{flex:none;width:120px;height:120px}
+.qr-blok p{margin:0;font-size:var(--fs-sm)}
+.videoer.en{display:block;max-width:34rem}
+details.fold.efter{border-color:var(--navy)}
+details.fold.efter summary{color:var(--navy)}
+details.fold .fold-inner h4{margin:1.1rem 0 .3rem;font-size:var(--fs-md);color:var(--navy)}
+details.fold .fold-inner ul{margin:.4rem 0 .6rem;padding-left:1.2rem;font-size:var(--fs-sm)}
+details.fold .fold-inner li{margin:.3rem 0}
 .albedo-boks{background:var(--card);border:1px solid var(--line);padding:1.2rem 1.35rem;margin:1.8rem 0}
 .albedo-boks h3{margin:0 0 .5rem;font-size:var(--fs-lg);color:var(--navy)}
 .albedo-boks h3+p{margin-top:0}
@@ -170,7 +180,7 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
   <a href="#gletsjeren">Gå med på isen</a>
   <span class="navcta">
     <a href="oevelsesvejledning.html">Øvelsesvejledning</a>
-    <a class="sek" href="https://geo.sg.dk/albedo">Albedo-app</a>
+
     <a class="sek" href="../kort/dk.html">Satellitkort</a>
   </span>
 </div></nav>
@@ -184,6 +194,18 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
   <p class="lede">I august 2026 lagde en gruppe forskere felter ud på en gletsjer i
      Østgrønland. Nogle felter blev dækket med mørkt sediment, andre fik lov at
      ligge som ren is. Så satte de pinde i og ventede seks dage.</p>
+
+  <div class="videoer en">
+    <figure>
+      <video controls preload="none" playsinline poster="video/gletsjer-invitation.jpg">
+        <source src="video/gletsjer-invitation.mp4" type="video/mp4">
+        Din browser kan ikke afspille videoen.
+      </video>
+      <figcaption><b>Kom med.</b> Optaget på Mittivakkat-gletsjeren 8. august 2026.
+        Bag i billedet ligger fjorden fuld af isbjerge — og under fødderne den is,
+        alle tallene i dette forløb handler om.</figcaption>
+    </figure>
+  </div>
 
   <div class="to-op">
     <figure>
@@ -235,38 +257,10 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
     <hr>
 
     <h3>Er albedo bare, hvor lys noget ser ud?</h3>
-    <p><b>Næsten.</b> Mørke ting har lav albedo, og lyse ting har høj. Jeres øjne og jeres
-       telefon er derfor et godt sted at starte.</p>
-    <p>Men kun næsten. Omkring halvdelen af solens energi er lys, vi kan se. Resten er mest
-       infrarødt lys, som er usynligt for os. Albedo tæller det hele med.</p>
-    <p>For de fleste overflader gør det ingen forskel. Asfalt, beton og vand er lige så
-       mørke i det usynlige lys som i det synlige. To slags overflader snyder:</p>
-    <ul>
-      <li><b>Planter</b> ser mørke ud, men er lyse i infrarødt. Deres albedo er højere,
-        end den ser ud.</li>
-      <li><b>Sne og is</b> ser kridhvide ud, men er mørkere i infrarødt. Deres albedo er
-        lidt lavere, end den ser ud.</li>
-    </ul>
-    <p>Det kommer I selv til at opdage, når I sammenligner jeres måling med satellittens.</p>
+    <p>Gæt. Svaret finder I selv i trin 2 — når I sammenligner jeres egen måling med
+       satellittens.</p>
   </div>
 
-  <div class="boks">
-    <h4>Ikke en detalje&hellip;</h4>
-    <p>Grønlands indlandsis taber masse på to måder, som vejer omtrent lige tungt.
-       Cirka <b>halvdelen</b> sker på <b>overfladen</b>, hvor sollyset smelter is og sne.
-       Den anden halvdel sker ved at isen <b>flyder ud i havet</b> og kalver som isbjerge.</p>
-
-    <figure>
-      <img src="foto/apusiaajik.jpg" alt="Apusiaajik-gletsjerens kalvefront møder havet, med isstykker i vandet og bjerge i tåge bagved">
-      <figcaption><b>Apusiaajik-gletsjeren</b>, få kilometer fra feltstationen. Her ender
-        isen i havet og brækker af som isbjerge. Gletsjeren har trukket sig
-        <b>flere kilometer tilbage</b> de seneste 50 år — det brune, bare land i
-        forgrunden lå under is inden for et menneskeliv.</figcaption>
-    </figure>
-
-    <p>Albedo styrer den første halvdel. Og albedo er noget I kan måle — med en telefon
-       og et stykke papir.</p>
-  </div>
 </section>
 
 <!-- ============ SKOLEGÅRDEN ============ -->
@@ -282,13 +276,17 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
       fotograferes sammen med den. Felterne på kortet har kendt albedo — resten regner appen ud.</figcaption>
   </figure>
 
-  <p>Selve fremgangsmåden — de fem trin, forventede værdier for asfalt, græs og sne,
-     og spørgsmålene til klassen — står i øvelsesvejledningen. Den kan printes som elevark.</p>
+  <p>Fremgangsmåden, måleskemaet og opgaverne står i øvelsesvejledningen.</p>
 
   <div class="cta">
     <a href="oevelsesvejledning.html">Åbn øvelsesvejledningen</a>
     <a class="sek" href="referencekort.html">Print referencekortet</a>
-    <a class="sek" href="https://geo.sg.dk/albedo">Åbn albedo-appen</a>
+  </div>
+
+  <div class="qr-blok">
+    <img src="foto/qr-albedo.svg" alt="QR-kode til albedo-appen på geo.sg.dk/albedo" width="120" height="120">
+    <p><b>Appen skal I bruge på mobilen.</b> Scan koden — eller skriv
+       <b>geo.sg.dk/albedo</b>. Koden står også på referencekortet, så I har den med ud.</p>
   </div>
 </section>
 
@@ -309,19 +307,32 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
     <a class="sek" href="oevelsesvejledning.html">Opgaven står i øvelsesvejledningen</a>
   </div>
 
-  <h3>Det I sandsynligvis opdager</h3>
-  <p><strong>1. Græsset snyder.</strong> For jeres telefon er en græsplæne lige så mørk
-     som asfalt. For satellitten er den flere gange så lys, fordi planter kaster infrarødt
-     lys tilbage — lys, jeres telefon ikke kan se. Det var det, boksen
-     <a href="#albedo">«Hvad er albedo?»</a> advarede om.</p>
-  <p><strong>2. Satellitten ser mere end jeres flade.</strong> Jeres asfalt målte måske
-     0,12. Satellitten siger måske 0,20 for samme sted. Ingen af jer tager fejl —
-     I måler bare ikke det samme. Satellitten lægger alt sammen inden for sit felt:
-     asfalten, græsplænen ved siden af, det lyse tag, cykelskuret. Det hedder en
-     <strong>blandet pixel</strong>, og det er et af de største problemer i al
-     satellitovervågning.</p>
-  <p>Kortet hjælper jer med at skelne: når I trykker på et sted, fortæller det, om
-     fladen er ensartet eller blandet.</p>
+  <details class="fold efter"><summary>Åbn, når I har slået jeres egne tal op</summary>
+  <div class="fold-inner">
+    <p><strong>På asfalten er I nogenlunde enige med satellitten.</strong> Asfalt ser ens
+       ud i alt lys, og fladen er stor nok til, at satellitten kun ser asfalt. Metoden virker.</p>
+    <p><strong>På græsset er I helt uenige.</strong> For jeres telefon er en græsplæne lige
+       så mørk som asfalt. For satellitten er den flere gange så lys.</p>
+
+    <h4>Derfor var I uenige om græsset</h4>
+    <p>Er albedo bare, hvor lys noget ser ud? <b>Næsten.</b> Mørke ting har lav albedo, og
+       lyse ting har høj. Men omkring halvdelen af solens energi er infrarødt lys, som er
+       usynligt for os — og for jeres telefon. Albedo tæller det hele med.</p>
+    <p>For de fleste overflader gør det ingen forskel. Asfalt, beton og vand er lige så
+       mørke i det usynlige lys som i det synlige. To slags overflader snyder:</p>
+    <ul>
+      <li><b>Planter</b> ser mørke ud, men er lyse i infrarødt. Deres albedo er højere,
+        end den ser ud.</li>
+      <li><b>Sne og is</b> ser kridhvide ud, men er mørkere i infrarødt. Deres albedo er
+        lidt lavere, end den ser ud.</li>
+    </ul>
+
+    <h4>Og når satellitten ser mere end jeres flade</h4>
+    <p>Klikker I i et hjørne, hvor asfalt, græs og tag mødes, lægger satellitten det hele
+       sammen til ét tal. Det hedder en <strong>blandet pixel</strong>, og det er et af de
+       største problemer i al satellitovervågning. Satellitkortet fortæller jer, om fladen
+       er ensartet eller blandet.</p>
+  </div></details>
 
   <figure>
     <img src="foto/vejrstation.jpg" alt="PROMICE-vejrstationen på klippen ved Mittivakkat-gletsjeren med gletsjersø i baggrunden">
@@ -362,6 +373,24 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
   <h2>Tilbage til isen — hvad betyder det for Grønland?</h2>
   <p class="lede">Nu har I metoden. Så kan I regne på det samme som klimaforskerne gør,
      med tallene fra gletsjeren.</p>
+
+  <div class="boks">
+    <h4>Ikke en detalje&hellip;</h4>
+    <p>Grønlands indlandsis taber masse på to måder, som vejer omtrent lige tungt.
+       Cirka <b>halvdelen</b> sker på <b>overfladen</b>, hvor sollyset smelter is og sne.
+       Den anden halvdel sker ved at isen <b>flyder ud i havet</b> og kalver som isbjerge.</p>
+
+    <figure>
+      <img src="foto/apusiaajik.jpg" alt="Apusiaajik-gletsjerens kalvefront møder havet, med isstykker i vandet og bjerge i tåge bagved">
+      <figcaption><b>Apusiaajik-gletsjeren</b>, få kilometer fra feltstationen. Her ender
+        isen i havet og brækker af som isbjerge. Gletsjeren har trukket sig
+        <b>flere kilometer tilbage</b> de seneste 50 år — det brune, bare land i
+        forgrunden lå under is inden for et menneskeliv.</figcaption>
+    </figure>
+
+    <p>Albedo styrer den første halvdel. Og albedo er noget I kan måle — med en telefon
+       og et stykke papir.</p>
+  </div>
 
   <figure class="helt">
     <img src="foto/smeltevand.jpg" alt="Turkis smeltevandsgryde i gletsjeroverfladen, omgivet af ru, lys is med bjerge i baggrunden">
@@ -410,19 +439,10 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
 <section id="gletsjeren">
   <div class="trin">Til sidst</div>
   <h2>Gå med på gletsjeren</h2>
-  <p class="lede">I har målt jeres egen asfalt, fundet stedet fra rummet, opdaget den blandede
-     pixel og regnet på hvor meget der smelter. Så er der kun ét tilbage: at se det.</p>
+  <p class="lede">I har målt jeres egen asfalt, fundet stedet fra rummet og regnet på, hvor
+     meget der smelter. Så er der kun ét tilbage: at se vandet løbe.</p>
 
-  <div class="videoer">
-    <figure>
-      <video controls preload="none" playsinline poster="video/gletsjer-invitation.jpg">
-        <source src="video/gletsjer-invitation.mp4" type="video/mp4">
-        Din browser kan ikke afspille videoen.
-      </video>
-      <figcaption><b>Kom med.</b> Optaget på Mittivakkat-gletsjeren 8. august 2026.
-        Bag i billedet ligger fjorden fuld af isbjerge — og under fødderne den is,
-        alle tallene i dette forløb handler om.</figcaption>
-    </figure>
+  <div class="videoer en">
 
     <figure>
       <video controls preload="none" playsinline poster="video/smeltevandsgryde-drone.jpg">
@@ -463,11 +483,10 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
 
 <footer><div class="wrap">
   <div class="links">
-    <a href="laerervejledning.html">Til læreren: tidsplan og facit</a>
     <a href="referencekort.html">Referencekort til print</a>
-    <a href="https://geo.sg.dk/albedo">Albedo-appen</a>
-    <a href="../kort/">Kort med satellitdata</a>
-    <a href="../spektrum/">Det faglige grundlag</a>
+    <a href="../kort/dk.html">Danmarkskortet</a>
+    <a href="../kort/">Grønlandskortet</a>
+    <a href="../spektrum/#sne">Det faglige grundlag</a>
   </div>
   <p class="sml">Feltarbejde ved Sermilik feltstation, Ammassalik Ø, Østgrønland
     (65°41′N · 37°55′V), august 2026. Satellitdata: Sentinel-2 fra Copernicus /ESA.<br>

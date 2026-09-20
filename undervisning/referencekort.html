@@ -28,10 +28,12 @@
   .side1 .sub{font-size:9pt;color:#444;margin:0 0 4mm}
   .feltlabel{font-size:11pt;font-weight:700;margin:2.5mm 0 1.5mm}
   .feltlabel span{font-weight:400;color:#444;font-size:9pt}
-  svg.sortfelt{display:block;width:100%;height:112mm}
-  .hvidfelt{width:100%;height:112mm;border:0.6mm dashed #999;position:relative}
+  svg.sortfelt{display:block;width:100%;height:105mm}
+  .hvidfelt{width:100%;height:105mm;border:0.6mm dashed #999;position:relative}
   .hvidfelt em{position:absolute;left:3mm;bottom:2mm;font-size:8pt;color:#999;font-style:normal}
-  .fod1{margin-top:3mm;font-size:8pt;color:#666;display:flex;justify-content:space-between}
+  .fod1{margin-top:3mm;font-size:8pt;color:#666;display:flex;justify-content:space-between;align-items:flex-end}
+  .fod1 .qr{display:flex;gap:3mm;align-items:center;font-size:9pt;color:#222}
+  .fod1 .qr img{width:18mm;height:18mm}
 
   /* ── SIDE 2: instruktion ── */
   .side2{page-break-before:always}
@@ -79,7 +81,8 @@
   <div class="hvidfelt"><em>upåtrykt papir — her må intet printes</em></div>
 
   <div class="fod1">
-    <span>Sans Science · geo.sg.dk/albedo</span>
+    <span class="qr"><img src="foto/qr-albedo.svg" alt="QR-kode til geo.sg.dk/albedo" width="70" height="70">
+      <span><b>Åbn appen på mobilen:</b><br>scan koden — eller skriv geo.sg.dk/albedo</span></span>
     <span>Print sort/hvid · 100 % · mat papir</span>
   </div>
 </div>
@@ -93,10 +96,10 @@
       Glat det ud, og undgå skygge fra dig selv og genskin fra solen.</li>
     <li><b>Fotografér lige oppefra</b> (1–2 m højde), så både kortets to felter og
       overfladen omkring det er med i samme billede, i samme lys.</li>
-    <li><b>Åbn appen</b> på geo.sg.dk/albedo, vælg “Selvtaget foto”, og læg billedet ind.</li>
+    <li><b>Åbn appen på mobilen</b> — scan QR-koden på kortets forside, eller skriv geo.sg.dk/albedo — og læg billedet ind.</li>
     <li><b>Markér felterne i rækkefølge:</b> først det <b>sorte felt</b>, så det
       <b>hvide felt</b> — og derefter de overflader du vil måle.</li>
-    <li><b>Aflæs albedoen</b> for hvert område, og gem/eksportér målingen.</li>
+    <li><b>Aflæs albedoen</b>, og giv målingen et navn (asfalt, græs …). Appen samler jeres tal under «Mine målinger».</li>
   </ol>
 
   <h3>Hvorfor sort og hvid — og ikke gråtoner?</h3>

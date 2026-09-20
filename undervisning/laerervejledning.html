@@ -103,6 +103,9 @@ figure.lille figcaption{font-size:var(--fs-xs);color:var(--muted);padding-top:.5
 .to-kol{display:grid;grid-template-columns:minmax(0,360px) 1fr;gap:1.4rem;align-items:start}
 @media (max-width:700px){.to-kol{grid-template-columns:1fr}}
 td.n,th.n{white-space:nowrap}
+details.fold{margin:.8rem 0;border:1px solid var(--line);background:#fff}
+details.fold summary{cursor:pointer;padding:.7rem 1rem;font-weight:600;font-size:var(--fs-md);color:var(--navy)}
+details.fold .fold-inner{padding:0 1.1rem 1rem}
 </style>
 </head>
 <body>
@@ -132,8 +135,24 @@ td.n,th.n{white-space:nowrap}
   <a class="sek" href="../kort/dk.html">Satellitkortet</a>
 </div>
 
-<p class="niveau-note">Elevarket er delt i et <b>kerneforløb</b> (del 1–3) for alle og en
-  <b>udvidelse</b> til B- og A-niveau. Forløbet kan bruges i både naturgeografi og fysik.</p>
+<p class="niveau-note">Elevarket er <b>kerneforløbet</b> (del 1–3) for alle. <a href="udvidelse.html">Udvidelsen</a>
+  til B- og A-niveau ligger på sin egen side. Eleverne bruger den bærbare til forløbsside, elevark
+  og satellitkort — og mobilen til appen. Forløbet kan bruges i både naturgeografi og fysik.</p>
+
+<h2>Før timen</h2>
+<ul class="fejl">
+  <li><b>Print referencekortet</b> — ét pr. gruppe, mat papir, 100 % skalering,
+    tonerbesparelse slået fra. Det sorte felt skal være helt sort.</li>
+  <li><b>Find to store flader</b> på mindst 40 × 40 meter: én med asfalt, én med græs.
+    Tjek dem i satellitkortet på forhånd: et klik på fladen skal kalde omgivelserne <i>ensartede</i>.</li>
+  <li><b>Tjek at der findes et skyfrit satellitbillede.</b> Opslaget viser datoen for det nyeste
+    skyfri billede. Driller vejret, så åbn «Flere værktøjer» i satellitkortet og vælg «Seneste sommer» — asfalt
+    ændrer sig ikke med årstiden, men det gør græs.</li>
+  <li><b>Vejret:</b> jævnt overskyet er bedst. Lav sol giver lange skygger, og våde flader
+    spejler lyset.</li>
+  <li><b>Roller i gruppen:</b> en fotograf (mobil), en skriver (måleskema) og en kortlæser
+    (satellitkortet på den bærbare). Åbn elevark og satellitkort i to faner, <i>før</i> I går ud.</li>
+</ul>
 
 <h2>Tidsplan</h2>
 
@@ -141,33 +160,94 @@ td.n,th.n{white-space:nowrap}
 <table>
   <thead><tr><th class="n">Tid</th><th>Hvad</th><th>Hvor i materialet</th></tr></thead>
   <tbody>
-    <tr><td class="n">0–10</td><td>Casen, «Hvad er albedo?» og «Gæt først»</td><td>Forløbssiden · elevark del 1</td></tr>
+    <tr><td class="n">0–10</td><td>Casen og videoen på lærred, «Hvad er albedo?» og «Gæt først»</td><td>Forløbssiden · elevark del 1</td></tr>
     <tr><td class="n">10–35</td><td>Ude: asfalt og græs, tre målinger af hver</td><td>Del 1, trin 1–5</td></tr>
     <tr><td class="n">35–50</td><td>Fotos ind i appen, tal i måleskemaet</td><td>Måleskema</td></tr>
-    <tr><td class="n">50–65</td><td>Satellitkortet: slå stederne op med ⓘ</td><td>Del 2, opgave 2</td></tr>
-    <tr><td class="n">65–75</td><td>Opsamling: græsset, den blandede pixel — og tilbage til Grønland</td><td>«Det I sandsynligvis opdager»</td></tr>
+    <tr><td class="n">50–65</td><td>Satellitkortet på den bærbare: søg skolen, klik på de to flader</td><td>Del 2, opgave 2</td></tr>
+    <tr><td class="n">65–75</td><td>Opsamling: klassens tal på tavlen — hvem har ret? Åbn folden sammen.</td><td>«Åbn, når I har jeres egne tal»</td></tr>
   </tbody>
 </table>
 
 <h3>To moduler</h3>
-<p>Modul 1 som ovenfor. Modul 2: del 3 (regn på afsmeltningen), usikkerhed, udvidelsen og
-  eventuelt droneopgaven sidst på forløbssiden. Opgave 1c (tør og våd asfalt) passer godt
+<p>Modul 1 som ovenfor. Modul 2: del 3 (tilbage til gletsjeren), udvidelsen og
+  eventuelt droneopgaven sidst på forløbssiden. Opgave 1b (tør og våd asfalt) passer godt
   som start på modul 2 — den kræver kun en spand vand.</p>
 
-<h2>Før timen</h2>
+<h2>Når det går galt</h2>
 <ul class="fejl">
-  <li><b>Print referencekortet</b> — ét pr. gruppe, mat papir, 100 % skalering,
-    tonerbesparelse slået fra. Det sorte felt skal være helt sort.</li>
-  <li><b>Find to store flader</b> på mindst 40 × 40 meter: én med asfalt, én med græs.
-    Tjek dem i satellitkortet på forhånd: ⓘ skal kalde omgivelserne <i>ensartede</i>.</li>
-  <li><b>Tjek at der findes et skyfrit satellitbillede.</b> ⓘ viser datoen for det nyeste
-    skyfri billede i den valgte periode. Driller vejret, så vælg «Seneste sommer» — asfalt
-    ændrer sig ikke med årstiden, men det gør græs.</li>
-  <li><b>Vejret:</b> jævnt overskyet er bedst. Lav sol giver lange skygger, og våde flader
-    spejler lyset.</li>
+  <li><b>Appen advarer om overeksponering</b> — det hvide felt er brændt ud. Tag billedet
+    igen, gerne i skygge eller med lavere eksponering.</li>
+  <li><b>Albedo over 1 eller helt urimelige tal</b> — felterne er markeret i forkert
+    rækkefølge (sort først), eller der ligger skygge over kortet.</li>
+  <li><b>Blankt papir eller gråt sort felt</b> — print igen på mat papir uden tonerbesparelse.</li>
+  <li><b>Satellitkortet siger «Ingen måling her»</b> — ingen skyfri optagelse i perioden. Åbn
+    «Flere værktøjer», og vælg en længere periode eller hæv «Max sky %».</li>
+  <li><b>Lav sol og lange skygger</b> — stil jer, så skyggen falder <i>væk</i> fra referencekortet,
+    eller mål i skygge eller under skyer. Kort og flade skal bare have samme lys.</li>
+  <li><b>Våde flader</b> — fotografér lodret ned, så solen ikke spejler sig i fladen.</li>
 </ul>
 
-<h2>Faglige mål</h2>
+<h2>Resten — fold ud efter behov</h2>
+
+<details class="fold stille"><summary>Facit og forventede svar</summary>
+<div class="fold-inner">
+<div class="opg">
+  <h4>Opgave 1</h4>
+  <p><b>a)</b> Den mørkeste tørre flade — typisk asfalt. Mange grupper måler dog græsset som
+    lige så mørkt eller mørkere. Det er pointen, ikke en fejl — gem forklaringen til folden.</p>
+  <p><b>b)</b> Våd asfalt er tydeligt mørkere end tør — regn med et fald på omkring en
+    tredjedel. Vand på overfladen gør, at mere lys fanges i stedet for at blive spredt
+    tilbage. Samme mekanisme gør våd is mørkere end tør.</p>
+</div>
+
+<div class="opg">
+  <h4>Opgave 2</h4>
+  <p><b>Asfalt:</b> elever og satellit er typisk enige inden for ca. 0,05.
+    <b>Græs:</b> telefonen giver 0,03–0,08, satellitten 0,16–0,25. <b>Blandet hjørne:</b>
+    satellitkortet kalder fladen blandet, og tallet ligger mellem de flader, den ser.</p>
+  <p><b>d)</b> To grunde: græs kaster meget infrarødt lys tilbage, som telefonen ikke ser, så
+    dets rigtige albedo er højere, end det ser ud. Og planter bruger energi på at fordampe vand.</p>
+</div>
+
+<div class="opg">
+  <h4>Opgave 3</h4>
+  <p><b>a)</b> Det lyse felt beholder 1 − 0,58 = 0,42, det mørke 1 − 0,11 = 0,89. Forholdet
+    er ca. 2 — som 40 cm mod 20 cm.</p>
+  <p><b>b)</b> Albedo 0,58: 266 · 0,42 · 518 400 = 57,9 MJ/m² → 173 kg/m² → <b>19 cm</b>.
+    Albedo 0,11: 266 · 0,89 · 518 400 = 122,7 MJ/m² → 367 kg/m² → <b>41 cm</b>.
+    Målt: 20 og 40 cm.</p>
+</div>
+
+<div class="opg">
+  <h4>Udvidelse 1–4</h4>
+  <p><b>1)</b> Albedo 0,27 giver <b>33–34 cm</b>, cirka 74 % mere end det lyse felt.</p>
+  <p><b>2)</b> Græs absorberer 80 %, asfalt 88 %. Telefonen ser kun synligt lys. Græssets
+    ekstra trick er fordampning. Samlet: byer med meget asfalt bliver varmere — varmeø-effekten.</p>
+  <p><b>3)</b> Forskerne på gletsjeren ramte den blandede pixel: de målte i randzonen.</p>
+  <p><b>4)</b> På ujævne flader giver det mest spredning at flytte referencekortet. Appens albedo
+    holder ved forskellig eksponering, indtil det hvide felt bliver overeksponeret — så
+    advarer appen, og tallene bliver for høje.</p>
+</div>
+
+<div class="opg">
+  <h4>Udvidelse 5 (A-niveau)</h4>
+  <p><b>a)</b> Med 308 W/m²: <b>22 cm</b> og <b>47 cm</b>.
+    <b>b)</b> Der mangler ca. <b>13 W/m²</b> (lyst felt) og <b>42 W/m²</b> (mørkt felt).</p>
+  <p><b>c)</b> Netto langbølget: 276 − 316 = −40 W/m². Varme fra luften: +20 til +30 W/m²
+    (et overslag med vind 2 m/s og 5 °C varmere luft giver ca. 27 W/m²). Sum: −10 til −20 W/m².</p>
+  <p><b>d)</b> Det passer fint for det lyse felt. For det mørke felt mangler der mere — en
+    albedo omkring 0,20 i stedet for 0,11 ville få regnestykket til at gå op. Det mørke
+    felts albedo er den mest usikre måling i hele forsøget.</p>
+  <p><b>e)</b> De 266 W/m² er solindstrålingen <i>minus</i> nettotabet fra de led, modellen
+    udelader. At en så simpel model rammer, skyldes at de to største udeladte led har
+    modsat fortegn.</p>
+</div>
+
+</div></details>
+
+<details class="fold stille"><summary>Faglige mål (forslag)</summary>
+<div class="fold-inner">
+
 <p class="niveau-note">Forslag — ret formuleringerne til efter jeres læreplan og studieplan.</p>
 <table>
   <thead><tr><th>Naturgeografi</th><th>Fysik</th></tr></thead>
@@ -178,7 +258,12 @@ td.n,th.n{white-space:nowrap}
   </tbody>
 </table>
 
-<h2>Niveaudeling</h2>
+
+</div></details>
+
+<details class="fold stille"><summary>Niveaudeling: C, B og A</summary>
+<div class="fold-inner">
+
 <table>
   <thead><tr><th class="n">Niveau</th><th>Hvad</th><th>Hvordan</th></tr></thead>
   <tbody>
@@ -188,74 +273,12 @@ td.n,th.n{white-space:nowrap}
   </tbody>
 </table>
 
-<h2>Facit og forventede svar</h2>
 
-<div class="opg">
-  <h4>Opgave 1</h4>
-  <p><b>a)</b> Den mørkeste tørre flade — typisk asfalt. Mange grupper måler dog græsset som
-    lige så mørkt eller mørkere. Det er pointen, ikke en fejl.</p>
-  <p><b>b)</b> To grunde: græs kaster meget infrarødt lys tilbage, som telefonen ikke ser, så
-    dets rigtige albedo er højere, end det ser ud. Og planter bruger energi på at fordampe
-    vand.</p>
-  <p><b>c)</b> Våd asfalt er tydeligt mørkere end tør — regn med et fald på omkring en
-    tredjedel. Vand på overfladen gør, at mere lys fanges i stedet for at blive spredt
-    tilbage. Samme mekanisme gør våd is mørkere end tør.</p>
-</div>
+</div></details>
 
-<div class="opg">
-  <h4>Opgave 2</h4>
-  <p><b>Asfalt:</b> elever og satellit er typisk enige inden for ca. 0,05.
-    <b>Græs:</b> telefonen giver 0,03–0,08, satellitten 0,16–0,25. <b>Blandet hjørne:</b>
-    ⓘ kalder fladen blandet, og satellittens tal ligger mellem de flader, den ser.</p>
-</div>
+<details class="fold stille"><summary>Hvor præcis er metoden? — baggrund og diskussionsoplæg til A-niveau</summary>
+<div class="fold-inner">
 
-<div class="opg">
-  <h4>Opgave 3</h4>
-  <p>Energi pr. m²: <code>E = Q · (1 − albedo) · t</code> med t = 6 · 86 400 s = 518 400 s.
-    Smeltet masse: <code>m = E / 334 000 J/kg</code>. Tykkelse: <code>d = m / 900 kg/m³</code>.</p>
-  <p><b>a)</b> Albedo 0,58: 266 · 0,42 · 518 400 = 57,9 MJ/m² → 173 kg/m² → <b>19 cm</b>.
-    Albedo 0,11: 266 · 0,89 · 518 400 = 122,7 MJ/m² → 367 kg/m² → <b>41 cm</b>.</p>
-  <p><b>b)</b> Ja — målt 20 og 40 cm.</p>
-  <p><b>c)</b> Albedo 0,27 giver <b>33–34 cm</b>, cirka 74 % mere end det lyse felt.</p>
-</div>
-
-<div class="opg">
-  <h4>Udvidelse 1–3</h4>
-  <p><b>1)</b> Græs absorberer 80 %, asfalt 88 %. Telefonen ser kun synligt lys. Græssets
-    ekstra trick er fordampning. Samlet: byer med meget asfalt bliver varmere — varmeø-effekten.</p>
-  <p><b>2)</b> Forskerne på gletsjeren ramte den blandede pixel: de målte i randzonen.</p>
-  <p><b>3)</b> På ujævne flader giver det mest spredning at flytte kortet. Appens albedo
-    holder ved forskellig eksponering, indtil det hvide felt bliver overeksponeret — så
-    advarer appen, og tallene bliver for høje.</p>
-</div>
-
-<div class="opg">
-  <h4>Udvidelse 4 (A-niveau)</h4>
-  <p><b>a)</b> Med 308 W/m²: <b>22 cm</b> og <b>47 cm</b>.
-    <b>b)</b> Der mangler ca. <b>13 W/m²</b> (lyst felt) og <b>42 W/m²</b> (mørkt felt).</p>
-  <p><b>c)</b> Netto langbølget: 276 − 316 = −40 W/m². Varme fra luften: +20 til +30 W/m²
-    (et overslag med vind 2 m/s og 5 °C varmere luft giver ca. 27 W/m²). Sum: −10 til −20 W/m².</p>
-  <p><b>d)</b> Det passer fint for det lyse felt. For det mørke felt mangler der mere — en
-    albedo omkring 0,20 i stedet for 0,11 ville få regnestykket til at gå op. Det mørke
-    felts albedo er den mest usikre måling i hele forsøget (se nedenfor).</p>
-  <p><b>e)</b> De 266 W/m² er solindstrålingen <i>minus</i> nettotabet fra de led, modellen
-    udelader. At en så simpel model rammer, skyldes at de to største udeladte led har
-    modsat fortegn.</p>
-</div>
-
-<h2>Når det går galt</h2>
-<ul class="fejl">
-  <li><b>Appen advarer om overeksponering</b> — det hvide felt er brændt ud. Tag billedet
-    igen, gerne i skygge eller med lavere eksponering.</li>
-  <li><b>Albedo over 1 eller helt urimelige tal</b> — felterne er markeret i forkert
-    rækkefølge (sort først), eller der ligger skygge over kortet.</li>
-  <li><b>Blankt papir eller gråt sort felt</b> — print igen på mat papir uden tonerbesparelse.</li>
-  <li><b>ⓘ siger «Ingen måling her»</b> — ingen skyfri optagelse i perioden. Vælg en længere
-    periode eller hæv «Max sky %».</li>
-  <li><b>Våde flader og lav sol</b> — mål lodret ned og med solen i ryggen, så I undgår genskin.</li>
-</ul>
-
-<h2>Hvor præcis er metoden?</h2>
 <p>Metoden er god til at <i>sammenligne</i> flader. De absolutte tal skal tages med
   forbehold — regn med ± 0,03–0,05 under gode forhold. Fire ting er værd at kende:</p>
 
@@ -296,11 +319,18 @@ td.n,th.n{white-space:nowrap}
   (Liang 2001) ud fra bånd på 10 og 20 meter. Atmosfærekorrektionen antager en vandret
   flade. Det er et godt tal — men ikke et facit.</p>
 
+
+</div></details>
+
 <div class="knapper">
   <a class="sek" href="./">← Tilbage til forløbet</a>
-  <a class="sek" href="../spektrum/">Det faglige grundlag</a>
+  <a class="sek" href="../spektrum/#sne">Det faglige grundlag</a>
 </div>
 
 </main>
+<script>
+  // Ved print skal alt med — også det, der er foldet sammen på skærmen
+  window.addEventListener('beforeprint', () => document.querySelectorAll('details').forEach(d => { d.open = true; }));
+</script>
 </body>
 </html>
