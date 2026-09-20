@@ -30,8 +30,15 @@ body{margin:0;background:var(--bg);color:var(--ink);line-height:1.65;
 /* ---------- hero ---------- */
 .hero{position:relative;min-height:min(58vh,520px);display:flex;align-items:flex-end;
   background:#0a0f2c center/cover no-repeat}
-.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  object-position:22% 25%}  /* silhuetterne øverst tv. skal blive i billedet ved beskæring */
+.hero img,.hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  object-position:50% 42%}  /* horisonten og de to vandrere skal blive i billedet ved beskæring */
+.hero-pause{position:absolute;z-index:3;right:.9rem;bottom:.9rem;width:2.1rem;height:2.1rem;border:1px solid rgba(255,255,255,.6);
+  background:rgba(6,10,32,.45);color:#fff;font-size:.7rem;line-height:1;cursor:pointer;border-radius:50%}
+.hero-pause:hover{background:rgba(6,10,32,.75)}
+/* På en smal skærm flyttes udsnittet mod højre, så de to vandrere bliver i billedet */
+@media (max-width:700px){.hero img,.hero video{object-position:80% 42%}}
+/* Har brugeren bedt om mindre bevægelse, vises stillbilledet i stedet for loopet */
+@media (prefers-reduced-motion:reduce){.hero video,.hero-pause{display:none}}
 .hero::after{content:"";position:absolute;inset:0;
   background:linear-gradient(180deg,rgba(6,10,32,.34) 0%,rgba(6,10,32,.12) 38%,rgba(6,10,32,.9) 100%)}
 .hero .inner{position:relative;z-index:2;max-width:1000px;margin:0 auto;
@@ -162,7 +169,11 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
 <body>
 
 <header class="hero">
-  <img src="foto/hero.jpg" alt="To personer i dis på Mittivakkat-gletsjerens knudrede, gråmelerede isoverflade">
+  <img src="video/invitation-paa-isen.jpg" alt="To personer går hen over Mittivakkat-gletsjerens hvide is under en blå himmel, med en klippetop i baggrunden">
+  <video id="hero-video" autoplay muted loop playsinline preload="metadata" poster="video/invitation-paa-isen.jpg" aria-hidden="true">
+    <source src="video/invitation-paa-isen.mp4" type="video/mp4">
+  </video>
+  <button type="button" id="hero-pause" class="hero-pause" aria-label="Sæt videoen på pause">❙❙</button>
   <div class="inner">
     <p class="kicker">Sermilik feltstation · Østgrønland</p>
     <h1>Mørk is smelter dobbelt så hurtigt</h1>
@@ -194,18 +205,6 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
   <p class="lede">I august 2026 lagde en gruppe forskere felter ud på en gletsjer i
      Østgrønland. Nogle felter blev dækket med mørkt sediment, andre fik lov at
      ligge som ren is. Så satte de pinde i og ventede seks dage.</p>
-
-  <div class="videoer en">
-    <figure>
-      <video controls preload="none" playsinline poster="video/gletsjer-invitation.jpg">
-        <source src="video/gletsjer-invitation.mp4" type="video/mp4">
-        Din browser kan ikke afspille videoen.
-      </video>
-      <figcaption><b>Kom med.</b> Optaget på Mittivakkat-gletsjeren 8. august 2026.
-        Bag i billedet ligger fjorden fuld af isbjerge — og under fødderne den is,
-        alle tallene i dette forløb handler om.</figcaption>
-    </figure>
-  </div>
 
   <div class="to-op">
     <figure>
@@ -440,9 +439,18 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
   <div class="trin">Til sidst</div>
   <h2>Gå med på gletsjeren</h2>
   <p class="lede">I har målt jeres egen asfalt, fundet stedet fra rummet og regnet på, hvor
-     meget der smelter. Så er der kun ét tilbage: at se vandet løbe.</p>
+     meget der smelter. Så er der kun ét tilbage: at se det.</p>
 
-  <div class="videoer en">
+  <div class="videoer">
+    <figure>
+      <video controls preload="none" playsinline poster="video/gletsjer-invitation.jpg">
+        <source src="video/gletsjer-invitation.mp4" type="video/mp4">
+        Din browser kan ikke afspille videoen.
+      </video>
+      <figcaption><b>Kom med.</b> Optaget på Mittivakkat-gletsjeren 8. august 2026.
+        Bag i billedet ligger fjorden fuld af isbjerge — og under fødderne den is,
+        alle tallene i dette forløb handler om.</figcaption>
+    </figure>
 
     <figure>
       <video controls preload="none" playsinline poster="video/smeltevandsgryde-drone.jpg">
@@ -493,5 +501,16 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
     Sans Science · undervisning med SANS</p>
 </div></footer>
 
+<script>
+  // Forsidens video: pause/afspil
+  (function () {
+    var v = document.getElementById('hero-video'), k = document.getElementById('hero-pause');
+    if (!v || !k) return;
+    k.addEventListener('click', function () {
+      if (v.paused) { v.play(); k.textContent = '❙❙'; k.setAttribute('aria-label', 'Sæt videoen på pause'); }
+      else { v.pause(); k.textContent = '▶'; k.setAttribute('aria-label', 'Afspil videoen'); }
+    });
+  })();
+</script>
 </body>
 </html>
