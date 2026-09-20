@@ -14,11 +14,13 @@ export const SH_WMS_BASE = 'https://sh.dataspace.copernicus.eu/ogc/wms';
 // Statistical API (pixel-info) kaldes via proxyen /sermilik/api — OAuth-nøglen
 // ligger på serveren (GEO_site/Sermilik_api), ikke her.
 
+// Grønlandskortet åbner på feltugen i august 2026: den 7. august er næsten skyfri
+// (0,11 % skydække) og er den scene, forløbets satellittal stammer fra.
 export const SH_DEFAULT_DATES = {
-  mode: 'range',
-  from: '2024-06-01',
-  to: '2024-09-30',
-  target: '2024-07-15',
+  mode: 'single',
+  from: '2026-08-01',
+  to: '2026-08-15',
+  target: '2026-08-07',
   tolerance: 3,
   maxcc: 30,
 };

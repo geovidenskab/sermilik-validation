@@ -17,6 +17,7 @@ import { sampleMulti } from './sentinel-stats.js';
 import { getShDates } from './sentinel-hub.js';
 import { ARCTICDEM_URL } from './config.js';
 import { erDK } from './profiles.js';
+import { erElevvisning } from './elevvisning.js';
 
 // Et klik henter 2×2 Sentinel-2-pixels (20×20 m). Det svarer til opløsningen i
 // B11/B12, som indgår i albedoformlen, og er småt nok til at en ensartet flade
@@ -32,7 +33,8 @@ const ENSARTET_STD = 0.02;
 let active = false;
 let toolButton = null;
 let modalEl = null;
-let hintEl = null;        // hjælpetekst ved ⓘ på Danmarkskortet
+let hintEl = null;        // hjælpetekst, indtil første opslag er lavet
+let placerHint = () => {};
 
 // Indtegning af rektangel
 let drawing = null;       // { startLatLng, currentRect (L.rectangle) }
@@ -61,27 +63,43 @@ export function initPixelInfo() {
     if (active) deactivate(); else activate();
   });
 
-  // På Danmarkskortet er ⓘ det eneste værktøj, eleverne SKAL bruge. Fremhæv det,
-  // og vis en hjælpetekst, indtil de har prøvet det første gang.
-  if (erDK) {
-    btn.classList.add('fremhaev');
-    hintEl = document.createElement('div');
-    hintEl.className = 'px-hint';
-    hintEl.textContent = 'Tryk her — og så på det sted, I vil måle';
-    // Værktøjslinjen klipper sit indhold (overflow: hidden), så hjælpeteksten
-    // lægges i kortets container og stilles ud for knappen.
-    const kortEl = document.getElementById('map');
-    kortEl.appendChild(hintEl);
-    const placer = () => {
-      if (!hintEl) return;
+  // ⓘ er det eneste værktøj, eleverne skal bruge — fremhæv det på begge kort.
+  btn.classList.add('fremhaev');
+
+  // Hjælpetekst, indtil første opslag er lavet:
+  //   Danmarkskortet i elevvisning: et klik på kortet ER opslaget — ingen værktøjslinje.
+  //   Ellers: teksten står ud for ⓘ-knappen.
+  const kortEl = document.getElementById('map');
+  hintEl = document.createElement('div');
+  hintEl.className = 'px-hint';
+  kortEl.appendChild(hintEl);
+  const placer = () => {
+    if (!hintEl) return;
+    const klikOpslag = erDK && erElevvisning();
+    hintEl.classList.toggle('midt', klikOpslag);
+    if (klikOpslag) {
+      hintEl.textContent = 'Klik på kortet, dér hvor I har målt';
+      hintEl.style.left = ''; hintEl.style.top = '';
+    } else {
+      hintEl.textContent = active ? 'Tryk nu på det sted, I vil måle' : 'Tryk her — og så på det sted, I vil måle';
       const k = kortEl.getBoundingClientRect();
-      const b = btn.getBoundingClientRect();
-      hintEl.style.left = `${b.right - k.left + 10}px`;
-      hintEl.style.top = `${b.top - k.top + (b.height - hintEl.offsetHeight) / 2}px`;
-    };
-    requestAnimationFrame(placer);
-    window.addEventListener('resize', placer);
-  }
+      const kn = btn.getBoundingClientRect();
+      hintEl.style.left = `${kn.right - k.left + 10}px`;
+      hintEl.style.top = `${kn.top - k.top + (kn.height - hintEl.offsetHeight) / 2}px`;
+    }
+  };
+  placerHint = placer;
+  requestAnimationFrame(placer);
+  window.addEventListener('resize', () => requestAnimationFrame(placer));
+
+  // Klik = opslag (kun Danmarkskortet i elevvisning, og kun når intet værktøj er aktivt).
+  // Leaflet sender ikke 'click', når kortet er blevet trukket, så panorering er fri.
+  map.on('click', (e) => {
+    if (!erDK || !erElevvisning() || active) return;
+    if (document.querySelector('.tool-btn.active')) return;
+    if (hintEl) { hintEl.remove(); hintEl = null; }
+    openInfoModal(makePointBbox(e.latlng, KLIK_SIDE_M), true);
+  });
 
   // Esc deaktiverer
   document.addEventListener('keydown', e => {
@@ -95,7 +113,7 @@ export function initPixelInfo() {
 
 function activate() {
   active = true;
-  if (hintEl) hintEl.textContent = 'Tryk nu på det sted, I vil måle';
+  placerHint();
   toolButton?.classList.add('active');
   document.getElementById('map').classList.add('tool-active');
   map.dragging.disable();  // så vi kan tegne rektangel
@@ -287,7 +305,7 @@ function renderResultat(r) {
   const A = r.punkt.layers.S2_ALBEDO, V = r.punkt.layers.S2_NDVI, S = r.punkt.layers.S2_NDSI;
   const pct = Math.round(A.value * 100);
   const omraade = r.erKlik
-    ? `et felt på ${KLIK_SIDE_M} × ${KLIK_SIDE_M} meter, hvor I trykkede`
+    ? `et felt på ${KLIK_SIDE_M} × ${KLIK_SIDE_M} meter, dér hvor I klikkede — fire af satellittens felter`
     : `jeres firkant på ${r.widthM} × ${r.heightM} meter`;
   const indeks = erDK
     ? `<div class="px-indeks"><span>Plantedække (NDVI)</span><b>${tal(V?.value)}</b><i>${ndviTekst(V?.value)}</i></div>`

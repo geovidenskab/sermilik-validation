@@ -19,6 +19,8 @@ import {
 } from './ui.js';
 import { initValidation } from './validation.js';
 import { initPixelInfo } from './pixel-info.js';
+import { initElevvisning } from './elevvisning.js';
+import { initSoeg } from './soeg.js';
 import './promice-viewer.js';  // side-effekt: registrerer window.__openPromiceViewer
 import './station-info.js';    // side-effekt: registrerer window.__openStationInfo
 
@@ -47,3 +49,7 @@ initValidation();
 
 // 6. Foldelige panel-sektioner (kører efter alt UI er bygget)
 addPanelCollapseToggles();
+
+// 7. Elevvisning som standard + søgefelt (kun Danmarkskortet har feltet)
+initElevvisning();
+initSoeg();

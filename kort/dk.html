@@ -20,10 +20,14 @@
   <aside id="panel">
     <p class="intro"><b>Sådan finder I satellittens albedo:</b></p>
     <ol class="intro-trin">
-      <li>Find jeres sted på luftfotoet.</li>
-      <li>Tryk på <b>ⓘ</b> i værktøjslinjen — og tryk så på stedet.</li>
+      <li>Find jeres sted — søg på skolens navn eller en adresse.</li>
+      <li>Klik på kortet, dér hvor I har målt.</li>
       <li>Sammenlign satellittens albedo med jeres egen måling.</li>
     </ol>
+    <div id="soeg" class="soeg">
+      <input type="search" id="soeg-felt" placeholder="Søg skole eller adresse …" autocomplete="off" aria-label="Søg skole eller adresse">
+      <ul id="soeg-resultater" class="soeg-resultater" hidden></ul>
+    </div>
     <p class="intro">Vil I se hele området på én gang? Tænd albedokortet herunder.</p>
     <p class="intro" style="margin-top:0.2rem;">
       <a href="../undervisning/">← Undervisningsforløbet</a> ·
@@ -33,12 +37,14 @@
 
     <h2>Albedokortet</h2>
     <p style="font-size:0.78rem; color:#555; margin: 0 0 0.4rem;">
-      Beregnet ud fra satellittens råbånd med samme formel, som forskerne bruger på indlandsisen.
-      Farverne her er skaleret til danske overflader — vand og asfalt i bunden, sne i toppen.
+      Farverne viser albedo: mørkt er vand og asfalt, grønt er græs, lyst er beton og sne.
+      Hvert farvet felt er 10 × 10 meter.
     </p>
     <div class="layer-group" id="glacial-layers"></div>
 
-    <h2>Vælg dato</h2>
+    <p class="flere"><button type="button" id="vis-flere" class="link-btn">Flere værktøjer</button></p>
+
+    <h2 class="avanceret">Vælg dato</h2>
 
     <div id="sh-config" class="connected">
       <div class="sh-mangler">
@@ -81,7 +87,7 @@
           <button data-preset="latest-summer">Sommeren før</button>
           <button data-preset="last-winter">Sidste vinter</button>
         </div>
-        <p class="hint">Et sammenklip af alle skyfrie optagelser i perioden. Godt til at få noget at se — men datoen er ikke én bestemt dag. Vil du sammenligne med din egen måling, så skift til «Bestemt dag».</p>
+        <p class="hint">Et sammenklip af alle skyfrie optagelser i perioden. Godt til at få noget at se — men datoen er ikke én bestemt dag. Klikker I på kortet, får I tallet fra det nyeste skyfri billede i perioden. Vil I have en bestemt dag, så skift til «Bestemt dag».</p>
       </div>
 
       <div id="mode-single" style="display:none;">
@@ -112,17 +118,17 @@
       </div>
     </div>
 
-    <h2>Andre satellitbilleder</h2>
+    <h2 class="avanceret">Andre satellitbilleder</h2>
 
     <div class="layer-group" id="spectral-layers" style="margin-top: 0.7rem;"></div>
 
-    <h2>Baggrundskort</h2>
+    <h2 class="avanceret">Baggrundskort</h2>
     <div class="layer-group" id="basemaps-dk"></div>
     <h3 class="layer-subhead">Andre kort</h3>
     <div class="layer-group" id="basemaps-vektor"></div>
     <div class="layer-group" id="basemaps-none"></div>
 
-    <div class="external-links">
+    <div class="external-links avanceret-blok">
       <h2 style="margin-top:0;">Baggrund</h2>
       <a href="../undervisning/#rummet">Hvorfor får I ikke det samme som satellitten?</a>
       <a href="../spektrum/">Det faglige grundlag — spektralmålinger fra felten</a>

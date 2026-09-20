@@ -30,23 +30,23 @@ export const LEGENDS = {
   },
 
   ALBEDO: {
-    title: 'Albedo (broadband shortwave, Liang 2001)',
+    title: 'Albedo — hvor meget kastes tilbage?',
     type: 'gradient',
-    unit: 'andel reflekteret stråling (0-1)',
+    unit: 'andel af sollyset (0–1) · hver farveflade = 10 × 10 m',
     description: 'Hvor meget af solens kortbølgede stråling overfladen kaster tilbage. '
       + 'Beregnet af fem Sentinel-2-bånd med Liang (2001): '
       + 'α = 0,356·B02 + 0,130·B04 + 0,373·B08 + 0,085·B11 + 0,072·B12 − 0,0018 '
       + '(blå, rød, nær-infrarød og to kortbølge-infrarøde bånd — vægtene fordeler '
       + 'solens energi over spektret, kalibreret mod feltmålinger).',
     stops: [
-      { value: '0.85', label: 'frisk sne', color: '#ffffff' },
-      { value: '0.75', label: '', color: '#d9f2fa' },
-      { value: '0.65', label: 'firn', color: '#e6f2d9' },
-      { value: '0.55', label: '', color: '#f2d973' },
-      { value: '0.45', label: 'bar is', color: '#f29940' },
-      { value: '0.35', label: '', color: '#cc5944' },
-      { value: '0.25', label: 'mørk is / debris', color: '#8c2e59' },
-      { value: '0.15', label: 'lav (smelt-intens)', color: '#1a0533' },
+      { value: '0,85', label: 'frisk sne', color: '#ffffff' },
+      { value: '0,75', label: '', color: '#d9f2fa' },
+      { value: '0,65', label: 'firn', color: '#e6f2d9' },
+      { value: '0,55', label: '', color: '#f2d973' },
+      { value: '0,45', label: 'bar is', color: '#f29940' },
+      { value: '0,35', label: '', color: '#cc5944' },
+      { value: '0,25', label: 'snavset is', color: '#8c2e59' },
+      { value: '0,15', label: 'mørk is, klippe og vand', color: '#1a0533' },
     ],
   },
 
@@ -54,9 +54,9 @@ export const LEGENDS = {
   // overflader faktisk ligger. Med is-skalaen ville hele landet falde i de
   // tre mørkeste felter.
   ALBEDO_DK: {
-    title: 'Albedokort — hvor meget kastes tilbage? (Liang 2001)',
+    title: 'Albedo — hvor meget kastes tilbage?',
     type: 'gradient',
-    unit: 'andel reflekteret stråling (0-1) · hver farveflade = 10 × 10 m',
+    unit: 'andel af sollyset (0–1) · hver farveflade = 10 × 10 m',
     description: 'Hvor meget af solens kortbølgede stråling overfladen kaster tilbage. '
       + 'Beregnet af fem Sentinel-2-bånd med Liang (2001): '
       + 'α = 0,356·B02 + 0,130·B04 + 0,373·B08 + 0,085·B11 + 0,072·B12 − 0,0018. '

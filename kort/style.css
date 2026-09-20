@@ -77,6 +77,7 @@ header .meta { font-size: 0.8rem; opacity: 0.75; }
 .layer-group { margin-bottom: 0.15rem; }
 .layer {
   display: flex;
+  flex-wrap: wrap;          /* transparens-skyderen får sin egen linje under navnet */
   align-items: center;
   gap: 0.5rem;
   padding: 0.25rem 0.35rem;
@@ -214,7 +215,8 @@ header .meta { font-size: 0.8rem; opacity: 0.75; }
 
 /* Transparens-slider per lag */
 .layer-controls-row {
-  margin-top: 0.3rem;
+  flex-basis: 100%;
+  margin-top: 0.1rem;
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -1758,11 +1760,37 @@ header .meta { font-size: 0.8rem; opacity: 0.75; }
   image-rendering: crisp-edges;
 }
 
-/* ─── Danmarkskortet: enkelt spor for elever ─────────────────────────────── */
-/* Instansen er fast på Danmarkskortet — "forbundet / skift instans" er udvikler-UI */
-html[data-profil="dk"] #sh-config.connected { display: none; }
+/* ─── Elevvisning — kortets standard (js/elevvisning.js) ─────────────────────
+   Den almindelige bruger er en elev, der skal slå ét tal op. Alt andet ligger bag
+   «Flere værktøjer» nederst i panelet. */
+
+/* "Sentinel Hub forbundet · skift instans" er udvikler-UI og vises aldrig, når
+   instansen er sat. Mangler den, står forklaringen der stadig. */
+#sh-config.connected { display: none; }
+
 #panel ol.intro-trin { margin: 0.2rem 0 0.6rem; padding-left: 1.25rem; font-size: 0.85rem; line-height: 1.55; color: #333; }
 #panel ol.intro-trin li { margin: 0.2rem 0; }
+#panel p.flere { margin: 1.1rem 0 0.4rem; font-size: 0.8rem; }
+#panel p.flere .link-btn { color: #555; background: none; border: none; padding: 0; font: inherit; font-size: 0.8rem; text-decoration: underline; cursor: pointer; }
+#panel p.flere .link-btn:hover { color: #D4763C; }
+
+/* Avancerede panelsektioner: overskriften og det indhold, ui.js pakker ind efter den */
+html.elevvisning #panel h2.avanceret,
+html.elevvisning #panel h2.avanceret + .collapse-content,
+html.elevvisning #panel .avanceret-blok { display: none !important; }
+/* I albedo-gruppen er kun albedolaget for eleven (NDSI og NDWI er avancerede) */
+html.elevvisning #glacial-layers .layer:not([data-lag="ALBEDO"]) { display: none; }
+
+/* Værktøjslinjen: Danmarkskortet har ingen (klik = opslag), Grønlandskortet kun ⓘ */
+html.elevvisning[data-profil="dk"] .tool-bar { display: none; }
+html.elevvisning .tool-bar .tool-btn:not([data-tool="pixel-info"]) { display: none; }
+
+/* Oven på kortet: kun målestok og signaturforklaring bliver */
+html.elevvisning #basemap-badge,
+html.elevvisning .sh-scene-info,
+html.elevvisning #coord-readout,
+html.elevvisning .leg-desc { display: none !important; }
+
 /* ⓘ er det værktøj eleverne skal bruge — gør det tydeligt */
 .tool-btn.fremhaev { background: #0A0F3C; color: #fff; }
 .tool-btn.fremhaev.active { background: #D4763C; }
@@ -1775,3 +1803,16 @@ html[data-profil="dk"] #sh-config.connected { display: none; }
   content: ""; position: absolute; left: -6px; top: 50%; transform: translateY(-50%);
   border: 6px solid transparent; border-left: none; border-right-color: #0A0F3C;
 }
+/* Danmarkskortet i elevvisning: hjælpeteksten står øverst midt på kortet */
+.px-hint.midt { left: 50%; top: 0.8rem; transform: translateX(-50%); font-size: 0.9rem; padding: 0.5rem 0.9rem; }
+.px-hint.midt::before { display: none; }
+
+/* Søgefelt (Danmarkskortet) */
+.soeg { position: relative; margin: 0.2rem 0 0.7rem; }
+.soeg input { width: 100%; padding: 0.5rem 0.6rem; font: inherit; font-size: 0.88rem; border: 1px solid #0A0F3C; border-radius: 0; background: #fff; }
+.soeg-resultater { position: absolute; left: 0; right: 0; top: 100%; z-index: 20; margin: 0; padding: 0; list-style: none;
+  background: #fff; border: 1px solid #0A0F3C; border-top: none; box-shadow: 0 4px 10px rgba(0,0,0,0.15); max-height: 16rem; overflow-y: auto; }
+.soeg-resultater li button { display: block; width: 100%; text-align: left; padding: 0.45rem 0.6rem; font: inherit; font-size: 0.82rem;
+  border: none; border-bottom: 1px solid #eef1f5; background: #fff; cursor: pointer; }
+.soeg-resultater li button:hover, .soeg-resultater li button:focus { background: #eef3fb; }
+.soeg-resultater li.tom { padding: 0.5rem 0.6rem; font-size: 0.8rem; color: #777; }

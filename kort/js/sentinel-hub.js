@@ -283,20 +283,22 @@ const spectralLayerDefs = [
       : 'Moisture Index (B8A-B11). Fugtighed i terrænet — finder smelteområder og våde overflader.' },
 ];
 
+// Albedolaget står først: det er det eneste, eleverne skal bruge. NDSI og NDWI er
+// avancerede (skjules i elevvisningen via data-lag i style.css).
 const glacialLayerDefs = [
-  { id: 'NDSI', name: 'NDSI — sne / firn / bar is',
-    desc: 'Normalized Difference Snow Index, (B3−B11)/(B3+B11). Hvid = ren sne, lyseblå = firn, gul/orange = bar is, brun = jord/debris. Brug juli-september for tydeligst kontrast.',
-    evalscript: NDSI_EVALSCRIPT,
-  },
   profil.albedoSkala === 'dk'
     ? { id: 'ALBEDO', name: 'Vis albedokortet',
         desc: 'Liang-formel fra B2, B4, B8, B11, B12, med farveskala til danske overflader (0,00–0,45). Mørkeblå = vand og asfalt, grøn = græs, gul = tørre marker og sand, lys = beton og lyse tage, hvid = sne. Sammenlign feltet med din egen måling.',
         evalscript: ALBEDO_EVALSCRIPT_DK,
       }
-    : { id: 'ALBEDO', name: 'Albedo (broadband shortwave)',
+    : { id: 'ALBEDO', name: 'Vis albedokortet',
         desc: 'Liang-formel fra B2, B4, B8, B11, B12. Mørk lilla = lav albedo (mørk is, smelt-intens), orange = bar is, gul = firn, hvid = frisk sne. Faldende albedo over sommeren = stigende smelte.',
         evalscript: ALBEDO_EVALSCRIPT,
       },
+  { id: 'NDSI', name: 'NDSI — sne / firn / bar is',
+    desc: 'Normalized Difference Snow Index, (B3−B11)/(B3+B11). Hvid = ren sne, lyseblå = firn, gul/orange = bar is, brun = jord/debris. Brug juli-september for tydeligst kontrast.',
+    evalscript: NDSI_EVALSCRIPT,
+  },
   { id: 'NDWI_LAKES', name: 'NDWI — smeltesøer',
     desc: 'McFeeters NDWI, (B3−B8)/(B3+B8). Mørkblå = dybt vand/sø, lyseblå = lavt eller fugtigt. Resten transparent — lægges som overlay på baggrundskort.',
     evalscript: NDWI_EVALSCRIPT,
@@ -345,6 +347,7 @@ function buildSpectralLayers() {
 
     const wrap = document.createElement('label');
     wrap.className = 'layer';
+    wrap.dataset.lag = def.id;
     const input = document.createElement('input');
     input.type = 'checkbox';
     input.checked = previouslyActive.has(def.id);
@@ -399,6 +402,7 @@ function buildGlacialLayers() {
 
     const wrap = document.createElement('label');
     wrap.className = 'layer';
+    wrap.dataset.lag = def.id;
     const input = document.createElement('input');
     input.type = 'checkbox';
     input.checked = previouslyActive.has(def.id);
@@ -452,6 +456,7 @@ function buildThermalLayers() {
 
     const wrap = document.createElement('label');
     wrap.className = 'layer';
+    wrap.dataset.lag = def.id;
     const input = document.createElement('input');
     input.type = 'checkbox';
     input.checked = previouslyActive.has(def.id);

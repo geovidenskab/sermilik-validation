@@ -10,7 +10,7 @@
 <body>
 
 <header>
-  <h1>Sermilik feltstation — Validation-GIS</h1>
+  <h1>Mittivakkat-gletsjeren <em>— set fra rummet</em></h1>
   <div class="meta">65°41′N · 37°55′W · Ammassalik Ø, Østgrønland</div>
 </header>
 
@@ -18,17 +18,28 @@
   <button id="toggle-panel">☰ Kortlag</button>
 
   <aside id="panel">
-    <p class="intro">
-      Tematisk kort til feltarbejde og on-ground-validation omkring Mittivakkat-gletsjeren
-      og Sermilik feltstation. Tænd og sluk lag efter undervisningstema. Klik på markører
-      for kontekst og direkte links til realtidsdata.
-    </p>
+    <p class="intro"><b>Passer satellitten med forskernes måling?</b></p>
+    <ol class="intro-trin">
+      <li>Find Mittivakkat-gletsjeren — den hvide cirkel på kortet. Zoom ind.</li>
+      <li>Tryk på <b>ⓘ</b>, og tryk så tre steder på gletsjeren: ved isranden, midt på og højere oppe.</li>
+      <li>Forskerne målte en albedo på 0,27 på isen i august 2026. Hvor passer det — og hvor passer det ikke?</li>
+    </ol>
+    <p class="intro">Vil I se hele gletsjeren på én gang? Tænd albedokortet herunder.</p>
     <p class="intro" style="margin-top:0.2rem;">
       <a href="../undervisning/">← Undervisningsforløbet</a> ·
       <a href="../spektrum/">Det faglige grundlag</a>
     </p>
 
-    <h2>Spektrale lag (Sentinel-2 bånd)</h2>
+    <h2>Albedokortet</h2>
+    <p style="font-size:0.78rem; color:#555; margin: 0 0 0.4rem;">
+      Farverne viser albedo: mørk lilla er mørk is og vand, orange er bar is, hvid er frisk sne.
+      Hvert farvet felt er 10 × 10 meter.
+    </p>
+    <div class="layer-group" id="glacial-layers"></div>
+
+    <p class="flere"><button type="button" id="vis-flere" class="link-btn">Flere værktøjer</button></p>
+
+    <h2 class="avanceret">Dato og satellitbilleder</h2>
 
     <div id="sh-config" class="connected">
       <div class="sh-status-row">
@@ -46,7 +57,7 @@
 
       <div class="mode-toggle">
         <button type="button" data-mode="range" class="active">Periode (mosaik)</button>
-        <button type="button" data-mode="single">Specifik dato</button>
+        <button type="button" data-mode="single">Bestemt dag</button>
       </div>
 
       <div id="mode-range">
@@ -98,21 +109,15 @@
 
     <div class="layer-group" id="spectral-layers" style="margin-top: 0.7rem;"></div>
 
-    <h2>Glaciologiske indekser</h2>
-    <p style="font-size:0.78rem; color:#555; margin: 0 0 0.4rem;">
-      Beregnet on-the-fly af satellitens råbånd via custom evalscript.
-      Kræver Sentinel Hub-instance forbundet ovenfor. Bruger samme tidsperiode og skytærskel.
-    </p>
-    <div class="layer-group" id="glacial-layers"></div>
 
     <!-- Landsat-termiske lag fjernet 2026-08: kan hverken valideres fra jorden
          eller kobles til spektrometeret, og 8 dages revisit gjorde dem upålidelige
          til feltbrug. Koden ligger stadig i js/sentinel-hub.js (thermalLayerDefs). -->
 
-    <h2>Lokaliteter</h2>
+    <h2 class="avanceret">Lokaliteter</h2>
     <div class="layer-group" id="poi-layers"></div>
 
-    <h2>Baggrundskort</h2>
+    <h2 class="avanceret">Baggrundskort</h2>
     <div class="layer-group" id="basemaps-none"></div>
     <h3 class="layer-subhead">Satellit</h3>
     <div class="layer-group" id="basemaps-satellit"></div>
@@ -121,14 +126,14 @@
     <h3 class="layer-subhead">Bathymetri &amp; ocean</h3>
     <div class="layer-group" id="basemaps-bathy"></div>
 
-    <h2>Terræn &amp; relief</h2>
+    <h2 class="avanceret">Terræn &amp; relief</h2>
     <div class="layer-group" id="terrain-layers"></div>
 
     <!-- NASA GIBS-overlay fjernet 2026-08: lav opløsning, duplikerede Sentinel-2,
          og indgik ikke i undervisningsforløbene. Lagdefinitionerne ligger stadig i
          js/map.js + js/layer-control.js og vender tilbage hvis sektionen genindsættes. -->
 
-    <div class="external-links">
+    <div class="external-links avanceret-blok">
       <h2 style="margin-top:0;">Eksterne kilder</h2>
       <a href="https://promice.org/" target="_blank">PROMICE realtidsdata fra AWS</a>
       <a href="https://thredds.geus.dk/thredds/catalog/catalog.html" target="_blank">GEUS THREDDS datakatalog</a>
