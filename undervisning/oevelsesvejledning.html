@@ -58,6 +58,10 @@ tr.hi td{background:#fff9ee}
 .skala-tekst{display:flex;justify-content:space-between;font-size:var(--fs-xs);
   color:var(--muted);margin-bottom:1.2rem}
 
+table.skema td,table.skema th{border:1px solid var(--line);padding:.55rem .4rem;text-align:center;font-size:var(--fs-xs)}
+table.skema td:first-child,table.skema th:first-child{text-align:left}
+table.skema td{height:2.1rem}
+.tabel-rul{overflow-x:auto}
 .niveau{display:inline-block;background:var(--navy);color:#fff;font-size:var(--fs-xs);
   letter-spacing:.1em;text-transform:uppercase;padding:.3rem .7rem;margin:1.6rem 0 0}
 .niveau.udvid{background:var(--varm);margin-top:2.6rem}
@@ -127,6 +131,15 @@ th small{display:block;text-transform:none;letter-spacing:0;font-weight:400}
   <p>Albedo er <i>næsten</i> det samme som, hvor lys en overflade ser ud — men ikke helt.
     Omkring halvdelen af solens energi er infrarødt lys, som vi ikke kan se, og albedo
     tæller det med. Planter og sne snyder. <a href="./#albedo">Læs mere på forløbssiden.</a></p>
+  <div class="skala">
+    <div style="background:#1a1a1a;color:#fff">0,10</div>
+    <div style="background:#3d3d3d;color:#fff">0,20</div>
+    <div style="background:#6b6b6b;color:#fff">0,35</div>
+    <div style="background:#9c9c9c;color:#222">0,50</div>
+    <div style="background:#cfcfcf;color:#222">0,65</div>
+    <div style="background:#f2f2f2;color:#222">0,85</div>
+  </div>
+  <div class="skala-tekst"><span>mørkt — absorberer næsten alt</span><span>lyst — kaster næsten alt tilbage</span></div>
 </div>
 
 <p class="niveau-note"><b>Sådan er arket bygget op:</b> Kerneforløbet (del 1–3) er for alle.
@@ -137,6 +150,14 @@ th small{display:block;text-transform:none;letter-spacing:0;font-weight:400}
 <!-- ══════════ DEL 1 ══════════ -->
 <h2>Del 1 · Mål albedo i skolegården</h2>
 
+<div class="opg">
+  <h4>Før I går ud · Gæt først</h4>
+  <p>Rangér de overflader, I vil måle, fra mørkest til lysest — og gæt på et tal for hver.
+    Brug gråtoneskalaen ovenfor. Skriv jeres gæt i måleskemaet.</p>
+  <p>Gæt <b>to</b> tal for græsset: Hvad tror I, jeres telefon måler? Og hvad tror I,
+    satellitten siger?</p>
+</div>
+
 <ol class="trin-liste">
   <li><b>Print kortet</b> i sort/hvid på mat papir, 100 % skalering. Blankt papir
     giver genskin og ødelægger målingen.</li>
@@ -146,8 +167,8 @@ th small{display:block;text-transform:none;letter-spacing:0;font-weight:400}
     kort og overflade er med i samme billede. Pas på din egen skygge.</li>
   <li><b>Åbn appen</b>, læg billedet ind, og markér det sorte felt, så det hvide —
     og derefter overfladen.</li>
-  <li><b>Notér albedoen</b> for hver overflade. Mål gerne det samme sted to gange for
-    at se hvor meget resultatet svinger.</li>
+  <li><b>Notér albedoen</b> i måleskemaet. Mål hver overflade <b>tre gange</b>, og flyt
+    kortet lidt hver gang — så kan I se, hvor meget tallet svinger.</li>
 </ol>
 
 <div class="info">
@@ -161,34 +182,24 @@ th small{display:block;text-transform:none;letter-spacing:0;font-weight:400}
     præcis samme princip som satellitter bruger.</p>
 </div>
 
-<h3>Hvad I kan forvente</h3>
-<div class="skala">
-  <div style="background:#1a1a1a;color:#fff">0,10</div>
-  <div style="background:#3d3d3d;color:#fff">0,20</div>
-  <div style="background:#6b6b6b;color:#fff">0,35</div>
-  <div style="background:#9c9c9c;color:#222">0,50</div>
-  <div style="background:#cfcfcf;color:#222">0,65</div>
-  <div style="background:#f2f2f2;color:#222">0,85</div>
-</div>
-<div class="skala-tekst"><span>mørkt — absorberer næsten alt</span><span>lyst — kaster næsten alt tilbage</span></div>
 
-<table>
-  <thead><tr><th>Overflade</th><th class="n">Det ser telefonen<br><small>synligt lys</small></th><th class="n">Det siger satellitten<br><small>alt sollys</small></th></tr></thead>
+
+
+
+
+
+<h3>Måleskema</h3>
+<div class="tabel-rul"><table class="skema">
+  <thead><tr><th>Overflade</th><th>Mit gæt</th><th>Måling 1</th><th>Måling 2</th><th>Måling 3</th><th>Middel</th><th>Satellit</th><th>Ensartet / blandet</th></tr></thead>
   <tbody>
-    <tr><td>Vand</td><td class="n">0,05–0,10</td><td class="n">0,05–0,10</td></tr>
-    <tr><td>Asfalt</td><td class="n">0,08–0,12</td><td class="n">0,10–0,15</td></tr>
-    <tr class="hi"><td>Græs</td><td class="n">0,03–0,08</td><td class="n">0,16–0,25</td></tr>
-    <tr><td>Lyse fliser, beton</td><td class="n">0,25–0,35</td><td class="n">0,30–0,40</td></tr>
-    <tr><td>Hvid mur</td><td class="n">0,60–0,80</td><td class="n">0,60–0,80</td></tr>
-    <tr class="hi"><td>Frisk sne</td><td class="n">0,90–0,95</td><td class="n">0,75–0,85</td></tr>
+    <tr><td>Asfalt</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>Græs</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
   </tbody>
-</table>
-
-<p><b>Læg mærke til græsset.</b> For jeres telefon er en græsplæne lige så mørk som
-  asfalt — måske mørkere. For satellitten er den flere gange så lys. Ingen af dem tager fejl.
-  Planter opsuger det synlige lys til fotosyntese, men kaster næsten halvdelen af det
-  infrarøde tilbage, og det infrarøde er en stor del af Solens energi. Sne og is gør det
-  modsatte: blændende hvide for øjet, men mørkere i infrarødt.</p>
+</table></div>
+<p class="niveau-note">De to sidste kolonner udfylder I i del 2. Skriv usikkerheden med:
+  svinger jeres tre målinger mellem 0,10 og 0,14, er resultatet <b>0,12 ± 0,02</b>.</p>
 
 <div class="opg">
   <h4>Opgave 1 · Spørgsmål at tage med ind</h4>
@@ -196,9 +207,11 @@ th small{display:block;text-transform:none;letter-spacing:0;font-weight:400}
     Passer det med jeres målinger?</p>
   <p><b>b)</b> I målte sikkert græsset som lige så mørkt som asfalten — eller mørkere.
     Alligevel er en græsplæne køligere at gå på en sommerdag. Hvorfor?
-    <i>(Hint: se tabellen — og tænk på, hvad planten bruger vandet til.)</i></p>
-  <p><b>c)</b> Mål det samme sted igen når der ligger sne. Hvor meget flytter
-    albedoen sig — og hvad sker der med den absorberede energi?</p>
+    <i>(Hint: læs «Albedo på 30 sekunder» igen — og tænk på, hvad planten bruger vandet til.)</i></p>
+  <p><b>c)</b> Mål den samme asfalt <b>tør og våd</b> — hæld en spand vand ud. Hvor meget
+    flytter albedoen sig? På gletsjeren sker det samme: smeltevand gør isen mørkere, og
+    mørkere is smelter hurtigere. <i>Ligger der sne, så mål den også. Eller læg et hvidt
+    lagen på græsset: sne på ti sekunder.</i></p>
 </div>
 
 <h3>Typiske fejl</h3>
@@ -241,6 +254,26 @@ th small{display:block;text-transform:none;letter-spacing:0;font-weight:400}
   asfalt, græs og tag lagt sammen. Det hedder en <b>blandet pixel</b>. Forskerne på
   gletsjeren faldt i samme fælde: første sammenligning lå en faktor tre forkert, fordi de
   målte, hvor mørkt sediment og lys is ligger inden for få meter.</p>
+
+<h3>Typiske værdier</h3>
+<p>Sådan plejer det at gå. Hvordan passer det med jeres gæt?</p>
+<table>
+  <thead><tr><th>Overflade</th><th class="n">Det ser telefonen<br><small>synligt lys</small></th><th class="n">Det siger satellitten<br><small>alt sollys</small></th></tr></thead>
+  <tbody>
+    <tr><td>Vand</td><td class="n">0,05–0,10</td><td class="n">0,05–0,10</td></tr>
+    <tr><td>Asfalt</td><td class="n">0,08–0,12</td><td class="n">0,10–0,15</td></tr>
+    <tr class="hi"><td>Græs</td><td class="n">0,03–0,08</td><td class="n">0,16–0,25</td></tr>
+    <tr><td>Lyse fliser, beton</td><td class="n">0,25–0,35</td><td class="n">0,30–0,40</td></tr>
+    <tr><td>Hvid mur</td><td class="n">0,60–0,80</td><td class="n">0,60–0,80</td></tr>
+    <tr class="hi"><td>Frisk sne</td><td class="n">0,90–0,95</td><td class="n">0,75–0,85</td></tr>
+  </tbody>
+</table>
+
+<p><b>Læg mærke til græsset.</b> For jeres telefon er en græsplæne lige så mørk som
+  asfalt — måske mørkere. For satellitten er den flere gange så lys. Ingen af dem tager fejl.
+  Planter opsuger det synlige lys til fotosyntese, men kaster næsten halvdelen af det
+  infrarøde tilbage, og det infrarøde er en stor del af Solens energi. Sne og is gør det
+  modsatte: blændende hvide for øjet, men mørkere i infrarødt.</p>
 
 <!-- ══════════ DEL 3 ══════════ -->
 <h2>Del 3 · Regn på afsmeltningen</h2>
@@ -295,6 +328,45 @@ th small{display:block;text-transform:none;letter-spacing:0;font-weight:400}
     skyldes en <b>blandet pixel</b>.</p>
   <p>Reglen: <b>højt plantedække og ensartet flade betyder spektral forskel; blandet flade
     betyder blandet pixel.</b> Hvilken af de to ramte forskerne på gletsjeren?</p>
+</div>
+
+<div class="opg">
+  <h4>Udvidelse 3 · Hvor sikker er jeres måling?</h4>
+  <p><b>a)</b> Hvad giver mest spredning: at flytte kortet til et nyt sted på samme flade,
+    at markere et andet udsnit i samme foto, eller at tage et nyt foto? Lav et lille forsøg,
+    der skiller de tre ad.</p>
+  <p><b>b)</b> Tag tre fotos af samme flade med forskellig lysstyrke (eksponering −1, 0 og +1).
+    Appens albedo bør være den samme, selv om billederne ikke er det — det er hele idéen
+    med referencekortet. Holder det? Hvornår går det galt?</p>
+  <p><b>c)</b> Hvor stor skal forskellen til satellitten være, før den er større end jeres
+    egen usikkerhed?</p>
+</div>
+
+<div class="opg">
+  <h4>Udvidelse 4 · Hvorfor passer den simple model? <span style="font-weight:400">(A-niveau)</span></h4>
+  <p>Modellen i opgave 3 regner kun med det sollys, isen absorberer, og bruger
+    <b>Q = 266 W/m²</b>. Men vejrstationen ved gletsjeren målte i de samme seks døgn
+    (3.–8. august 2026), i døgnmiddel:</p>
+  <table>
+    <tbody>
+      <tr><td>Indstråling fra solen</td><td>308 W/m²</td></tr>
+      <tr><td>Langbølget stråling fra himlen</td><td>276 W/m²</td></tr>
+      <tr><td>Lufttemperatur</td><td>5,3 °C</td></tr>
+      <tr><td>Vind</td><td>2,1 m/s</td></tr>
+    </tbody>
+  </table>
+  <p><b>a)</b> Regn opgave 3a igen med de målte 308 W/m². Hvor meget <i>skulle</i> de to
+    felter være smeltet?</p>
+  <p><b>b)</b> Forskellen til de målte 20 og 40 cm er energi, som modellen mangler. Hvor
+    mange W/m² er det for hvert felt? <i>(1 cm smeltning på seks døgn svarer til 5,8 W/m².)</i></p>
+  <p><b>c)</b> Smeltende is er 0 °C og udsender 316 W/m² langbølget stråling
+    (Stefan-Boltzmann). Himlen sender 276 W/m² tilbage. Den lune luft afleverer omvendt
+    varme til isen — et overslag giver 20–30 W/m². Hvad bliver summen af de to?</p>
+  <p><b>d)</b> Passer summen med det, der manglede i b)? For hvilket felt passer det
+    bedst — og hvad kan forklare resten? <i>(Hint: hvor sikker er albedoen for det mørke felt?)</i></p>
+  <p><b>e)</b> De 266 W/m² er altså en <i>effektiv</i> værdi. Hvad er gemt i den?
+    I kan selv hente stationens tal i <a href="../kort/">Grønlandskortet</a>: tryk på
+    vejrstationen og vælg «Vis og plot data».</p>
 </div>
 
 <div class="info">
