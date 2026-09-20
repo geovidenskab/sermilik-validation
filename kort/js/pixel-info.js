@@ -11,7 +11,7 @@
 //
 // UI-flow:
 //   1. Klik værktøjs-knap "🔍" i toolbar → mode aktiveres
-//   2. Klik på kortet → 100×100 m bbox, viser én "pixel-stak"
+//   2. Klik på kortet → 20×20 m bbox (2×2 Sentinel-2-pixels)
 //      ELLER træk-rektangel → større bbox, viser middel + range
 //   3. Modal popup med tabeller af alle målte værdier
 //   4. Tabel kan kopieres / eksporteres som CSV
@@ -19,6 +19,14 @@
 import { map } from './map.js';
 import { samplePoint } from './sentinel-stats.js';
 import { SH_DEFAULT_DATES, SH_DATE_LS_KEY, ARCTICDEM_URL } from './config.js';
+import { erDK } from './profiles.js';
+
+// Et klik henter 2×2 Sentinel-2-pixels (20×20 m). Det svarer til opløsningen i
+// B11/B12, som indgår i albedoformlen, og er småt nok til at en ensartet flade
+// på 40×40 m giver en ren værdi.
+const KLIK_SIDE_M = 20;
+// Længste halve søgevindue proxyen accepterer (se sentinel-stats.js)
+const MAX_HALVT_VINDUE = 30;
 
 let active = false;
 let toolButton = null;
@@ -100,11 +108,11 @@ function onMouseUp(e) {
   const distPx = dragStartPos
     ? Math.hypot(e.containerPoint.x - dragStartPos.x, e.containerPoint.y - dragStartPos.y)
     : 0;
-  // Hvis brugeren bare klikkede (mindre end 5 px) — brug fast 60m bbox omkring punktet
+  // Hvis brugeren bare klikkede (mindre end 5 px) — brug fast bbox omkring punktet
   // Ellers brug det tegnede rektangel
   let bboxLatLng;
   if (distPx < 5) {
-    bboxLatLng = makePointBbox(e.latlng, 100);  // 100 m kvadrat — matcher Statistical API'ets snap-grid bedre end 60 m
+    bboxLatLng = makePointBbox(e.latlng, KLIK_SIDE_M);
   } else {
     bboxLatLng = L.latLngBounds(drawing.startLatLng, e.latlng);
   }
@@ -187,9 +195,9 @@ async function openInfoModal(bboxLatLng) {
 
   modalEl.querySelector('#px-bbox').innerHTML = `
     <b>Område:</b> ${widthM}×${heightM} m omkring
-    ${centerLat.toFixed(5)}°N · ${Math.abs(centerLng).toFixed(5)}°W
+    ${centerLat.toFixed(5)}°N · ${formatLng(centerLng)}
   `;
-  const effHalf = Math.max(halfDays, 5);
+  const effHalf = Math.min(Math.max(halfDays, 5), MAX_HALVT_VINDUE);
   modalEl.querySelector('#px-date').innerHTML = `
     <b>Tidsperiode:</b> ${fromIso} → ${toIso}${shDates.maxcc != null ? ` · maks ${shDates.maxcc}% skydække` : ''}
     <span class="px-eff">· søger nærmeste skyfri scene ±${effHalf} dage</span>
@@ -201,7 +209,7 @@ async function openInfoModal(bboxLatLng) {
   resultsEl.innerHTML = '<div class="px-loading">Henter satellit-data…</div>';
 
   // Brug centerLat/lng + tilpasset side-meter til samplePoint
-  const sideM = Math.max(widthM, heightM, 100);
+  const sideM = Math.max(widthM, heightM, KLIK_SIDE_M);
   const layers = [
     { key: 'S2_ALBEDO', label: 'Sentinel-2 albedo (Liang)', unit: '', decimals: 3 },
     { key: 'S2_NDVI', label: 'Sentinel-2 NDVI', unit: '', decimals: 3 },
@@ -210,25 +218,28 @@ async function openInfoModal(bboxLatLng) {
   ];
   // Start alle 4 + ArcticDEM
   const promises = layers.map(l =>
-    samplePoint(l.key, centerLat, centerLng, centerIso, Math.max(halfDays, 5), {
+    samplePoint(l.key, centerLat, centerLng, centerIso, effHalf, {
       sideMeters: sideM,
       maxcc: shDates.maxcc ?? 60,
     }).catch(e => ({ value: null, error: e.message }))
   );
-  const arcticPromise = fetchArcticDEMElevation(centerLat, centerLng).catch(e => ({ value: null, error: e.message }));
+  // ArcticDEM dækker kun Arktis — på Danmarkskortet udelades højderækken
+  const arcticPromise = erDK
+    ? Promise.resolve(null)
+    : fetchArcticDEMElevation(centerLat, centerLng).catch(e => ({ value: null, error: e.message }));
   const all = await Promise.all([...promises, arcticPromise]);
   const arctic = all[all.length - 1];
   const satResults = all.slice(0, -1);
 
   // Render
   const rows = layers.map((l, i) => renderResultRow(l, satResults[i]));
-  const arcticRow = renderArcticRow(arctic);
+  const arcticRow = erDK ? '' : renderArcticRow(arctic);
   resultsEl.innerHTML = `
     <table class="px-table">
       <thead><tr><th>Variabel</th><th>Værdi</th><th>Min / Max</th><th>Std</th><th>n px</th><th>Scene</th></tr></thead>
       <tbody>${arcticRow}${rows.join('')}</tbody>
     </table>
-    <div class="px-tip">Tip: <b>klik</b> på kortet for et punkt (100×100 m) eller <b>træk-rektangel</b> for større område.</div>
+    <div class="px-tip">Tip: <b>klik</b> på kortet for et punkt (${KLIK_SIDE_M}×${KLIK_SIDE_M} m = 2×2 satellitpixels) eller <b>træk-rektangel</b> for større område.</div>
   `;
   // Gem til kopiering
   modalEl._lastResult = { centerLat, centerLng, widthM, heightM, fromIso, toIso, arctic, layers, satResults };
@@ -280,7 +291,7 @@ function copyAsText() {
   const r = modalEl._lastResult;
   if (!r) return;
   const lines = [
-    `Pixel-info — ${r.centerLat.toFixed(5)}°N · ${Math.abs(r.centerLng).toFixed(5)}°W`,
+    `Pixel-info — ${r.centerLat.toFixed(5)}°N · ${formatLng(r.centerLng)}`,
     `Område: ${r.widthM} × ${r.heightM} m   Periode: ${r.fromIso} → ${r.toIso}`,
     '',
     'Variabel\tVærdi\tMin\tMax\tStd\tn\tScene',
@@ -298,6 +309,10 @@ function copyAsText() {
     btn.textContent = '✓ Kopieret';
     setTimeout(() => { btn.textContent = orig; }, 1500);
   });
+}
+
+function formatLng(lng) {
+  return `${Math.abs(lng).toFixed(5)}°${lng < 0 ? 'V' : 'Ø'}`;
 }
 
 function escapeHtml(s) {

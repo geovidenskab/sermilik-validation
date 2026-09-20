@@ -11,10 +11,8 @@ export const SH_LS_KEY = lagerNoegle('sermilik_sh_instance_id');
 export const SH_DATE_LS_KEY = lagerNoegle('sermilik_sh_dates');
 export const SH_WMS_BASE = 'https://sh.dataspace.copernicus.eu/ogc/wms';
 
-// Sentinel Hub OAuth (Sprint 3+) — kun Client ID embeddes, secret kommer via proxy/manuel
-export const SH_OAUTH_CLIENT_ID = 'sh-b878c677-cb71-4a35-8aa3-eab9ee1c50e8';
-export const SH_TOKEN_ENDPOINT = 'https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token';
-export const SH_STATISTICAL_API = 'https://sh.dataspace.copernicus.eu/api/v1/statistics';
+// Statistical API (pixel-info) kaldes via proxyen /sermilik/api — OAuth-nøglen
+// ligger på serveren (GEO_site/Sermilik_api), ikke her.
 
 export const SH_DEFAULT_DATES = {
   mode: 'range',

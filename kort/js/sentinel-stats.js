@@ -1,238 +1,28 @@
-// Sentinel Hub Statistical API — punkt-sampling for validation.
+// Sentinel Hub Statistical API — punkt-sampling for validation og pixel-info.
+//
+// Kaldene går gennem proxyen /sermilik/api (GEO_site/Sermilik_api/server.js).
+// OAuth-nøglen og evalscripts ligger dér — ikke i den offentlige kode. Klienten
+// sender kun {layer, lat, lng, side, from, to, maxcc}; proxyen bygger selve
+// Statistical API-requesten (P1D-buckets, skymaskering via SCL, width/height i
+// pixels) og afviser punkter uden for Danmark og Sermilik.
 //
 // API-doku: https://documentation.dataspace.copernicus.eu/APIs/SentinelHub/Statistical.html
-//
-// Vi sampler en lille bbox (~30×30 m) omkring et lat/lng punkt og henter
-// gennemsnitlige værdier af albedo (Liang), NDVI og Landsat LST for en given
-// dato med tolerance.
-//
-// Autentificering: OAuth2 client_credentials flow mod Copernicus Data Space.
-// Token caches i sessionStorage (max 1 time levetid).
-//
-// SIKKERHEDSNOTE: Client Secret er indlejret i koden. Det er kun acceptabelt
-// fordi OAuth-clienten har web-origin-restriction (kun https://geo.sg.dk og
-// http://localhost:5173). Hvis det her flyttes til andre domæner skal vi
-// proxy via en server-side function eller bruge SPA OAuth-flow.
 
-import {
-  SH_OAUTH_CLIENT_ID,
-  SH_TOKEN_ENDPOINT,
-  SH_STATISTICAL_API,
-  ALBEDO_EVALSCRIPT,
-  NDSI_EVALSCRIPT,
-  LANDSAT_LST_FULL_EVALSCRIPT,
-} from './config.js';
+// Lokalt (dev på :5173) kaldes den rigtige proxy; den tillader denne origin.
+const STATS_PROXY = (typeof location !== 'undefined' && location.hostname === 'geo.sg.dk')
+  ? '/sermilik/api/stats'
+  : 'https://geo.sg.dk/sermilik/api/stats';
 
-// Client Secret — kommer fra ~/.config/sans-science/sermilik-credentials.json
-// IKKE noget at gøre ved at det er i koden, fordi origin-restriction er sat.
-// Hvis vi senere proxy'er via Apache, fjernes secret herfra.
-const SH_OAUTH_CLIENT_SECRET = 'Jkf0zHPz7OzDA84D6sZ9befpmjh3DJqO';
+const STATS_CACHE_KEY = 'sermilik_sh_stats_cache_v3';  // v3: proxy + width/height i pixels
+const MAX_TOLERANCE_DAGE = 30;                         // proxyen tillader højst 62 dages vindue
 
-const TOKEN_STORAGE_KEY = 'sermilik_sh_token';
-const STATS_CACHE_KEY = 'sermilik_sh_stats_cache_v2';  // v2: P1D-buckets + skymaskering
-
-// ─── OAuth token management ────────────────────────────────────────────────────
-
-/**
- * Hent en gyldig access token. Cacher i sessionStorage.
- * Genbruger token hvis det ikke udløber inden for 60 sek.
- */
-async function getAccessToken() {
-  // Tjek cache
-  const cached = readTokenCache();
-  if (cached && cached.expires_at - Date.now() > 60_000) {
-    return cached.access_token;
-  }
-  // Hent nyt token
-  const body = new URLSearchParams({
-    grant_type: 'client_credentials',
-    client_id: SH_OAUTH_CLIENT_ID,
-    client_secret: SH_OAUTH_CLIENT_SECRET,
-  });
-  const res = await fetch(SH_TOKEN_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body,
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`OAuth token failed (HTTP ${res.status}): ${text.slice(0, 200)}`);
-  }
-  const data = await res.json();
-  const tokenInfo = {
-    access_token: data.access_token,
-    expires_at: Date.now() + (data.expires_in || 3600) * 1000,
-  };
-  writeTokenCache(tokenInfo);
-  return tokenInfo.access_token;
-}
-
-function readTokenCache() {
-  try { return JSON.parse(sessionStorage.getItem(TOKEN_STORAGE_KEY) || 'null'); }
-  catch { return null; }
-}
-
-function writeTokenCache(info) {
-  try { sessionStorage.setItem(TOKEN_STORAGE_KEY, JSON.stringify(info)); }
-  catch { /* full storage — ignorér */ }
-}
-
-// ─── Bbox-konstruktion ────────────────────────────────────────────────────────
-
-/**
- * Lav en kvadratisk bbox omkring (lat, lng) med side-længde i meter.
- * Returnerer [minLon, minLat, maxLon, maxLat] i WGS84 (EPSG:4326).
- *
- * For 30 m side ved 65°N er det ca. 0.00027° lat × 0.00064° lon (compensated).
- */
-function daysBetween(fromIso, toIso) {
-  const from = new Date(fromIso);
-  const to = new Date(toIso);
-  return Math.max(1, Math.round((to - from) / 86400000));
-}
-
-function pointBbox(lat, lng, sideMeters = 30) {
-  const dLat = (sideMeters / 2) / 111320;                    // 1° lat ≈ 111.32 km
-  const dLng = (sideMeters / 2) / (111320 * Math.cos(lat * Math.PI / 180));
-  return [lng - dLng, lat - dLat, lng + dLng, lat + dLat];
-}
-
-// ─── Statistical API kald ─────────────────────────────────────────────────────
-
-// Statistical API kræver evalscripts der returnerer NAMED bands.
-// Vores almindelige evalscripts returnerer RGBA — vi laver dedikerede her.
-// Evalscript-konstanterne defineres FØR DATA_LAYERS bruger dem (JS const-hoisting).
-
-// Statistical API forventer at primary output hedder "default" — output-ID'er
-// matches mod calculations-keys, og {default: {default: ...}} kræver "default".
-
-const ALBEDO_EVALSCRIPT_STATS_BANDS = `//VERSION=3
-function setup() {
-  return {
-    input: [{ bands: ["B02","B04","B08","B11","B12","SCL","dataMask"] }],
-    output: [
-      { id: "default",  bands: 1, sampleType: "FLOAT32" },
-      { id: "dataMask", bands: 1 }
-    ]
-  };
-}
-function evaluatePixel(s) {
-  // Skyer og skyskygger ud af statistikken (SCL 3, 8, 9, 10)
-  var sky = (s.SCL === 3 || s.SCL === 8 || s.SCL === 9 || s.SCL === 10);
-  var v = 0.356*s.B02 + 0.130*s.B04 + 0.373*s.B08 + 0.085*s.B11 + 0.072*s.B12 - 0.0018;
-  return { default: [v], dataMask: [sky ? 0 : s.dataMask] };
-}`;
-
-const NDVI_STATS_EVALSCRIPT = `//VERSION=3
-function setup() {
-  return {
-    input: [{ bands: ["B04","B08","SCL","dataMask"] }],
-    output: [
-      { id: "default",  bands: 1, sampleType: "FLOAT32" },
-      { id: "dataMask", bands: 1 }
-    ]
-  };
-}
-function evaluatePixel(s) {
-  // Skyer og skyskygger ud af statistikken (SCL 3, 8, 9, 10)
-  var sky = (s.SCL === 3 || s.SCL === 8 || s.SCL === 9 || s.SCL === 10);
-  var v = (s.B08 - s.B04) / (s.B08 + s.B04);
-  return { default: [v], dataMask: [sky ? 0 : s.dataMask] };
-}`;
-
-const NDSI_STATS_EVALSCRIPT = `//VERSION=3
-function setup() {
-  return {
-    input: [{ bands: ["B03","B11","SCL","dataMask"] }],
-    output: [
-      { id: "default",  bands: 1, sampleType: "FLOAT32" },
-      { id: "dataMask", bands: 1 }
-    ]
-  };
-}
-function evaluatePixel(s) {
-  // Skyer og skyskygger ud af statistikken (SCL 3, 8, 9, 10)
-  var sky = (s.SCL === 3 || s.SCL === 8 || s.SCL === 9 || s.SCL === 10);
-  var v = (s.B03 - s.B11) / (s.B03 + s.B11);
-  return { default: [v], dataMask: [sky ? 0 : s.dataMask] };
-}`;
-
-const LST_STATS_EVALSCRIPT = `//VERSION=3
-function setup() {
-  return {
-    input: [{ bands: ["B10","dataMask"] }],
-    output: [
-      { id: "default",  bands: 1, sampleType: "FLOAT32" },
-      { id: "dataMask", bands: 1 }
-    ]
-  };
-}
-function evaluatePixel(s) {
-  return { default: [s.B10 - 273.15], dataMask: [s.dataMask] };
-}`;
-
-// DATA_LAYERS skal komme EFTER evalscripts er defineret (JS const-temporal dead zone).
+// Visningsinfo pr. lag. Evalscripts ligger i proxyen.
 const DATA_LAYERS = {
-  S2_ALBEDO: {
-    label: 'Sentinel-2 albedo (Liang 2001)',
-    unit: '', dataset: 'sentinel-2-l2a',
-    evalscript: ALBEDO_EVALSCRIPT_STATS_BANDS,
-  },
-  S2_NDVI: {
-    label: 'Sentinel-2 NDVI',
-    unit: '', dataset: 'sentinel-2-l2a',
-    evalscript: NDVI_STATS_EVALSCRIPT,
-  },
-  S2_NDSI: {
-    label: 'Sentinel-2 NDSI (sne)',
-    unit: '', dataset: 'sentinel-2-l2a',
-    evalscript: NDSI_STATS_EVALSCRIPT,
-  },
-  LANDSAT_LST: {
-    label: 'Landsat overfladetemperatur',
-    unit: '°C', dataset: 'landsat-ot-l1',
-    evalscript: LST_STATS_EVALSCRIPT,
-  },
+  S2_ALBEDO:   { label: 'Sentinel-2 albedo (Liang 2001)', unit: '' },
+  S2_NDVI:     { label: 'Sentinel-2 NDVI', unit: '' },
+  S2_NDSI:     { label: 'Sentinel-2 NDSI (sne)', unit: '' },
+  LANDSAT_LST: { label: 'Landsat overfladetemperatur', unit: '°C' },
 };
-
-/**
- * Bygg en Statistical API request body for et punkt + datointerval + lag.
- *
- * VIGTIGT: Statistical API kræver resolution der matcher datasettets max-resolution.
- *   - Sentinel-2 L2A: 10 m/pixel max
- *   - Landsat 8/9 L1: 30 m/pixel max (TIRS resampled fra 100 m)
- * Vi bruger resx/resy i meter — bbox-størrelsen bestemmer da antallet af pixels.
- */
-function buildStatRequest(bbox, fromIso, toIso, dataset, evalscript, maxcc = 30) {
-  const resolution = dataset.startsWith('landsat') ? 30 : 10;
-  return {
-    input: {
-      bounds: {
-        bbox,  // [minLon, minLat, maxLon, maxLat]
-        properties: { crs: 'http://www.opengis.net/def/crs/EPSG/0/4326' },
-      },
-      data: [{
-        type: dataset,
-        dataFilter: {
-          ...(dataset === 'sentinel-2-l2a' ? { maxCloudCoverage: maxcc } : {}),
-        },
-      }],
-    },
-    aggregation: {
-      timeRange: { from: `${fromIso}T00:00:00Z`, to: `${toIso}T23:59:59Z` },
-      // Én bucket pr. dag (P1D), så hvert bucket svarer til én scene-dag.
-      // Tidligere dækkede ét bucket hele vinduet, og "værdien" blev et gennemsnit
-      // af ALLE scener i perioden — skyer inklusive — mens "scene"-datoen i
-      // virkeligheden var vinduets startdato. Det gav fx albedo 0,616 dateret
-      // 23. juli for et punkt hvis reelle værdi den 7. august er 0,13.
-      aggregationInterval: { of: 'P1D' },
-      resx: resolution,
-      resy: resolution,
-      evalscript,
-    },
-    // Default-output: bare alle standardstatistikker. Vi bruger ikke per-percentile-config.
-  };
-}
 
 /**
  * Sample en variabel for ét punkt + dato med tolerance.
@@ -250,38 +40,32 @@ export async function samplePoint(layerKey, lat, lng, centerDateIso, toleranceDa
   if (!layer) throw new Error(`Ukendt lag: ${layerKey}`);
 
   // Cache-tjek
-  const cacheKey = `${layerKey}|${lat.toFixed(4)},${lng.toFixed(4)}|${centerDateIso}|${toleranceDays}|${opts.maxcc ?? 30}`;
+  const cacheKey = `${layerKey}|${lat.toFixed(5)},${lng.toFixed(5)}|${Math.round(opts.sideMeters ?? 200)}|${centerDateIso}|${toleranceDays}|${opts.maxcc ?? 60}`;
   const cached = readStatsCache(cacheKey);
   if (cached) return { ...cached, cached: true };
 
+  toleranceDays = Math.min(toleranceDays, MAX_TOLERANCE_DAGE);
   const center = new Date(centerDateIso);
   const from = new Date(center); from.setDate(center.getDate() - toleranceDays);
   const to = new Date(center); to.setDate(center.getDate() + toleranceDays);
   const fromIso = from.toISOString().slice(0, 10);
   const toIso = to.toISOString().slice(0, 10);
 
-  // Bbox skal være min ~150m for at få stabilt resultat. Statistical API
-  // snapper bbox til S2's 10m-grid, og små bboxes der ikke matcher Sentinel-2's
-  // tile-grænser kan ende uden overlap. 200m default = 20×20 S2-pixels =
-  // pålideligt resultat med god statistik.
-  const bbox = pointBbox(lat, lng, opts.sideMeters ?? 200);
-  const body = buildStatRequest(bbox, fromIso, toIso, layer.dataset, layer.evalscript, opts.maxcc ?? 60);
-  // For debug: console.log('[Stats] Request for', layerKey, JSON.stringify(body, null, 2));
-
-  const token = await getAccessToken();
-  const res = await fetch(SH_STATISTICAL_API, {
+  const res = await fetch(STATS_PROXY, {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    body: JSON.stringify(body),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      layer: layerKey, lat, lng,
+      side: opts.sideMeters ?? 200,
+      from: fromIso, to: toIso,
+      maxcc: opts.maxcc ?? 60,
+    }),
   });
 
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Statistical API ${layerKey} failed (HTTP ${res.status}): ${text.slice(0, 300)}`);
+    let besked = `HTTP ${res.status}`;
+    try { besked = (await res.json()).error || besked; } catch { /* ikke JSON */ }
+    throw new Error(`Satellitopslag fejlede: ${besked}`);
   }
   const data = await res.json();
 
