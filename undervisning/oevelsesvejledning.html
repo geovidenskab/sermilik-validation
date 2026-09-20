@@ -84,21 +84,6 @@ th small{display:block;text-transform:none;letter-spacing:0;font-weight:400}
 
 .fejl li{font-size:var(--fs-sm);margin:.45rem 0}
 
-@media print{
-  body{background:#fff;font-size:10.5pt}
-  header{background:#fff;color:#000;border-bottom:2px solid #000;padding:0 0 .4rem}
-  header a,.knapper{display:none}
-  header h1{font-size:15pt}
-  main{padding:.6rem 0}
-  h2{margin-top:1.1rem;font-size:12pt}
-  .opg,.info,.mat{break-inside:avoid}
-  details.fold{display:none}   /* facit og baggrund printes ikke med på elevarket */
-  .qr-blok img{width:80px;height:80px}
-  /* sideskift virker ikke på inline-block — gør banneret til en blok ved print */
-  .niveau.udvid{display:block;width:max-content;break-before:page;margin-top:0}
-  h2,h3,h4{break-after:avoid}
-  @page{size:A4;margin:14mm}
-}
 .qr-blok{display:flex;gap:1rem;align-items:center;margin:.6rem 0 0}
 .qr-blok img{flex:none;width:96px;height:96px}
 .qr-blok p{margin:0;font-size:var(--fs-sm)}
@@ -109,17 +94,88 @@ details.fold.stille{border-color:var(--line)}
 details.fold.stille summary{color:var(--ink);font-weight:500}
 .stige{margin:.5rem 0;padding-left:1.3rem;font-size:var(--fs-sm)}
 .stige li{margin:.25rem 0}
+
+/* Kun på skærm / kun på print */
+.kun-print{display:none}
+.printknap{background:var(--navy);color:#fff;border:none;padding:.65rem 1.2rem;font:inherit;font-size:var(--fs-sm);font-weight:600;cursor:pointer}
+.printknap:hover{opacity:.9}
+
+/* ── PRINT: ét ark, to sider. Side 1 tages med ud, side 2 bruges inde. ── */
+@media print{
+  @page{size:A4;margin:11mm 13mm}
+  html,body{background:#fff}
+  body{font-size:9.6pt;line-height:1.35;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .kun-skaerm,header a,.knapper,details.fold{display:none !important}
+  .kun-print{display:block}
+  span.kun-print{display:inline}
+  header{background:#fff;color:#000;border-bottom:1.5pt solid #000;padding:0 0 1.5mm;margin:0}
+  header .wrap{padding:0;max-width:none}
+  header h1{font-size:14pt;margin:0}
+  header p{font-size:9pt;margin:.5mm 0 0;color:#333}
+  main{padding:2mm 0 0;max-width:none}
+  .navnelinje{display:flex;gap:6mm;font-size:9.5pt;margin:2.5mm 0 1mm}
+  .navnelinje span{flex:1;border-bottom:.3mm solid #333;padding-bottom:4.5mm;white-space:nowrap}
+  .navnelinje span.kort{flex:0 0 32mm}
+  h2{margin:3.2mm 0 1.2mm;font-size:11.5pt;padding-bottom:.6mm}
+  h2:first-of-type{margin-top:3mm}
+  h3{margin:3mm 0 1mm;font-size:10.5pt}
+  p,li{max-width:none !important}
+  p{margin:1.2mm 0}
+  a{color:inherit;text-decoration:none}
+  .mat{position:relative;padding:2mm 62mm 2mm 3mm;margin:2mm 0;min-height:27mm}
+  .mat ul{margin:1mm 0 0;padding-left:4.5mm}
+  .mat li{margin:.5mm 0;font-size:9.3pt}
+  .mat .qr-blok{position:absolute;right:3mm;top:2mm;width:56mm;margin:0;gap:2.5mm;align-items:center}
+  .qr-blok img{width:22mm;height:22mm}
+  .qr-blok p{font-size:8pt;line-height:1.3}
+  .info{padding:1.6mm 3mm;margin:1.6mm 0}
+  .info h4,.opg h4{margin:0 0 1mm;font-size:10pt}
+  .info p,.opg p{font-size:9.4pt;margin:1mm 0}
+  .skala{height:6.5mm;margin:1.5mm 0 .5mm}
+  .skala div{font-size:8pt}
+  .skala-tekst{font-size:8pt;margin-bottom:0}
+  .opg{padding:1.8mm 3mm;margin:2mm 0}
+  ol.trin-liste{margin:2mm 0}
+  ol.trin-liste li{padding:0 0 1.2mm 8mm;max-width:none;font-size:9.5pt}
+  ol.trin-liste li::before{width:5.2mm;height:5.2mm;line-height:5.2mm;font-size:8.5pt;top:.2mm}
+  table{margin:1.5mm 0;font-size:9pt}
+  th,td{padding:1mm 1.5mm}
+  table.skema td{height:11mm}
+  table.skema th{font-size:7.5pt;padding:1mm .8mm}
+  table.skema th,table.skema td{border:.3mm solid #444}
+  .tabel-rul{overflow:visible}
+  .niveau-note{font-size:8.8pt;margin:1mm 0}
+  ul.fejl{margin:1mm 0;padding-left:4.5mm}
+  ul.fejl li{margin:.6mm 0;font-size:9.3pt}
+  .stige{margin:1mm 0;padding-left:5mm;font-size:9.2pt}
+  .stige li{margin:.5mm 0}
+  code{font-size:8.8pt}
+  /* Skrivelinjer under opgaverne */
+  .svar{display:block;margin:1.2mm 0 2mm}
+  .svar i{display:block;border-bottom:.25mm solid #777;height:6.8mm}
+  .udfyld{margin:2.2mm 0 1mm !important}
+  .udfyld u{display:inline-block;min-width:20mm;border-bottom:.25mm solid #555;text-decoration:none;height:4mm;vertical-align:bottom}
+  .udfyld u.lang{min-width:45mm}
+  .fejl-kort{font-size:9.3pt;margin:2mm 0 0}
+  /* Side 2 begynder ved opgave 1 */
+  .side2{break-before:page}
+  .opg,.info,.mat,table{break-inside:avoid}
+  h2,h3,h4{break-after:avoid}
+  .printfod{max-width:none;margin-top:3mm;padding-top:1.5mm;border-top:.3mm solid #999;font-size:8.3pt;color:#333}
+}
 </style>
 </head>
 <body>
 
 <header><div class="wrap">
   <h1>Øvelsesvejledning: mål albedo</h1>
-  <p>Fra skolegården til satellitten — elevark til forløbet om afsmeltning</p>
+  <p>Fra skolegården til satellitten — elevark til forløbet om afsmeltning<span class="kun-print"> · Side 1 tager I med ud. Side 2 bruger I inde.</span></p>
   <p style="margin-top:.5rem"><a href="./">← Tilbage til forløbet</a></p>
 </div></header>
 
 <main>
+
+<div class="navnelinje kun-print"><span>Navne:</span><span class="kort">Klasse:</span><span class="kort">Dato:</span></div>
 
 <div class="mat">
   <b>Det skal I bruge</b>
@@ -136,7 +192,9 @@ details.fold.stille summary{color:var(--ink);font-weight:500}
 </div>
 
 <div class="knapper">
-  <a href="referencekort.html">Print referencekortet</a>
+  <button type="button" class="printknap" onclick="window.print()">Print elevarket (ét ark, to sider)</button>
+  <a class="sek" href="oevelsesvejledning.pdf">Hent som PDF</a>
+  <a class="sek" href="referencekort.html">Print referencekortet</a>
   <a class="sek" href="../kort/dk.html">Åbn satellitkortet</a>
 </div>
 
@@ -191,8 +249,9 @@ details.fold.stille summary{color:var(--ink);font-weight:500}
 <p class="niveau-note">De to sidste kolonner udfylder I i del 2. Skriv usikkerheden med:
   svinger jeres tre målinger mellem 0,10 og 0,14, er resultatet <b>0,12 ± 0,02</b>.</p>
 
-<h3>Typiske fejl</h3>
-<ul class="fejl">
+<h3 class="kun-skaerm">Typiske fejl</h3>
+<p class="kun-print fejl-kort"><b>Pas på:</b> skygge hen over referencekortet · skråt billede (hold telefonen lodret ned) · genskin i papiret.</p>
+<ul class="fejl kun-skaerm">
   <li><b>Skygge hen over referencekortet</b> — stil jer, så skyggen falder væk fra det,
     eller mål i jævnt overskyet vejr.</li>
   <li><b>Skråt billede</b> — hold telefonen lodret ned, ellers bliver albedoen for høj.</li>
@@ -210,14 +269,16 @@ details.fold.stille summary{color:var(--ink);font-weight:500}
     præcis samme princip som satellitter bruger.</p>
 </div></details>
 
-<div class="opg">
+<div class="opg side2">
   <h4>Opgave 1 · Tag med ind</h4>
   <p><b>a)</b> Hvilken af jeres flader bliver varmest på en solskinsdag? Passer det med
     jeres målinger?</p>
+  <span class="svar kun-print"><i></i><i></i></span>
   <p><b>b)</b> Mål den samme asfalt <b>tør og våd</b> — hæld en spand vand ud. Hvor meget
     flytter albedoen sig? På gletsjeren sker det samme: smeltevand gør isen mørkere, og
     mørkere is smelter hurtigere. <i>Ligger der sne, så mål den også. Eller læg et hvidt
     lagen på græsset: sne på ti sekunder.</i></p>
+  <p class="kun-print udfyld">Tør asfalt: <u></u> &nbsp; Våd asfalt: <u></u> &nbsp; Forskel: <u></u></p>
 </div>
 
 <!-- ══════════ DEL 2 ══════════ -->
@@ -228,11 +289,12 @@ details.fold.stille summary{color:var(--ink);font-weight:500}
 
 <div class="opg">
   <h4>Opgave 2 · Er I enige med satellitten?</h4>
-  <p><b>a)</b> Åbn <a href="../kort/dk.html">satellitkortet</a> på den bærbare. Søg efter
+  <p><b>a)</b> Åbn <a href="../kort/dk.html">satellitkortet</a><span class="kun-print"> (geo.sg.dk/sermilik → «Åbn jeres eget sted i satellitkortet»)</span> på den bærbare. Søg efter
     skolen, og klik dér, hvor I stod på <b>asfalten</b>. Notér satellittens albedo — og om
     satellitkortet kalder omgivelserne <b>ensartede</b> eller <b>blandede</b>.</p>
   <p><b>b)</b> Gør det samme for <b>græsset</b>.</p>
   <p><b>c) Hvor er I enige med satellitten — og hvor er I ikke?</b></p>
+  <span class="svar kun-print"><i></i><i></i><i></i></span>
   <p><i>Har I tid:</i> klik også i et hjørne, hvor asfalt, græs og tag mødes inden for få
     meter. Hvad siger satellitkortet dér?</p>
 </div>
@@ -280,6 +342,7 @@ details.fold.stille summary{color:var(--ink);font-weight:500}
   <p><b>a)</b> Uden lommeregner: hvor stor en del af sollyset beholder det lyse felt?
     Og det mørke? Hvor mange gange mere beholder det mørke felt — og passer det med
     40 cm mod 20 cm?</p>
+  <p class="kun-print udfyld">Lyst felt beholder: <u></u> &nbsp; Mørkt felt beholder: <u></u> &nbsp; Forhold: <u></u></p>
   <p><b>b)</b> Med lommeregner: beregn, hvor mange centimeter is der smelter på seks døgn
     ved albedo <b>0,58</b> og ved albedo <b>0,11</b>. Passer det med det målte?</p>
   <ol class="stige">
@@ -295,7 +358,11 @@ details.fold.stille summary{color:var(--ink);font-weight:500}
       <tr><td>Isens massefylde</td><td>900 kg/m³</td></tr>
     </tbody>
   </table>
+  <p class="kun-print udfyld">Albedo 0,58: <u></u> cm &nbsp; Albedo 0,11: <u></u> cm &nbsp; Målt: 20 og 40 cm. Passer det? <u class="lang"></u></p>
 </div>
+
+<p class="printfod kun-print">Forløbet: <b>geo.sg.dk/sermilik</b> · Appen (mobil): <b>geo.sg.dk/albedo</b> ·
+  Når I har jeres egne tal: åbn folden «Åbn, når I har jeres egne tal» i øvelsesvejledningen på skærmen.</p>
 
 <div class="knapper">
   <a href="udvidelse.html">Videre til udvidelsen · B- og A-niveau</a>
