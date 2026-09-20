@@ -89,6 +89,18 @@ figcaption b{color:var(--ink)}
 
 
 /* ---------- bokse og kort ---------- */
+.albedo-boks{background:var(--card);border:1px solid var(--line);padding:1.2rem 1.35rem;margin:1.8rem 0}
+.albedo-boks h3{margin:0 0 .5rem;font-size:var(--fs-lg);color:var(--navy)}
+.albedo-boks h3+p{margin-top:0}
+.albedo-boks p{margin:.55rem 0;max-width:none}
+.albedo-boks ul{margin:.4rem 0 .6rem;padding-left:1.2rem}
+.albedo-boks li{margin:.3rem 0}
+.albedo-boks hr{border:none;border-top:1px solid var(--line);margin:1.1rem 0 1rem}
+.skala{display:flex;height:34px;margin:.9rem 0 .3rem;border:1px solid var(--line)}
+.skala div{flex:1;display:flex;align-items:center;justify-content:center;
+  font-size:var(--fs-xs);font-weight:600;font-variant-numeric:tabular-nums}
+.skala-tekst{display:flex;justify-content:space-between;gap:1rem;font-size:var(--fs-xs);
+  color:var(--muted);margin-bottom:.9rem}
 .boks{border-left:3px solid var(--teal);background:#f1fbfb;padding:1.05rem 1.25rem;margin:1.6rem 0}
 .boks h4{margin:0 0 .45rem;font-size:var(--fs-md);color:var(--navy)}
 .boks figure{margin:.9rem 0 .2rem;background:none;border:none;padding:0}
@@ -151,6 +163,7 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
 
 <nav class="toc"><div class="wrap">
   <a href="#casen">Casen</a>
+  <a href="#albedo">Hvad er albedo?</a>
   <a href="#skolegaarden">1 · Mål selv</a>
   <a href="#rummet">2 · Fra rummet</a>
   <a href="#gronland">3 · Tilbage til Grønland</a>
@@ -201,6 +214,42 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
      samme luft, samme is nedenunder. Den mørke overflade kastede mindre lys tilbage,
      absorberede mere energi — og smeltede dobbelt så hurtigt.</p>
 
+  <div class="albedo-boks" id="albedo">
+    <h3>Hvad er albedo?</h3>
+    <p>Albedo er et tal mellem 0 og 1. Det fortæller, hvor stor en del af sollyset en
+       overflade kaster tilbage.</p>
+    <p>Frisk sne har albedo omkring <b>0,85</b>. Den kaster 85 % af lyset tilbage og
+       beholder kun 15 %. Asfalt har omkring <b>0,10</b>. Den beholder 90 %.</p>
+    <div class="skala" role="img" aria-label="Gråtoneskala fra albedo 0,10 (næsten sort) til 0,85 (næsten hvid)">
+      <div style="background:#1a1a1a;color:#fff">0,10</div>
+      <div style="background:#3d3d3d;color:#fff">0,20</div>
+      <div style="background:#6b6b6b;color:#fff">0,35</div>
+      <div style="background:#9c9c9c;color:#222">0,50</div>
+      <div style="background:#cfcfcf;color:#222">0,65</div>
+      <div style="background:#f2f2f2;color:#222">0,85</div>
+    </div>
+    <div class="skala-tekst"><span>mørkt — beholder næsten alt</span><span>lyst — kaster næsten alt tilbage</span></div>
+    <p>Det lys, der ikke bliver kastet tilbage, bliver til varme. Derfor fortæller albedo,
+       hvor meget solen kan varme en overflade op — eller smelte den.</p>
+
+    <hr>
+
+    <h3>Er albedo bare, hvor lys noget ser ud?</h3>
+    <p><b>Næsten.</b> Mørke ting har lav albedo, og lyse ting har høj. Jeres øjne og jeres
+       telefon er derfor et godt sted at starte.</p>
+    <p>Men kun næsten. Omkring halvdelen af solens energi er lys, vi kan se. Resten er mest
+       infrarødt lys, som er usynligt for os. Albedo tæller det hele med.</p>
+    <p>For de fleste overflader gør det ingen forskel. Asfalt, beton og vand er lige så
+       mørke i det usynlige lys som i det synlige. To slags overflader snyder:</p>
+    <ul>
+      <li><b>Planter</b> ser mørke ud, men er lyse i infrarødt. Deres albedo er højere,
+        end den ser ud.</li>
+      <li><b>Sne og is</b> ser kridhvide ud, men er mørkere i infrarødt. Deres albedo er
+        lidt lavere, end den ser ud.</li>
+    </ul>
+    <p>Det kommer I selv til at opdage, når I sammenligner jeres måling med satellittens.</p>
+  </div>
+
   <div class="boks">
     <h4>Ikke en detalje&hellip;</h4>
     <p>Grønlands indlandsis taber masse på to måder, som vejer omtrent lige tungt.
@@ -247,27 +296,13 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
 <section id="rummet">
   <div class="trin">Trin 2</div>
   <h2>Se det samme sted fra rummet</h2>
-  <p class="lede">Satellitten Sentinel-2 fotograferer hele Jorden mindst hver femte dag
-     — over Danmark hver anden til tredje dag, fordi banerne overlapper så langt mod nord.
-     Nu hvor I har målt jeres egen skolegård, kan I slå den op — og sammenligne.</p>
+  <p class="lede">Satellitten Sentinel-2 flyver hen over Danmark hver anden til tredje dag
+     og måler, hvor meget lys Jorden kaster tilbage. Nu hvor I har målt jeres egen
+     skolegård, kan I slå den op — og sammenligne.</p>
 
-  <p>Sentinel-2 måler ikke albedo direkte. Den måler, hvor meget lys Jorden kaster
-     tilbage i 13 farvebånd, og albedoen beregnes bagefter ud fra fem af dem.
-     De skarpeste bånd ser felter på <strong>10 × 10 meter</strong>, de infrarøde
-     20 × 20. Det lyder småt,
+  <p>Satellitten ser Jorden i felter på <strong>10 × 10 meter</strong>. Det lyder småt,
      men prøv at se skolegården for jer: hvor meget asfalt, græs, tag og grus ligger
      der inden for ti meter?</p>
-
-  <figure>
-    <img src="foto/vejrstation.jpg" alt="PROMICE-vejrstationen på klippen ved Mittivakkat-gletsjeren med gletsjersø i baggrunden">
-    <figcaption><b>Sandheden på jorden.</b> Vejrstationen ved Mittivakkat måler albedo
-      hvert eneste døgn med to pyranometre — ét der vender op, ét der vender ned.
-      Sådan ser en rigtig albedomåling ud. Men stationen står på klippen og ser ned på
-      klippe, ikke på is, så den kan ikke bruges som facit for gletsjeren. Dér har vi to
-      metoder: den 7. august 2026 gav satellitten <b>0,231</b> og referencekortet
-      <b>0,265</b>. 15 % fra hinanden — tæt nok til at de ser det samme, langt nok til
-      at der er noget at forklare.</figcaption>
-  </figure>
 
   <div class="cta">
     <a href="../kort/dk.html">Åbn jeres eget sted i satellitkortet</a>
@@ -275,18 +310,40 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
   </div>
 
   <h3>Det I sandsynligvis opdager</h3>
-  <p>Jeres asfalt målte måske 0,12. Satellitten siger måske 0,25 for feltet.
-     Ingen af jer tager fejl — <strong>I måler bare ikke det samme.</strong> Satellitten
-     lægger alt sammen inden for sine ti meter: asfalten, græsplænen ved siden af,
-     det lyse tag, cykelskuret.</p>
-  <p>Det hedder en <strong>blandet pixel</strong>, og det er et af de største problemer
-     i al satellitovervågning. Man kan ikke se af tallet alene, hvad der ligger bagved.</p>
-  <p>Men der er to mulige grunde til at være uenig med satellitten. Enten ser den
-     <i>mere end jeres flade</i> — eller også ser den <i>lys, jeres telefon ikke kan se</i>.
-     Prøv en fodboldbane: for telefonen er græs lige så mørkt som asfalt, for satellitten
-     er det flere gange så lyst, fordi planter kaster infrarødt lys tilbage.
-     <a href="oevelsesvejledning.html">Øvelsesvejledningen</a> viser, hvordan I finder
-     ud af, hvilken af de to grunde I står med.</p>
+  <p><strong>1. Græsset snyder.</strong> For jeres telefon er en græsplæne lige så mørk
+     som asfalt. For satellitten er den flere gange så lys, fordi planter kaster infrarødt
+     lys tilbage — lys, jeres telefon ikke kan se. Det var det, boksen
+     <a href="#albedo">«Hvad er albedo?»</a> advarede om.</p>
+  <p><strong>2. Satellitten ser mere end jeres flade.</strong> Jeres asfalt målte måske
+     0,12. Satellitten siger måske 0,20 for samme sted. Ingen af jer tager fejl —
+     I måler bare ikke det samme. Satellitten lægger alt sammen inden for sit felt:
+     asfalten, græsplænen ved siden af, det lyse tag, cykelskuret. Det hedder en
+     <strong>blandet pixel</strong>, og det er et af de største problemer i al
+     satellitovervågning.</p>
+  <p>Kortet hjælper jer med at skelne: når I trykker på et sted, fortæller det, om
+     fladen er ensartet eller blandet.</p>
+
+  <figure>
+    <img src="foto/vejrstation.jpg" alt="PROMICE-vejrstationen på klippen ved Mittivakkat-gletsjeren med gletsjersø i baggrunden">
+    <figcaption><b>Sandheden på jorden.</b> Vejrstationen ved Mittivakkat måler albedo
+      hvert eneste døgn med to pyranometre — ét der vender op, ét der vender ned.
+      Sådan ser en rigtig albedomåling ud.</figcaption>
+  </figure>
+
+  <details class="fold"><summary>For de nysgerrige: sådan måler satellitten · B- og A-niveau</summary>
+  <div class="fold-inner">
+    <p>Sentinel-2 måler ikke albedo direkte. Den måler, hvor meget lys Jorden kaster
+       tilbage i 13 farvebånd, og albedoen beregnes bagefter ud fra fem af dem.
+       De skarpeste bånd ser felter på 10 × 10 meter, de infrarøde 20 × 20.</p>
+    <p>Satellitten fotograferer hele Jorden mindst hver femte dag — over Danmark hver
+       anden til tredje dag, fordi banerne overlapper så langt mod nord. Men skyerne
+       bestemmer, hvor tit der er noget at se.</p>
+    <p>Vejrstationen på billedet står på klippen og ser ned på klippe, ikke på is, så den
+       kan ikke bruges som facit for gletsjeren. Dér har vi to metoder: den 7. august 2026
+       gav satellitten <b>0,231</b> og referencekortet <b>0,265</b>. 15 % fra hinanden —
+       tæt nok til at de ser det samme, langt nok til at der er noget at forklare.
+       Forklaringen står på siden om <a href="../spektrum/#satellit">det faglige grundlag</a>.</p>
+  </div></details>
 
   <details class="fold"><summary>Præcis samme fælde ramte forskerne på gletsjeren</summary>
   <div class="fold-inner">
