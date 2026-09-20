@@ -952,6 +952,9 @@ overgange i oxideret jern absorberer kraftigt i UV og blå og aftager gennem gr�
        til en to-punkts-kalibrering</b> i stedet for kun det hvide. To kendte albedoer
        og to målte gråværdier fastlægger sammenhængen empirisk, uanset hvad kameraets
        eksponering og tonekurve har gjort undervejs.</p>
+    <p>Det er siden gjort: det nuværende <a href="../undervisning/referencekort.html">referencekort</a>
+       har et sort felt (5 %) og et hvidt (75 %), og appen kalibrerer gennem begge.
+       Målingerne på denne side er lavet med det gamle kort og den gamle app.</p>
   </div>
 </section>
 
@@ -1085,10 +1088,14 @@ overgange i oxideret jern absorberer kraftigt i UV og blå og aftager gennem gr�
      ikke har noget med hinanden at gøre — den ene et kamera og et stykke papir på isen,
      den anden et spektrometer i 786 km højde — er det en god overensstemmelse.</p>
 
-  <p>Og der er god plads til de sidste 15 %: appens reference står på 70 % hvor kortet
-     siger 65 % (godt 7 %), og en hældning på blot 3–5° væk fra solen giver 6–11 %,
-     fordi Sentinel-2's atmosfærekorrektion regner med en vandret flade.
-     <b>Der er ikke noget uforklaret tilbage.</b></p>
+  <p>Og der er plads til de 15 %. Appen regnede med 70 % for et hvidt felt, som kortet
+     angav til 65 % — og som i virkeligheden var bart papir, nærmere 75–80 %. I
+     felt-fotoet var papiret desuden overeksponeret, og telefonen gengiver ikke lys
+     lineært. Isen ligger skråt i forhold til solen, og Sentinel-2's atmosfærekorrektion
+     regner med en vandret flade. Hver af de ting flytter tallet flere procent, nogle op
+     og andre ned. <b>At det ender 15 % fra satellitten er derfor til dels held.</b>
+     Siden er referencekortet lavet om (sort 5 %, hvidt papir 75 %), og appen bruger
+     begge felter, så kameraets tonekurve ikke længere tæller med.</p>
 
   <h3>Men først gik det galt — og dét er den vigtigste lektion</h3>
   <p>Den første sammenligning blev lavet nær isranden og gav satellit 0,077 mod
@@ -1137,7 +1144,7 @@ overgange i oxideret jern absorberer kraftigt i UV og blå og aftager gennem gr�
   <h3>Hvad der vil stramme sammenligningen yderligere</h3>
   <p>To ting mangler for at lukke de sidste 15 %. Et <b>hvidt referencepanel</b>, så
      jordreflektansen bliver absolut frem for kalibreret mod et trykt kort — det fjerner
-     de 7 % fra referencen. Og <b>hældningen læst af ArcticDEM</b>, så den topografiske
+     usikkerheden fra referencen. Og <b>hældningen læst af ArcticDEM</b>, så den topografiske
      korrektion kan regnes med i stedet for skønnes.</p>
 
   <p>Begge ville flytte tallene få procent. <b>Ingen af dem ændrer konklusionen:</b>
