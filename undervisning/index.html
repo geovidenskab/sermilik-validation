@@ -108,7 +108,7 @@ figcaption b{color:var(--ink)}
 .videokort .vk-billede{position:relative;flex:none;display:block;width:184px;line-height:0;background:#0a0f2c}
 .videokort .vk-billede img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
 .videokort .vk-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:2.6rem;height:2.6rem;
-  border-radius:50%;background:rgba(10,15,60,.82);border:1.5px solid rgba(255,255,255,.85);
+  background:rgba(10,15,60,.82);border:1.5px solid rgba(255,255,255,.85);
   display:flex;align-items:center;justify-content:center}
 .videokort .vk-play::before{content:"";margin-left:.2rem;border-style:solid;border-width:.48rem 0 .48rem .8rem;
   border-color:transparent transparent transparent #fff}
@@ -519,19 +519,29 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
     </figure>
 
     <figure>
-      <video controls preload="none" playsinline poster="video/smeltevandsgryde-drone.jpg">
-        <source src="video/smeltevandsgryde-drone.mp4" type="video/mp4">
+      <video controls muted loop playsinline preload="none" poster="video/mennesker-paa-isen.jpg">
+        <source src="video/mennesker-paa-isen.mp4" type="video/mp4">
         Din browser kan ikke afspille videoen.
       </video>
-      <figcaption><b>Se det bevæge sig.</b> Billedet ovenfor viser kontrasten; her løber
+      <figcaption><b>Se, hvor stor den er.</b> Prikkerne nederst i billedet er mennesker på isen.
+        Optaget ved Mittivakkat-gletsjeren 4. august 2026.</figcaption>
+    </figure>
+  </div>
+
+  <h3>Mål gletsjeren med jeres eget værktøj</h3>
+  <div class="videoer en">
+    <figure>
+      <video controls preload="none" playsinline poster="video/smeltevandsgryde.jpg">
+        <source src="video/smeltevandsgryde.mp4" type="video/mp4">
+        Din browser kan ikke afspille videoen.
+      </video>
+      <figcaption><b>Se det bevæge sig.</b> Billedet i trin 3 viser kontrasten; her løber
         vandet. Følg smeltevandskanalerne — de er skåret ned i isen af netop den energi,
         det mørke vand har optaget. Midtvejs træder en person ind i billedet, og først dér
         ser man, hvor dybe gryderne egentlig er.</figcaption>
     </figure>
   </div>
-
-  <h3>Mål gletsjeren med jeres eget værktøj</h3>
-  <p>Sæt dronevideoen på pause et sted hvor både gryden og den lyse is er i billedet, og
+  <p>Sæt videoen på pause et sted hvor både gryden og den lyse is er i billedet, og
      tag et skærmbillede. Læg det ind i <a href="https://geo.sg.dk/albedo">albedo-appen</a> —
      nøjagtig den samme, I brugte på skolegården — og vælg <b>«Foto uden referencekort»</b>.
      Der ligger intet kort på isen, så I må bruge isen selv som reference: markér først
@@ -542,7 +552,7 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
      Det problem havde forskerne også — med deres første referencekort.</p>
   <p>Nu måler I grønlandsk albedo med jeres eget instrument. <strong>Og så er spørgsmålet
      igen det samme som i trin 2:</strong> hvor meget kan I stole på tallet? Billedet er
-     taget skråt fra en drone, lyset rammer skævt, og kameraet har selv justeret
+     taget skråt, lyset rammer skævt, og kameraet har selv justeret
      eksponeringen undervejs. Diskutér hvilke af de fejlkilder der ville forsvinde, hvis I
      stod på isen med et pyranometer — og hvilke der ikke ville.</p>
 
