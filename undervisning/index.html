@@ -101,6 +101,36 @@ figcaption b{color:var(--ink)}
 .qr-blok img{flex:none;width:120px;height:120px}
 .qr-blok p{margin:0;font-size:var(--fs-sm)}
 .videoer.en{display:block;max-width:34rem}
+
+/* ---------- lille videokort: videoen åbner i et vindue oven på siden ---------- */
+.videokort{display:flex;gap:1.1rem;align-items:center;border:1px solid var(--line);background:var(--card);
+  padding:.8rem 1.1rem .8rem .8rem;margin:1.2rem 0;max-width:40rem}
+.videokort .vk-billede{position:relative;flex:none;display:block;width:184px;line-height:0;background:#0a0f2c}
+.videokort .vk-billede img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
+.videokort .vk-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:2.6rem;height:2.6rem;
+  border-radius:50%;background:rgba(10,15,60,.82);border:1.5px solid rgba(255,255,255,.85);
+  display:flex;align-items:center;justify-content:center}
+.videokort .vk-play::before{content:"";margin-left:.2rem;border-style:solid;border-width:.48rem 0 .48rem .8rem;
+  border-color:transparent transparent transparent #fff}
+.videokort .vk-billede:hover .vk-play{background:var(--navy)}
+.videokort p{margin:0;font-size:var(--fs-sm);max-width:none}
+.videokort .vk-titel{display:block;font-weight:700;font-size:var(--fs-md);color:var(--navy)}
+.videokort .vk-meta{display:block;color:var(--muted);font-size:var(--fs-xs);margin:.1rem 0 .35rem}
+@media (max-width:520px){
+  .videokort{flex-direction:column;align-items:flex-start;padding:.8rem}
+  .videokort .vk-billede{width:100%;max-width:320px}
+}
+dialog.videovindue{border:none;padding:0;background:#0a0f2c;color:#fff;max-width:none;max-height:none;
+  width:min(960px,94vw,calc((100vh - 7rem) * 16 / 9));box-shadow:0 20px 60px rgba(0,0,0,.5)}
+dialog.videovindue::backdrop{background:rgba(6,10,32,.82)}
+.videovindue .vv-top{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.5rem .6rem .5rem 1rem}
+.videovindue .vv-titel{margin:0;max-width:none;font-size:var(--fs-sm);font-weight:600}
+.videovindue form{margin:0}
+.videovindue .vv-luk{background:none;border:1px solid rgba(255,255,255,.55);color:#fff;font:inherit;
+  font-size:var(--fs-sm);padding:.3rem .75rem;cursor:pointer}
+.videovindue .vv-luk:hover{background:rgba(255,255,255,.14)}
+.videovindue video{display:block;width:100%;height:auto;background:#000}
+html:has(dialog.videovindue[open]){overflow:hidden}
 details.fold.efter{border-color:var(--navy)}
 details.fold.efter summary{color:var(--navy)}
 details.fold .fold-inner h4{margin:1.1rem 0 .3rem;font-size:var(--fs-md);color:var(--navy)}
@@ -269,16 +299,27 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
   <p class="lede">Metoden forskerne brugte på isen virker lige så godt på asfalt,
      græs og fliser. I skal bruge en telefon, et printet referencekort og cirka 20 minutter udenfor.</p>
 
-  <figure>
-    <video controls preload="none" playsinline poster="video/saadan-maaler-vi.jpg">
-      <source src="video/saadan-maaler-vi.mp4" type="video/mp4">
+  <div class="videokort">
+    <a class="vk-billede" href="video/saadan-maaler-vi.mp4" data-videovindue="vv-maaling" aria-hidden="true" tabindex="-1">
+      <img src="video/saadan-maaler-vi.jpg" alt="" width="184" height="104" loading="lazy">
+      <span class="vk-play"></span>
+    </a>
+    <p><a class="vk-titel" href="video/saadan-maaler-vi.mp4" data-videovindue="vv-maaling" aria-haspopup="dialog">Se videoen: Sådan måler vi albedo</a>
+       <span class="vk-meta">2 min 18 s · danske undertekster · optaget på Mittivakkat-gletsjeren 8. august 2026</span>
+       Referencekortet lægges på overfladen og fotograferes sammen med den. Felterne på kortet
+       har kendt albedo — resten regner appen ud.</p>
+  </div>
+
+  <dialog class="videovindue" id="vv-maaling" aria-labelledby="vv-maaling-titel">
+    <div class="vv-top">
+      <p class="vv-titel" id="vv-maaling-titel">Sådan måler vi albedo · Mittivakkat-gletsjeren, 8. august 2026</p>
+      <form method="dialog"><button class="vv-luk">Luk ✕</button></form>
+    </div>
+    <video controls playsinline preload="none" src="video/saadan-maaler-vi.mp4" poster="video/saadan-maaler-vi.jpg">
       <track kind="subtitles" src="video/saadan-maaler-vi.da.vtt" srclang="da" label="Dansk" default>
       Din browser kan ikke afspille videoen.
     </video>
-    <figcaption><b>Sådan måler vi albedo.</b> Optaget på Mittivakkat-gletsjeren 8. august 2026
-      (2 min 18 s, danske undertekster). Referencekortet lægges på overfladen og fotograferes
-      sammen med den. Felterne på kortet har kendt albedo — resten regner appen ud.</figcaption>
-  </figure>
+  </dialog>
 
   <p>Fremgangsmåden, måleskemaet og opgaverne står i øvelsesvejledningen.</p>
 
@@ -468,13 +509,13 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
 
   <div class="videoer">
     <figure>
-      <video controls preload="none" playsinline poster="video/gletsjer-invitation.jpg">
-        <source src="video/gletsjer-invitation.mp4" type="video/mp4">
+      <video controls preload="none" playsinline poster="video/kom-med-over-isen.jpg">
+        <source src="video/kom-med-over-isen.mp4" type="video/mp4">
         Din browser kan ikke afspille videoen.
       </video>
       <figcaption><b>Kom med.</b> Optaget på Mittivakkat-gletsjeren 8. august 2026.
-        Bag i billedet ligger fjorden fuld af isbjerge — og under fødderne den is,
-        alle tallene i dette forløb handler om.</figcaption>
+        Tre går forrest hen over isen. Se på overfladen: pukler og render, lyst og mørkt
+        side om side. Det er den is, alle tallene i dette forløb handler om.</figcaption>
     </figure>
 
     <figure>
@@ -534,6 +575,25 @@ footer .sml{opacity:.72;font-size:var(--fs-xs);line-height:1.6}
     k.addEventListener('click', function () {
       if (v.paused) { v.play(); k.textContent = '❙❙'; k.setAttribute('aria-label', 'Sæt videoen på pause'); }
       else { v.pause(); k.textContent = '▶'; k.setAttribute('aria-label', 'Afspil videoen'); }
+    });
+  })();
+
+  // Videokort: videoen åbner i et vindue oven på siden. Uden <dialog> åbner linket bare videofilen.
+  (function () {
+    var knapper = document.querySelectorAll('[data-videovindue]');
+    Array.prototype.forEach.call(knapper, function (k) {
+      var vindue = document.getElementById(k.getAttribute('data-videovindue'));
+      if (!vindue || typeof vindue.showModal !== 'function') return;
+      var v = vindue.querySelector('video');
+      k.addEventListener('click', function (e) {
+        e.preventDefault();
+        vindue.showModal();
+        if (v) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+      });
+      if (vindue.getAttribute('data-klar')) return;
+      vindue.setAttribute('data-klar', '1');
+      vindue.addEventListener('close', function () { if (v) v.pause(); });
+      vindue.addEventListener('click', function (e) { if (e.target === vindue) vindue.close(); });  // klik uden for videoen
     });
   })();
 </script>
