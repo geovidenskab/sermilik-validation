@@ -1,5 +1,13 @@
 # Korrektur af undervisningssiden — beslutninger (2026-09-23)
 
+> **Status:** Philip valgte «lav alle tre efter forslagene» samme dag. Punkt 1 og 3 er rettet
+> som foreslået, og elevark-PDF'en er lavet igen. Punkt 2 er løst med forslag A (advarslen er
+> bygget ind i appen), men grænsen er **10 %** mættede pixels i stedet for 2 %. Et korrekt
+> eksponeret hvidt papir omkring gråværdi 245 har let et par procent støjpixels over 250, og
+> feltfotoene med udbrændt hvidt felt var over 50 % mættede. Appen skriver desuden «overeksponeret
+> — det rigtige tal er højere» ved en måleflade, der selv er brændt ud (fx sne, der er lysere
+> end papiret).
+
 Korrekturen dækkede de fem sider i `undervisning/`: forløbssiden (`index.html`), elevarket
 (øvelsesvejledningen + PDF), udvidelsen, referencekortet og lærervejledningen. Tekstens henvisninger til appen og kortene er tjekket mod koden
 (`Albedo/src/components/SimpleAlbedo.jsx`, `kort/js/pixel-info.js`, `kort/dk.html`), og alle
