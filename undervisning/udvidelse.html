@@ -136,7 +136,7 @@ details.fold.stille summary{color:var(--ink);font-weight:500}
   <h4>Udvidelse 2 · Regn på græs og asfalt</h4>
   <p>Satellitten giver græs en albedo omkring 0,20 og asfalt omkring 0,12.</p>
   <ul>
-    <li>Regn ud hvor stor en del af sollyset hver flade absorberer, med satellittens tal.</li>
+    <li>Regn med satellittens tal ud, hvor stor en del af sollyset hver flade absorberer.</li>
     <li>Hvorfor kan jeres telefon ikke se forskellen?</li>
     <li>Græs har ét trick mere end albedo, som asfalt ikke har. Hvilket?
       <i>(Hint: hvad bruger planten vandet til?)</i></li>
@@ -149,7 +149,7 @@ details.fold.stille summary{color:var(--ink);font-weight:500}
   <p>Når I trykker på et sted i satellitkortet, får I også <b>plantedække (NDVI)</b> — åbn
     «Detaljer og tal til rapporten». Slå de tre steder fra opgave 2 op igen, og notér
     albedo, NDVI og om fladen er ensartet eller blandet.</p>
-  <p><b>På græsset</b> er fladen ensartet, så uenigheden er ikke en blandet pixel. NDVI er
+  <p><b>På græsset</b> er fladen ensartet, så uenigheden er ikke en blandet pixel. NDVI-værdien er
     høj, og det betyder, at fladen kaster meget infrarødt tilbage. Uenigheden er
     <b>spektral</b>: I måler i hver jeres del af solspektret.</p>
   <p><b>I det blandede hjørne</b> svinger albedoen meget inden for 100 meter. Uenigheden
@@ -185,10 +185,10 @@ details.fold.stille summary{color:var(--ink);font-weight:500}
   </table>
   <p><b>a)</b> Regn opgave 3b igen med de målte 308 W/m². Hvor meget <i>skulle</i> de to
     felter være smeltet?</p>
-  <p><b>b)</b> Forskellen til de målte 20 og 40 cm er energi, som modellen mangler. Hvor
-    mange W/m² er det for hvert felt? <i>(1 cm smeltning på seks døgn svarer til 5,8 W/m².)</i></p>
+  <p><b>b)</b> Det er mere end de målte 20 og 40 cm. Forskellen er et energitab, som modellen
+    ikke regner med. Hvor mange W/m² er det for hvert felt? <i>(1 cm smeltning på seks døgn svarer til 5,8 W/m².)</i></p>
   <p><b>c)</b> Smeltende is er 0 °C og udsender 316 W/m² langbølget stråling
-    (Stefan-Boltzmann). Himlen sender 276 W/m² tilbage. Den lune luft afleverer omvendt
+    (Stefan-Boltzmann). Himlen sender 276 W/m² ned mod isen. Den lune luft afleverer omvendt
     varme til isen — et overslag giver 20–30 W/m². Hvad bliver summen af de to?</p>
   <p><b>d)</b> Passer summen med det, der manglede i b)? For hvilket felt passer det
     bedst — og hvad kan forklare resten? <i>(Hint: hvor sikker er albedoen for det mørke felt?)</i></p>
@@ -203,7 +203,7 @@ details.fold.stille summary{color:var(--ink);font-weight:500}
     gennemsnit af fem af dem:</p>
   <p class="formel">albedo = 0,356·B02 + 0,130·B04 + 0,373·B08 + 0,085·B11 + 0,072·B12 − 0,0018</p>
   <p>B02 er blåt lys, B04 rødt, B08 nær-infrarødt og B11/B12 kortbølge-infrarødt.
-    Vægtene afspejler hvor meget af solens energi der ligger i hvert område af spektret.
+    Vægtene afspejler, hvor meget af solens energi der ligger i hvert område af spektret.
     Jeres referencekort ser kun det synlige lys; satellitten tæller det infrarøde med.
     For asfalt og beton betyder det lidt. For græs er det en faktor tre eller mere, fordi
     planter er lyse i infrarødt. For sne og is går det den anden vej — de er mørkere i
